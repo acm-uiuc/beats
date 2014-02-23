@@ -1,4 +1,4 @@
-from song import get_song, urlify, pathify
+from song import Song, urlify, pathify
 import player
 
 class Queue:
@@ -6,14 +6,18 @@ class Queue:
     position = -1
 
     def get_queue(self):
-        obj = {'queue': self.queue}
+        dict_queue = [media.dictify() for media in self.queue]
+        obj = {'queue': dict_queue}
         if self.is_valid_position(self.position) and \
                 self.queue[self.position] == player.now_playing:
             obj['position'] = self.position
         return obj
 
     def add(self, song_id):
-        self.queue.append(get_song(song_id))
+        try:
+            self.queue.append(Song(song_id))
+        except Exception:
+            pass
         return self.get_queue()
 
     def remove(self, pos):
@@ -34,14 +38,14 @@ class Queue:
     def now_playing(self):
         obj = {'player_status': player.get_status()}
         if player.now_playing:
-            obj['song'] = player.now_playing
+            obj['song'] = player.now_playing.dictify()
         return obj
 
     def set_position(self, pos):
         if self.is_valid_position(pos):
             self.position = pos
-            player.play_song(self.queue[self.position])
-            return self.queue[self.position]
+            player.play_media(self.queue[self.position])
+            return self.queue[self.position].dictify()
 
     def play_next(self, force=False):
         if self.has_next():

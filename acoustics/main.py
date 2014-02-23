@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from song import get_song
+from song import Song
 from queue import Queue
 import player
 
@@ -27,8 +27,8 @@ def player_status():
 
 @app.route('/v1/songs/<song_id>', methods=['GET'])
 def show_song(song_id):
-    song = get_song(song_id)
-    return jsonify(song or {})
+    song = Song(song_id)
+    return jsonify(song.dictify() or {})
 
 @app.route('/v1/queue', methods=['GET'])
 def show_queue():
