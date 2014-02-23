@@ -11,6 +11,14 @@ def play(mrl):
     player.play()
     return get_status()
 
+def play_subitem():
+    m = player.get_media()
+    if m is not None and 'http://www.youtube.com' in vlc.bytes_to_str(m.get_mrl()):
+        player.set_media(m.subitems()[0])
+        player.play()
+        return True
+    return False
+
 def play_id(song_id):
     song = Song(song_id)
     if song:

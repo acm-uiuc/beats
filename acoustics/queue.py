@@ -13,11 +13,8 @@ class Queue:
             obj['position'] = self.position
         return obj
 
-    def add(self, song_id):
-        try:
-            self.queue.append(Song(song_id))
-        except Exception:
-            pass
+    def add(self, media):
+        self.queue.append(media)
         return self.get_queue()
 
     def remove(self, pos):
@@ -48,6 +45,8 @@ class Queue:
             return self.queue[self.position].dictify()
 
     def play_next(self, force=False):
+        if player.play_subitem():
+            return self.queue[self.position].dictify()
         if self.has_next():
             return self.set_position(self.position + 1)
         if force and self.is_valid_position(0):

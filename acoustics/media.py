@@ -3,10 +3,6 @@ from abc import ABCMeta, abstractmethod
 class Media:
     __metaclass__ = ABCMeta
 
-    @property
-    def title(self):
-        raise NotImplementedError
-
     @abstractmethod
     def mrl(self):
         pass

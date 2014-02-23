@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from song import Song
+from youtube import YTVideo
 from queue import Queue
 import player
 
@@ -44,8 +45,13 @@ def queue_clear():
 
 @app.route('/v1/queue/add', methods=['PUT'])
 def queue_add():
-    song_id = request.args.get('id')
-    return jsonify(queue.add(song_id))
+    if request.args.get('id'):
+        song_id = request.args.get('id')
+        return jsonify(queue.add(Song(song_id)))
+    elif request.args.get('url'):
+        url = request.args.get('url')
+        return jsonify(queue.add(YTVideo(url)))
+    return jsonify({})
 
 @app.route('/v1/now_playing', methods=['GET'])
 def now_playing():
