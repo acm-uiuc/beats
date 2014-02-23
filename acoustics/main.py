@@ -1,9 +1,8 @@
 from flask import Flask, request, jsonify
-from player import Player
+import player
 
 app = Flask(__name__)
 app.debug = True
-player = Player()
 
 @app.route('/v1/player/play', methods=['PUT'])
 def play():
