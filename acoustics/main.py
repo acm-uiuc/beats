@@ -34,6 +34,10 @@ def show_song(song_id):
 def show_queue():
     return jsonify(queue.get_queue())
 
+@app.route('/v1/queue/<int:pos>', methods=['DELETE'])
+def queue_remove(pos):
+    return jsonify(queue.remove(pos))
+
 @app.route('/v1/queue', methods=['DELETE'])
 def queue_clear():
     return jsonify(queue.clear())

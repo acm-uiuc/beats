@@ -16,11 +16,19 @@ class Queue:
         self.queue.append(get_song(song_id))
         return self.get_queue()
 
+    def remove(self, pos):
+        if self.is_valid_position(pos):
+            del self.queue[pos]
+            if self.position > pos:
+                self.position -= 1
+            elif self.position == pos:
+                player.stop()
+        return self.get_queue()
+
     def clear(self):
         self.queue = []
         self.position = -1
         player.stop()
-        player.now_playing = None
         return self.get_queue()
 
     def now_playing(self):

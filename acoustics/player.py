@@ -29,6 +29,7 @@ def pause():
 
 def stop():
     player.stop()
+    now_playing = None
     return get_status()
 
 def get_status():
