@@ -19,3 +19,9 @@ def add_song(path, title='', artist='', album=''):
         title = splitext(basename(path))[0]
     song = {'title': title, 'artist': artist, 'album': album, 'path': path}
     return str(db.songs.insert(song))
+
+def remove_songs_in_dir(path):
+    db.songs.remove({'path': {'$regex':'^%s.*' % path}})
+
+def add_songs_in_dir(path):
+    pass
