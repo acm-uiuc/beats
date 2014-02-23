@@ -6,7 +6,11 @@ class Queue:
     position = -1
 
     def get_queue(self):
-        return {'queue': self.queue}
+        obj = {'queue': self.queue}
+        if self.is_valid_position(self.position) and \
+                self.queue[self.position] == player.now_playing:
+            obj['position'] = self.position
+        return obj
 
     def add(self, song_id):
         self.queue.append(get_song(song_id))
@@ -17,8 +21,10 @@ class Queue:
         return self.get_queue()
 
     def now_playing(self):
-        return {'position': self.position, 'song': player.now_playing, 'player_status': player.get_status()}
-
+        obj = {'player_status': player.get_status()}
+        if player.now_playing:
+            obj['song'] = player.now_playing
+        return obj
 
     def set_position(self, pos):
         if self.is_valid_position(pos):
