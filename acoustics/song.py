@@ -1,6 +1,7 @@
 import db
 from bson.objectid import ObjectId
 from os.path import basename, splitext
+import re
 
 def get_song(song_id):
     song = db.songs.find_one(ObjectId(song_id))
@@ -9,6 +10,9 @@ def get_song(song_id):
 
 def urlify(path):
     return 'file://' + path
+
+def pathify(mrl):
+    return re.sub(r'^file://', '', mrl)
 
 def add_song(path, title='', artist='', album=''):
     if not title:
