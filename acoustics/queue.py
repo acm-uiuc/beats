@@ -1,6 +1,5 @@
 from song import get_song, urlify, pathify
 import player
-from time import sleep
 
 class Queue:
     queue = []
