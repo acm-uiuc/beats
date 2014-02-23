@@ -27,6 +27,10 @@ def pause():
     player.pause()
     return get_status()
 
+def stop():
+    player.stop()
+    return get_status()
+
 def get_status():
     media = player.get_media()
     status = {'state': str(player.get_state())}

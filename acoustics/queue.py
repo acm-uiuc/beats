@@ -18,6 +18,9 @@ class Queue:
 
     def clear(self):
         self.queue = []
+        self.position = -1
+        player.stop()
+        player.now_playing = None
         return self.get_queue()
 
     def now_playing(self):
