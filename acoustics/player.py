@@ -1,4 +1,5 @@
 import vlc
+from song import get_song, urlify
 
 instance = vlc.Instance('--no-video')
 player = instance.media_player_new()
@@ -7,6 +8,12 @@ def play(mrl):
     m = instance.media_new(mrl)
     player.set_media(m)
     player.play()
+    return get_status()
+
+def play_id(song_id):
+    song = get_song(song_id)
+    if song:
+        play(urlify(song['path']))
     return get_status()
 
 def pause():
