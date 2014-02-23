@@ -1,5 +1,4 @@
 import db
-from timeit import default_timer
 from bson.objectid import ObjectId
 from os.path import basename, splitext
 from os import walk
@@ -28,7 +27,6 @@ def remove_songs_in_dir(path):
 
 def add_songs_in_dir(path, required={"title", "artist", "album"}):
     remove_songs_in_dir(path)
-    start = default_timer()
     metadata = EasyID3FileType()
     songs = []
     filepath = ""
@@ -43,7 +41,6 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
                     except:
                         values = ""
                         metadata[tag] = values
-                #metadata.load(mp3)
                 if not metadata["title"]:
                     title = splitext(basename(path))[0]
                 songs.append({'title': metadata['title'], 
@@ -51,4 +48,3 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
                     'album': metadata['album'],
                     'path': filepath})
     db.songs.insert(songs)   
-    print default_timer() - start
