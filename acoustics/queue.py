@@ -37,7 +37,7 @@ class Queue:
     def now_playing(self):
         obj = {'player_status': player.get_status()}
         if player.now_playing:
-            obj['song'] = player.now_playing.dictify()
+            obj['media'] = player.now_playing.dictify()
         return obj
 
     def set_position(self, pos):
