@@ -47,7 +47,7 @@ class Queue:
             return self.queue[self.position].dictify()
 
     def play_next(self, force=False):
-        if player.play_subitem():
+        if player.vlc_play_youtube():
             return self.queue[self.position].dictify()
         if self.has_next():
             return self.set_position(self.position + 1)
