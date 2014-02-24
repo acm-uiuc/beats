@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 from os.path import basename, splitext
 from os import walk
 import re
-from mutagen.easyid3 import EasyID3FileType
+from mutagen.mp3 import EasyMP3
 
 class Song(Media):
     def __init__(self, song_id):
@@ -41,26 +41,26 @@ def remove_songs_in_dir(path):
 
 def add_songs_in_dir(path, required={"title", "artist", "album"}):
     remove_songs_in_dir(path)
-    metadata = EasyID3FileType()
     songs = []
-    filepath = ""
-    values = {}
     for root, dirs, files in walk(path):
-        for mp3 in files:
-            if splitext(mp3)[1] == ".mp3":
-                filepath = root + "/" + mp3
-                metadata.load(filepath)
+        for f in files:
+            if splitext(f)[1] == ".mp3":
+                filepath = root + "/" + f
+                mp3 = EasyMP3(filepath)
+                values = {}
                 for tag in required:
                     try:
-                        values[tag] = metadata[tag][0]
-                    except:
+                        values[tag] = mp3.tags[tag][0]
+                    except Exception:
                         values[tag] = ""
                 if not values["title"]:
                     values['title'] = splitext(basename(filepath))[0]
                 songs.append({'title': values['title'],
                     'artist': values['artist'],
                     'album': values['album'],
+                    'length': mp3.info.length,
                     'path': filepath})
+            # TODO Add support for other audio file formats
     if not songs:
         return 0
     db.songs.insert(songs)
