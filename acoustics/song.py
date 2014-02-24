@@ -64,3 +64,14 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
         return 0
     db.songs.insert(songs)
     return len(songs)
+
+def search_songs(query):
+    return db.songs.find(
+            {"$or":[
+                {"title": query},
+                {"artist": query},
+                {"album": query}
+                ]
+            }
+            )
+
