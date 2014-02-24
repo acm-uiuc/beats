@@ -65,13 +65,19 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
     db.songs.insert(songs)
     return len(songs)
 
-def search_songs(query):
-    return db.songs.find(
-            {"$or":[
-                {"title": query},
-                {"artist": query},
-                {"album": query}
-                ]
-            }
-            )
-
+def search_songs(query, limit=20):
+    songs = []
+    if query:
+        pattern = re.compile('.*%s.*' % query, re.IGNORECASE)
+        res = db.songs.find(
+                {"$or":[
+                    {"title": pattern},
+                    {"artist": pattern},
+                    {"album": pattern}
+                    ]
+                    }
+                ).limit(limit)
+        for song in res:
+            song['_id'] = str(song['_id'])
+            songs.append(song)
+    return {'query': query, 'limit': limit, 'results': songs}
