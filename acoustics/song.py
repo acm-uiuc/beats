@@ -29,12 +29,6 @@ def urlify(path):
 def pathify(mrl):
     return re.sub(r'^file://', '', mrl)
 
-def add_song(path, title='', artist='', album=''):
-    if not title:
-        title = splitext(basename(path))[0]
-    song = {'title': title, 'artist': artist, 'album': album, 'path': path}
-    return str(db.songs.insert(song))
-
 def remove_songs_in_dir(path):
     pattern = re.compile('^%s.*' % path)
     return db.songs.remove({'path': pattern})['n']
