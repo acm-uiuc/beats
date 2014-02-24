@@ -43,6 +43,7 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
     metadata = EasyID3FileType()
     songs = []
     filepath = ""
+    values = {}
     for root, dirs, files in walk(path):
         for mp3 in files:
             if splitext(mp3)[1] == ".mp3":
@@ -50,15 +51,14 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
                 metadata.load(filepath)
                 for tag in required:
                     try:
-                        values = metadata[tag]
+                        values[tag] = metadata[tag][0]
                     except:
-                        values = ""
-                        metadata[tag] = values
-                if not metadata["title"]:
-                    title = splitext(basename(path))[0]
-                songs.append({'title': metadata['title'],
-                    'artist': metadata['artist'],
-                    'album': metadata['album'],
+                        values[tag] = ""
+                if not values["title"]:
+                    values['title'] = splitext(basename(filepath))[0]
+                songs.append({'title': values['title'],
+                    'artist': values['artist'],
+                    'album': values['album'],
                     'path': filepath})
     db.songs.insert(songs)
     return len(songs)
