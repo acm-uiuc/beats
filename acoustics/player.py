@@ -52,8 +52,6 @@ def get_status():
         status['media'] = vlc.bytes_to_str(media.get_mrl())
         status['current_time'] = player.get_time()
         status['duration'] = media.get_duration()
-    else:
-        status['media'] = 'none'
     return status
 
 def has_ended():
