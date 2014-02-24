@@ -1,5 +1,7 @@
 from song import Song, urlify, pathify
 import player
+import time
+import threading
 
 class Queue:
     queue = []
@@ -57,3 +59,15 @@ class Queue:
 
     def has_next(self):
         return self.is_valid_position(self.position + 1)
+
+    def autoplay_thread(self):
+        while True:
+            if player.has_ended() and \
+                    (self.has_next() or player.is_youtube_video()):
+                self.play_next()
+            time.sleep(0.25)
+
+    def start_autoplay(self):
+        t = threading.Thread(target=self.autoplay_thread)
+        t.daemon = True
+        t.start()

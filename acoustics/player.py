@@ -13,7 +13,7 @@ def play(mrl):
 
 def play_subitem():
     m = player.get_media()
-    if m is not None and 'http://www.youtube.com' in vlc.bytes_to_str(m.get_mrl()):
+    if m is not None and is_youtube_video(m):
         player.set_media(m.subitems()[0])
         player.play()
         return True
@@ -51,6 +51,14 @@ def get_status():
     else:
         status['media'] = 'none'
     return status
+
+def has_ended():
+    return player.get_state() == vlc.State.Ended
+
+def is_youtube_video(m=None):
+    if m is None:
+        m = player.get_media()
+    return 'http://www.youtube.com' in vlc.bytes_to_str(m.get_mrl())
 
 def get_vlc_version():
     return vlc.libvlc_get_version()

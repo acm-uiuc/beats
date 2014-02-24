@@ -69,4 +69,5 @@ def now_playing():
 if __name__ == '__main__':
     print 'Acoustics Media Player'
     print 'VLC version: ' + player.get_vlc_version()
+    queue.start_autoplay()
     app.run()
