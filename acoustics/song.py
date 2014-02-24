@@ -2,7 +2,9 @@ import db
 from media import Media
 from bson.objectid import ObjectId
 from os.path import basename, splitext
+from os import walk
 import re
+from mutagen.easyid3 import EasyID3FileType
 
 class Song(Media):
     def __init__(self, song_id):
@@ -36,5 +38,27 @@ def add_song(path, title='', artist='', album=''):
 def remove_songs_in_dir(path):
     db.songs.remove({'path': {'$regex':'^%s.*' % path}})
 
-def add_songs_in_dir(path):
-    pass
+def add_songs_in_dir(path, required={"title", "artist", "album"}):
+    remove_songs_in_dir(path)
+    metadata = EasyID3FileType()
+    songs = []
+    filepath = ""
+    for root, dirs, files in walk(path):
+        for mp3 in files:
+            if splitext(mp3)[1] == ".mp3":
+                filepath = root + "/" + mp3
+                metadata.load(filepath)
+                for tag in required:
+                    try:
+                        values = metadata[tag]
+                    except:
+                        values = ""
+                        metadata[tag] = values
+                if not metadata["title"]:
+                    title = splitext(basename(path))[0]
+                songs.append({'title': metadata['title'],
+                    'artist': metadata['artist'],
+                    'album': metadata['album'],
+                    'path': filepath})
+    db.songs.insert(songs)
+    return len(songs)
