@@ -36,7 +36,8 @@ def add_song(path, title='', artist='', album=''):
     return str(db.songs.insert(song))
 
 def remove_songs_in_dir(path):
-    db.songs.remove({'path': {'$regex':'^%s.*' % path}})
+    pattern = re.compile('^%s.*' % path)
+    return db.songs.remove({'path': pattern})['n']
 
 def add_songs_in_dir(path, required={"title", "artist", "album"}):
     remove_songs_in_dir(path)
