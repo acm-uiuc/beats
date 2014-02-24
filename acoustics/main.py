@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from song import Song
+from song import Song, search_songs
 from youtube import YTVideo
 from queue import Queue
 import player
@@ -30,6 +30,15 @@ def player_status():
 def show_song(song_id):
     song = Song(song_id)
     return jsonify(song.dictify() or {})
+
+@app.route('/v1/songs/search', methods=['GET'])
+def search():
+    query = request.args.get('q')
+    limit = request.args.get('limit')
+    if limit and int(limit) != 0:
+        return jsonify(search_songs(query, int(limit)))
+    return jsonify(search_songs(query))
+
 
 @app.route('/v1/queue', methods=['GET'])
 def show_queue():
