@@ -9,11 +9,6 @@ app.debug = True
 
 queue = Queue()
 
-@app.route('/v1/player/play', methods=['PUT'])
-def play():
-    song_id = request.args.get('id')
-    return jsonify(player.play_id(song_id))
-
 @app.route('/v1/player/play_next', methods=['PUT'])
 def play_next():
     return jsonify(queue.play_next(force=True) or {})

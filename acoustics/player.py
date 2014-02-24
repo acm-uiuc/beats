@@ -23,12 +23,6 @@ def vlc_play_youtube():
         return True
     return False
 
-def play_id(song_id):
-    song = Song(song_id)
-    if song:
-        return play_song(song)
-    return get_status()
-
 def play_media(media):
     play(media.mrl())
     global now_playing
