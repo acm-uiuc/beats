@@ -60,5 +60,7 @@ def add_songs_in_dir(path, required={"title", "artist", "album"}):
                     'artist': values['artist'],
                     'album': values['album'],
                     'path': filepath})
+    if not songs:
+        return 0
     db.songs.insert(songs)
     return len(songs)
