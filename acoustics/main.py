@@ -9,11 +9,11 @@ app.debug = True
 
 queue = Queue()
 
-@app.route('/v1/player/play_next', methods=['PUT'])
+@app.route('/v1/player/play_next', methods=['POST'])
 def play_next():
     return jsonify(queue.play_next(force=True) or {})
 
-@app.route('/v1/player/pause', methods=['PUT'])
+@app.route('/v1/player/pause', methods=['POST'])
 def pause():
     return jsonify(player.pause())
 
@@ -47,7 +47,7 @@ def queue_remove(pos):
 def queue_clear():
     return jsonify(queue.clear())
 
-@app.route('/v1/queue/add', methods=['PUT'])
+@app.route('/v1/queue/add', methods=['POST'])
 def queue_add():
     if request.form.get('id'):
         song_id = request.form.get('id')
