@@ -49,11 +49,11 @@ def queue_clear():
 
 @app.route('/v1/queue/add', methods=['PUT'])
 def queue_add():
-    if request.args.get('id'):
-        song_id = request.args.get('id')
+    if request.form.get('id'):
+        song_id = request.form.get('id')
         return jsonify(queue.add(Song(song_id)))
-    elif request.args.get('url'):
-        url = request.args.get('url')
+    elif request.form.get('url'):
+        url = request.form.get('url')
         return jsonify(queue.add(YTVideo(url)))
     return jsonify({})
 
