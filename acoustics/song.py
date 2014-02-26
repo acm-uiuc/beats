@@ -1,10 +1,13 @@
 import db
 from media import Media
 from bson.objectid import ObjectId
-from os.path import basename, splitext
 from os import walk
+from os.path import basename, splitext, join
 import re
 from mutagen.mp3 import EasyMP3
+from mutagen.flac import FLAC
+from mutagen.oggvorbis import OggVorbis
+from mutagen.mp4 import MP4
 
 class Song(Media):
     def __init__(self, song_id):
@@ -33,28 +36,46 @@ def remove_songs_in_dir(path):
     pattern = re.compile('^%s.*' % path)
     return db.songs.remove({'path': pattern})['n']
 
-def add_songs_in_dir(path, required={"title", "artist", "album"}):
+def add_songs_in_dir(path):
     remove_songs_in_dir(path)
     songs = []
     for root, dirs, files in walk(path):
         for f in files:
-            if splitext(f)[1] == ".mp3":
-                filepath = root + "/" + f
-                mp3 = EasyMP3(filepath)
+            ext = splitext(f)[1]
+            filepath = join(root, f)
+            if ext in {'.mp3', '.flac', '.ogg', '.m4a', '.mp4'}:
+                try:
+                    if ext == '.mp3':
+                        song = EasyMP3(filepath)
+                    elif ext == '.flac':
+                        song = FLAC(filepath)
+                    elif ext == '.ogg':
+                        song = OggVorbis(filepath)
+                    elif ext in {'.m4a', '.mp4'}:
+                        song = MP4(filepath)
+                except IOError, e:
+                    print e
+                    continue
+
                 values = {}
-                for tag in required:
-                    try:
-                        values[tag] = mp3.tags[tag][0]
-                    except Exception:
-                        values[tag] = ""
-                if not values["title"]:
-                    values['title'] = splitext(basename(filepath))[0]
-                songs.append({'title': values['title'],
-                    'artist': values['artist'],
-                    'album': values['album'],
-                    'length': mp3.info.length,
+                try:
+                    if ext in {'.m4a', '.mp4'}:
+                        title = song.tags['\xa9nam'][0]
+                        artist = song.tags['\xa9ART'][0]
+                        album = song.tags['\xa9alb'][0]
+                    else:
+                        title = song.tags['title'][0]
+                        artist = song.tags['artist'][0]
+                        album = song.tags['album'][0]
+                except Exception:
+                    print 'Skipped: ' + filepath
+                    continue
+
+                songs.append({'title': title,
+                    'artist': artist,
+                    'album': album,
+                    'length': song.info.length,
                     'path': filepath})
-            # TODO Add support for other audio file formats
     if not songs:
         return 0
     db.songs.insert(songs)
