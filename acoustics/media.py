@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-class Media:
+class Media(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod

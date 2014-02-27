@@ -1,9 +1,8 @@
-from song import Song, urlify, pathify
 import player
 import time
 import threading
 
-class Queue:
+class Queue(object):
     queue = []
     position = -1
 
@@ -68,6 +67,6 @@ class Queue:
             time.sleep(0.25)
 
     def start_autoplay(self):
-        t = threading.Thread(target=self.autoplay_thread)
-        t.daemon = True
-        t.start()
+        thread = threading.Thread(target=self.autoplay_thread)
+        thread.daemon = True
+        thread.start()

@@ -2,7 +2,7 @@ import db
 from media import Media
 from bson.objectid import ObjectId
 from os import walk
-from os.path import basename, splitext, join
+from os.path import splitext, join
 import re
 from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
@@ -39,7 +39,7 @@ def remove_songs_in_dir(path):
 def add_songs_in_dir(path):
     remove_songs_in_dir(path)
     songs = []
-    for root, dirs, files in walk(path):
+    for root, _, files in walk(path):
         for f in files:
             ext = splitext(f)[1]
             filepath = join(root, f)
@@ -57,7 +57,6 @@ def add_songs_in_dir(path):
                     print e
                     continue
 
-                values = {}
                 try:
                     if ext in {'.m4a', '.mp4'}:
                         title = song.tags['\xa9nam'][0]

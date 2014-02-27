@@ -1,5 +1,4 @@
 import vlc
-from song import Song, urlify
 
 instance = vlc.Instance('--no-video')
 player = instance.media_player_new()
@@ -13,7 +12,7 @@ def play(mrl):
 
 def vlc_play_youtube():
     """Play the first subitem if the current media is a YouTube video.
-    
+
     Specific to VLC YouTube support.
     """
     m = player.get_media()
@@ -54,7 +53,8 @@ def has_ended():
 def is_youtube_video(m=None):
     if m is None:
         m = player.get_media()
-    return m is not None and 'http://www.youtube.com' in vlc.bytes_to_str(m.get_mrl())
+    return m is not None and \
+            'http://www.youtube.com' in vlc.bytes_to_str(m.get_mrl())
 
 def get_vlc_version():
     return vlc.libvlc_get_version()
