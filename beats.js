@@ -28,9 +28,9 @@ function BeatsController($scope, $http)
 
     for (var i = 0; i < 100; i++)
     {
-        break;
-        songs[i] = songs[0];
-        songs[i].vote = true;
+        songs[i + 2] = JSON.parse(JSON.stringify(songs[0]));
+        songs[i + 2].trackNum = Math.floor(Math.random() * 20) + 1;
+        songs[i + 2].vote = (Math.random() < 0.5);
     }
 
     $scope.playlists =

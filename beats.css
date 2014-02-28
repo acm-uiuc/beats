@@ -25,7 +25,7 @@ html, body {
 .main-container {
     width: 100%;
     min-height: 100%; /* So the container takes the full height without scrolling */
-    height: auto; /* So the container takes the full height with scrolling */
+    height: 100%; /* So the container takes the full height with scrolling */
     display: flex;
     flex-direction: column;
 
@@ -37,6 +37,7 @@ html, body {
     flex: 10;
     display: flex;
 
+
     background-color: red;
 }
 
@@ -45,12 +46,13 @@ html, body {
     min-height: 100%;
     flex: 1;
 
+    box-shadow: inset -10px 0 10px -7px black;
     background: linear-gradient(to bottom, #444 0%,#333 100%);
 }
 
 .playlist-area {
-    min-height: 100%;
     flex: 5;
+    overflow: auto;
 
     background-color: #333;
 }
@@ -65,6 +67,7 @@ html, body {
     align-items: center;
 
     border-top: 1px solid #333;
+    box-shadow: 0 0 17px 3px black;
     background: linear-gradient(to bottom, #777 0%,#333 100%);
 }
 
@@ -100,7 +103,6 @@ html, body {
 
 table.playlist {
     width: 100%;
-    overflow: scroll;
 
     border-collapse: collapse;
     color: white;
