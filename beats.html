@@ -10,8 +10,8 @@
   <body>
     <div class="main-container" ng-app="BeatsApp" ng-controller="BeatsController">
       <div class="top-area">
-        <div class="control label" title="Play" data-icon="&#xf002;"></div>
-        <form ng-submit="searchSongs(searchText)"><input class="control" type="search" placeholder="search" ng-model="searchText"  /></form>
+        <div class="control label" title="Search" data-icon="&#xf002;"></div>
+        <form ng-submit="searchSongs(searchText)"><input class="control" type="search" placeholder="Seach" ng-model="searchText"  /></form>
       </div>
       <div class="middle-area">
         <div class="side-area">
@@ -30,6 +30,14 @@
         </div>
         <div class="playlist-area">
           <table class="playlist">
+            <colgroup>
+              <col span="1" style="width: 5%;">
+              <col span="1" style="width: 5%;">
+              <col span="1" style="width: 30%;">
+              <col span="1" style="width: 30%;">
+              <col span="1" style="width: 20%;">
+              <col span="1" style="width: 10%;">
+            </colgroup>
             <thead>
               <tr><th>Vote</th><th>Track</th><th>Title</th><th>Album</th><th>Artist</th><th>Length</th></tr>
             </thead>
@@ -47,7 +55,12 @@
         </div>
         <div class="queue-area">
           <ul class="song-queue">
-              <li ng-repeat="song in queue"><span class="song-title">{{ song.title }}</span><span class="song-album">{{ song.album }}</span><span class="song-artist">{{ song.artist }}</span><span ng-show="!$first" class="song-vote" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span></li>
+              <li ng-repeat="song in queue">
+                <span class="song-title" title="{{ song.title }}">{{ song.title }}</span>
+                <span class="song-album" title="{{ song.album }}">{{ song.album }}</span>
+                <span class="song-artist" title="{{ song.artist }}">{{ song.artist }}</span>
+                <span ng-show="!$first" class="song-vote" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span>
+              </li>
           </ul>
         </div>
       </div>

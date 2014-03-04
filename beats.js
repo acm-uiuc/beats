@@ -1,4 +1,4 @@
-angular.module('moment', [])
+angular.module('Beats.filters', [])
 // A filter that takes a number of seconds and converts it to MM:SS format
 .filter('momentFormat', function()
 {
@@ -13,7 +13,7 @@ angular.module('moment', [])
     };
 });
 
-angular.module('BeatsApp', ['moment'])
+angular.module('BeatsApp', ['Beats.filters'])
 .controller('BeatsController', ['$scope', '$http', '$interval', function($scope, $http, $interval)
 {
     $scope.playlist = [];

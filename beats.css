@@ -34,6 +34,7 @@ html, body {
 }
 
 .top-area {
+    position: relative;
     width: 100%;
     min-height: 30px;
     max-height: 50px;
@@ -41,7 +42,7 @@ html, body {
     vertical-align: middle;
     display: flex;
     align-items: center;
-    z-index: 1;
+    z-index: 10;
 
     background: linear-gradient(to bottom, #AAA 0%,#777 100%);
     border-bottom: 1px solid #333;
@@ -56,7 +57,9 @@ html, body {
 }
 
 .side-area {
-    min-width: 200px;
+    position: relative;
+    z-index: 1;
+    min-width: 150px;
     min-height: 100%;
     flex: 1;
     display: flex;
@@ -67,6 +70,8 @@ html, body {
 }
 
 .playlist-area {
+    position: relative;
+    z-index: 2;
     flex: 5;
     overflow: auto;
 
@@ -75,7 +80,9 @@ html, body {
 }
 
 .queue-area {
-    min-width: 100px;
+    position: relative;
+    z-index: 3;
+    min-width: 150px;
     flex: 1;
     overflow: auto;
 
@@ -84,6 +91,8 @@ html, body {
 }
 
 .bottom-area {
+    position: relative;
+    z-index: 10;
     width: 100%;
     min-height: 30px;
     max-height: 64px;
@@ -144,10 +153,8 @@ html, body {
 .song-queue li {
     position: relative;
     padding-left: 32px;
+    padding-bottom: 4px;
     list-style-image: none;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 
     color: white;
     font-size: 14px;
@@ -164,10 +171,12 @@ html, body {
 
 .song-queue .song-title, .song-queue .song-album, .song-queue .song-artist {
     display: block;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .song-queue .song-album, .song-queue .song-artist {
-    padding-left: 8px;
     font-size: 10px;
     font-weight: 400;
 }
@@ -180,6 +189,7 @@ html, body {
 }
 
 table.playlist {
+    table-layout: fixed;
     width: 100%;
 
     border-collapse: collapse;
@@ -207,7 +217,11 @@ table.playlist tr:nth-child(even)
     background-color: #666;
 }
 
-table.playlist td {
+table.playlist td, table.playlist th {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
     padding: 4px;
 }
 
