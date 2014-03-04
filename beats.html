@@ -8,16 +8,25 @@
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
   </head>
   <body>
-    <div class="main-container" ng-app ng-controller="BeatsController">
-      <div class="list-area">
+    <div class="main-container" ng-app="BeatsApp" ng-controller="BeatsController">
+      <div class="top-area">
+        <div class="control label" title="Play" data-icon="&#xf002;"></div>
+        <form ng-submit="searchSongs(searchText)"><input class="control" type="search" placeholder="search" ng-model="searchText"  /></form>
+      </div>
+      <div class="middle-area">
         <div class="side-area">
-          <ul class="playlists">
-            <li ng-repeat="section in sections"><span data-icon="{{ section.icon }}"></span>{{ section.title }}</li>
-          </ul>
-          <hr />
-          <ul class="playlists">
-            <li ng-repeat="playlist in playlists"><span data-icon="&#xf001;"></span>{{ playlist.title }}</li>
-          </ul>
+          <div class="playlists">
+            <ul class="playlists">
+              <li ng-repeat="section in sections"><span data-icon="{{ section.icon }}"></span>{{ section.title }}</li>
+            </ul>
+            <hr />
+            <ul class="playlists">
+              <li ng-repeat="playlist in playlists"><span data-icon="&#xf001;"></span>{{ playlist.title }}</li>
+            </ul>
+          </div>
+          <div class="album-art">
+            <img src="http://dummyimage.com/500x500/000dca/fff" />
+          </div>
         </div>
         <div class="playlist-area">
           <table class="playlist">
@@ -26,30 +35,36 @@
             </thead>
             <tbody>
               <tr ng-repeat="song in playlist track by $index">
-                <td style="text-align: center"><span data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span></td>
+                <td style="text-align: center" ng-click="voteSong(song)"><span data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span></td>
                 <td>{{ song.trackNum }}</td>
                 <td>{{ song.title }}</td>
-                <td>{{ song.albumTitle }}</td>
+                <td>{{ song.album }}</td>
                 <td>{{ song.artist }}</td>
-                <td>{{ song.length }}</td>
+                <td>{{ song.length|momentFormat }}</td>
               </tr>
             </tbody>
           </table>
         </div>
+        <div class="queue-area">
+          <ul class="song-queue">
+              <li ng-repeat="song in queue"><span class="song-title">{{ song.title }}</span><span class="song-album">{{ song.album }}</span><span class="song-artist">{{ song.artist }}</span><span ng-show="!$first" class="song-vote" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span></li>
+          </ul>
+        </div>
       </div>
-      <div class="control-area">
+      <div class="bottom-area">
         <div class="control" title="Play" data-icon="&#xf04b;"></div>
         <div class="control" title="Stop" data-icon="&#xf04d;"></div>
-        <div class="control" title="Skip" data-icon="&#xf051;"></div>
+        <div class="control" title="Skip" data-icon="&#xf051;" ng-click="skipSong()"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
         <div class="control bar volume" title="Volume">
           <div class="cover" style="width: {{ volumePercentage * 100 }}%"></div>
           <div class="handle" style="left: {{ volumePercentage * 100 }}%"></div>
         </div>
-        <div class="control label" title="Track">0:{{ playbackTime }}</div>
+        <div class="control label" title="Track">{{ playbackTime|momentFormat }}</div>
         <div class="control bar track" title="Track">
           <div class="cover" style="width: {{ playbackTime / playbackDuration * 100 }}%"></div>
         </div>
+        <div class="control label duration-label" title="Track">{{ playbackDuration|momentFormat }}</div>
       </div>
     </div>
     <script src="angular.min.js"></script>
