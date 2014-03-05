@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from crossdomain import crossdomain
 from song import Song, search_songs
 from youtube import YTVideo
@@ -93,6 +93,12 @@ def create_session():
 def get_session(token):
     r = user.get_session(token)
     return jsonify(r.json()), r.status_code
+
+@app.route('/v1/session/<token>', methods=['DELETE'])
+@crossdomain(origin='*')
+def delete_session(token):
+    r = user.delete_session(token)
+    return Response(status=r.status_code)
 
 if __name__ == '__main__':
     print 'Acoustics Media Player'
