@@ -15,6 +15,38 @@ html, body {
   margin-right: .5em;
   speak: none; }
 
+.dialog-container {
+  align-items: flex-start;
+  justify-content: space-around;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: 10; }
+
+.dialog-area {
+  background-color: white;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 17px 3px black;
+  padding: 8px; }
+  .dialog-area .login input, .dialog-area .login button {
+    display: block;
+    margin: 4px;
+    padding: 4px; }
+  .dialog-area .login button {
+    border-radius: 4px;
+    border: none;
+    color: white;
+    display: inline;
+    float: right;
+    padding: 8px;
+    text-shadow: 0 0 1px black; }
+  .dialog-area .login .confirm {
+    background-color: #3598ce; }
+  .dialog-area .login .cancel {
+    background-color: #d44637; }
+
 .main-container {
   display: flex;
   flex-direction: column;
@@ -32,11 +64,10 @@ html, body {
   flex: 1;
   max-height: 50px;
   min-height: 30px;
-  padding-left: 8px;
   position: relative;
   vertical-align: middle;
   width: 100%;
-  z-index: 10; }
+  z-index: 5; }
 
 .middle-area {
   background-color: red;
@@ -163,11 +194,15 @@ table.playlist {
   position: relative;
   vertical-align: middle;
   width: 100%;
-  z-index: 10; }
+  z-index: 5; }
 
 .control {
   color: #D0D9E5;
   cursor: default; }
+  .control:first-child {
+    padding-left: 16px; }
+  .control:last-child {
+    padding-right: 16px; }
   .control.button {
     font-size: 24px;
     margin: 0 10px;
@@ -175,10 +210,48 @@ table.playlist {
     transition: text-shadow 0.2s, box-shadow 0.2s; }
     .control.button:hover {
       text-shadow: 0 0 4px #d0d9e5; }
+  .control.login {
+    background: linear-gradient(to bottom, #88dd66 0%, #55aa44 100%);
+    border-radius: 8px;
+    border: 2px solid #AF8;
+    color: white;
+    left: -16px;
+    margin-left: auto;
+    padding: 6px;
+    position: relative; }
+    .control.login:focus {
+      outline: none; }
+    .control.login:active {
+      background: linear-gradient(to bottom, #55aa44 0%, #88ff66 100%); }
+  .control.logout {
+    background: linear-gradient(to bottom, #d44637 0%, #a5281b 100%);
+    border-radius: 8px;
+    border: 2px solid #e74c3c;
+    color: white;
+    left: -16px;
+    margin-left: auto;
+    padding: 6px;
+    position: relative; }
+    .control.logout:focus {
+      outline: none; }
+    .control.logout:active {
+      background: linear-gradient(to bottom, #a5281b 0%, #d44637 100%); }
   .control.label {
     font-size: 12px;
     margin-left: 8px;
     margin-right: 8px; }
+  .control input {
+    border-radius: 12px;
+    border: 1px solid #777;
+    color: black;
+    cursor: auto;
+    font-size: 14px;
+    padding: 4px;
+    text-shadow: none; }
+    .control input:focus {
+      outline: none; }
+    .control input:hover {
+      box-shadow: 0 0 4px #d0d9e5; }
   .control.bar {
     background: linear-gradient(to bottom, #374044 0%, #7e868c 100%);
     border-radius: 5px;
@@ -212,16 +285,3 @@ table.playlist {
     width: 100%; }
   .control.current-time-label {
     margin-right: 16px; }
-  .control.duration-label {
-    margin-right: 16px; }
-
-input.control {
-  border-radius: 12px;
-  border: 1px solid #777;
-  color: black;
-  cursor: auto;
-  font-size: 14px;
-  padding: 4px;
-  text-shadow: none; }
-  input.control:hover {
-    box-shadow: 0 0 4px #d0d9e5; }

@@ -16,6 +16,8 @@ angular.module('Beats.filters', [])
 angular.module('BeatsApp', ['Beats.filters'])
 .controller('BeatsController', ['$scope', '$http', '$interval', function($scope, $http, $interval)
 {
+    $scope.showDialog = false;
+    $scope.loggedIn = false;
     $scope.playlist = [];
     $scope.queue = [];
     $scope.volumePercentage = 0.5;
@@ -69,6 +71,11 @@ angular.module('BeatsApp', ['Beats.filters'])
         {
             console.log(data);
         });
+    };
+
+    $scope.pauseSong = function()
+    {
+        $http.post('/v1/player/pause');
     };
 
     $scope.skipSong = function()

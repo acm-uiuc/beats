@@ -7,11 +7,23 @@
     <link rel="stylesheet" href="beats.css">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
   </head>
-  <body>
-    <div class="main-container" ng-app="BeatsApp" ng-controller="BeatsController">
+  <body ng-app="BeatsApp" ng-controller="BeatsController">
+    <div class="dialog-container" ng-show="showDialog">
+      <div class="dialog-area">
+        <div class="login">
+          <input name="username" placeholder="Username" />
+          <input type="password" name="password" placeholder="Password" />
+          <button class="cancel" title="Cancel" ng-click="showDialog = false"><div data-icon="&#xf00d;">Cancel</button>
+          <button class="confirm" title="Login"><div data-icon="&#xf090;">Login</button>
+        </div>
+      </div>
+    </div>
+    <div class="main-container">
       <div class="top-area">
         <div class="control label" title="Search" data-icon="&#xf002;"></div>
-        <form ng-submit="searchSongs(searchText)"><input class="control" type="search" placeholder="Seach" ng-model="searchText"  /></form>
+        <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Seach" ng-model="searchText"  /></form>
+        <button class="control logout" title="Logout" ng-click="logout" ng-show="loggedIn"><div data-icon="&#xf08b;">Logout</button>
+        <button class="control login" title="Login" ng-click="showDialog = true" ng-show="!loggedIn"><div data-icon="&#xf090;">Login</button>
       </div>
       <div class="middle-area">
         <div class="side-area">
@@ -66,7 +78,7 @@
       </div>
       <div class="bottom-area">
         <div class="control button" title="Play" data-icon="&#xf04b;"></div>
-        <div class="control button" title="Stop" data-icon="&#xf04d;"></div>
+        <div class="control button" title="Pause" data-icon="&#xf04c;" ng-click="pauseSong()"></div>
         <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
         <div class="control bar volume" title="Volume">

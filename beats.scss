@@ -28,6 +28,51 @@ html, body {
     speak: none;
 }
 
+.dialog-container {
+    align-items: flex-start;
+    justify-content: space-around;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+}
+
+.dialog-area {
+    background-color: white;
+    border-radius: 0 0 4px 4px;
+    box-shadow: $area-shadow;
+    padding: 8px;
+
+    .login {
+        input, button {
+            display: block;
+            margin: 4px;
+            padding: 4px;
+        }
+
+        button {
+            border-radius: 4px;
+            border: none;
+            color: white;
+            display: inline;
+            float: right;
+            padding: 8px;
+            text-shadow: 0 0 1px black;
+        }
+
+        .confirm {
+            background-color: #3598ce;
+        }
+
+        .cancel {
+            background-color: #d44637;
+        }
+
+    }
+}
+
 .main-container {
     display: flex;
     flex-direction: column;
@@ -44,11 +89,10 @@ html, body {
     flex: 1;
     max-height: 50px;
     min-height: 30px;
-    padding-left: 8px;
     position: relative;
     vertical-align: middle;
     width: 100%;
-    z-index: 10;
+    z-index: 5;
 }
 
 .middle-area {
@@ -208,12 +252,20 @@ table.playlist {
     position: relative;
     vertical-align: middle;
     width: 100%;
-    z-index: 10;
+    z-index: 5;
 }
 
 .control {
     color: #D0D9E5;
     cursor: default;
+
+    &:first-child {
+        padding-left: 16px;
+    }
+
+    &:last-child {
+        padding-right: 16px;
+    }
 
     &.button {
         font-size: 24px;
@@ -226,10 +278,66 @@ table.playlist {
         }
     }
 
+    &.login {
+        background: linear-gradient(to bottom, #8D6 0%, #5A4 100%);
+        border-radius: 8px;
+        border: 2px solid #AF8;
+        color: white;
+        left: -16px;
+        margin-left: auto;
+        padding: 6px;
+        position: relative;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:active {
+            background: linear-gradient(to bottom, #5A4 0%, #8F6 100%);
+        }
+    }
+
+    &.logout {
+        background: linear-gradient(to bottom, #d44637 0%, #a5281b 100%);
+        border-radius: 8px;
+        border: 2px solid #e74c3c;
+        color: white;
+        left: -16px;
+        margin-left: auto;
+        padding: 6px;
+        position: relative;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:active {
+            background: linear-gradient(to bottom, #a5281b 0%, #d44637 100%);
+        }
+    }
+
     &.label {
         font-size: 12px;
         margin-left: 8px;
         margin-right: 8px;
+    }
+
+    input {
+        border-radius: 12px;
+        border: 1px solid #777;
+        color: black;
+        cursor: auto;
+        font-size: 14px;
+        padding: 4px;
+        text-shadow: none;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover {
+            box-shadow: $hover-blur;
+        }
     }
 
     &.bar {
@@ -280,23 +388,7 @@ table.playlist {
     &.current-time-label {
         margin-right: 16px;
     }
-
-    &.duration-label {
-        margin-right: 16px;
-    }
 }
 
 
-input.control {
-    border-radius: 12px;
-    border: 1px solid #777;
-    color: black;
-    cursor: auto;
-    font-size: 14px;
-    padding: 4px;
-    text-shadow: none;
 
-    &:hover {
-        box-shadow: $hover-blur;
-    }
-}
