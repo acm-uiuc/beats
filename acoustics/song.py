@@ -57,6 +57,7 @@ def add_songs_in_dir(path):
                     print e
                     continue
 
+                # Required tags
                 try:
                     if ext in {'.m4a', '.mp4'}:
                         title = song.tags['\xa9nam'][0]
@@ -70,11 +71,21 @@ def add_songs_in_dir(path):
                     print 'Skipped: ' + filepath
                     continue
 
-                songs.append({'title': title,
+                song_obj = {'title': title,
                     'artist': artist,
                     'album': album,
                     'length': song.info.length,
-                    'path': filepath})
+                    'path': filepath}
+
+                try:
+                    if ext in {'.m4a', '.mp4'}:
+                        song_obj['tracknumber'] = song.tags['trkn'][0][0]
+                    else:
+                        song_obj['tracknumber'] = int(song.tags['tracknumber'][0])
+                except Exception:
+                    pass
+
+                songs.append(song_obj)
     if not songs:
         return 0
     db.songs.insert(songs)
