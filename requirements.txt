@@ -2,8 +2,9 @@ Flask==0.10.1
 Jinja2==2.7.2
 MarkupSafe==0.18
 Werkzeug==0.9.4
-argparse==1.2.1
+argparse==1.1
 itsdangerous==0.23
 mutagen==1.22
 pymongo==2.6.3
+requests==2.2.1
 wsgiref==0.1.2
