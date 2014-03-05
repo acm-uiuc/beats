@@ -2,3 +2,7 @@
 server = replace_me:port
 application_name = replace_me
 password = replace_me
+
+[Database]
+host = localhost
+port = 27017
