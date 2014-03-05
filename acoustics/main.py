@@ -4,6 +4,7 @@ from song import Song, search_songs
 from youtube import YTVideo
 from queue import Queue
 import player
+import user
 
 app = Flask(__name__)
 app.debug = True
@@ -71,6 +72,27 @@ def queue_add():
 @crossdomain(origin='*')
 def now_playing():
     return jsonify(queue.now_playing() or {})
+
+@app.route('/v1/user', methods=['GET'])
+@crossdomain(origin='*')
+def get_user():
+    r = user.get_user()
+    return jsonify(r.json()), r.status_code
+
+@app.route('/v1/session', methods=['POST'])
+@crossdomain(origin='*')
+def create_session():
+    """For Crowd SSO support, save the token in a cookie with name 'crowd.token_key'."""
+    username = request.form.get('username')
+    password = request.form.get('password')
+    r = user.create_session(username, password)
+    return jsonify(r.json()), r.status_code
+
+@app.route('/v1/session/<token>', methods=['GET'])
+@crossdomain(origin='*')
+def get_session(token):
+    r = user.get_session(token)
+    return jsonify(r.json()), r.status_code
 
 if __name__ == '__main__':
     print 'Acoustics Media Player'
