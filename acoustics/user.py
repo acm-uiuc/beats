@@ -27,3 +27,9 @@ def get_session(token):
             headers=CROWD_HEADERS,
             auth=(CROWD_APPLICATION_NAME, CROWD_PASSWORD))
     return r
+
+def delete_session(token):
+    r = requests.delete('http://' + CROWD_SERVER + '/crowd/rest/usermanagement/1/session/' + token,
+            headers=CROWD_HEADERS,
+            auth=(CROWD_APPLICATION_NAME, CROWD_PASSWORD))
+    return r
