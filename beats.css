@@ -1,319 +1,227 @@
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,700);
-
 * {
-    margin: 0;
-    padding: 0;
-}
+  margin: 0;
+  padding: 0; }
 
 html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
+  height: 100%;
+  overflow: hidden;
+  width: 100%; }
 
 [data-icon]:before {
+  content: attr(data-icon);
   font-family: 'FontAwesome';
   font-size: 130%;
   margin-right: .5em;
-  content: attr(data-icon);
-  speak: none;
-}
-
-.icon-alone {
-  display: inline-block;
-}
+  speak: none; }
 
 .main-container {
-    width: 100%;
-    min-height: 100%; /* So the container takes the full height without scrolling */
-    height: 100%; /* So the container takes the full height with scrolling */
-    display: flex;
-    flex-direction: column;
-
-    background-color: magenta;
-}
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* So the container takes the full height with scrolling */
+  min-height: 100%;
+  /* So the container takes the full height without scrolling */
+  width: 100%; }
 
 .top-area {
-    position: relative;
-    width: 100%;
-    min-height: 30px;
-    max-height: 50px;
-    flex: 1;
-    vertical-align: middle;
-    display: flex;
-    align-items: center;
-    z-index: 10;
-
-    background: linear-gradient(to bottom, #AAA 0%,#777 100%);
-    border-bottom: 1px solid #333;
-}
+  align-items: center;
+  background: linear-gradient(to bottom, #aaaaaa 0%, #777777 100%);
+  border-bottom: 1px solid #333;
+  display: flex;
+  flex: 1;
+  max-height: 50px;
+  min-height: 30px;
+  padding-left: 8px;
+  position: relative;
+  vertical-align: middle;
+  width: 100%;
+  z-index: 10; }
 
 .middle-area {
-    width: 100%;
-    flex: 10;
-    display: flex;
-
-    background-color: red;
-}
+  background-color: red;
+  display: flex;
+  flex: 10;
+  width: 100%; }
 
 .side-area {
-    position: relative;
-    z-index: 1;
-    min-width: 150px;
-    min-height: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    background: linear-gradient(to bottom, #444 0%,#333 100%);
-}
-
-.playlist-area {
-    position: relative;
-    z-index: 2;
-    flex: 5;
-    overflow: auto;
-
-    box-shadow: 0 0 17px 3px black;
-    background-color: #333;
-}
-
-.queue-area {
-    position: relative;
-    z-index: 3;
-    min-width: 150px;
-    flex: 1;
-    overflow: auto;
-
-    box-shadow: 0 0 17px 3px black;
-    background-color: #222;
-}
-
-.bottom-area {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    min-height: 30px;
-    max-height: 64px;
-    flex: 1;
-    vertical-align: middle;
-    display: flex;
-    align-items: center;
-
-    border-top: 1px solid #333;
-    box-shadow: 0 0 17px 3px black;
-    background: linear-gradient(to bottom, #777 0%,#333 100%);
-}
-
-.side-area hr {
-    margin: 4px 0;
-    border-color: #374044;
-}
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  min-height: 100%;
+  min-width: 150px;
+  position: relative;
+  z-index: 1; }
 
 .playlists {
-    overflow-y: auto;
-}
-
-.playlists li {
-    position: relative;
+  overflow-y: auto; }
+  .playlists hr {
+    border-color: #374044;
+    margin: 4px 0; }
+  .playlists li {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: white;
+    cursor: default;
+    font-family: 'Open Sans';
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    list-style-image: none;
+    padding-bottom: 4px;
     padding-left: 24px;
     padding-top: 4px;
-    padding-bottom: 4px;
-    line-height: 20px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-
-    list-style-image: none;
-    cursor: default;
-    color: white;
-
-    font-size: 14px;
-    font-weight: 300;
-    font-family: 'Open Sans';
-}
-
-.playlists li:hover {
-    background: linear-gradient(to bottom, #7e868c 0%,#374044 100%);
-}
+    position: relative; }
+    .playlists li:hover {
+      background: linear-gradient(to bottom, #7e868c 0%, #374044 100%); }
 
 .album-art {
-    width: 100%;
-}
-
-.album-art img {
-    width: 100%;
+  width: 100%; }
+  .album-art img {
     height: 100%;
-}
+    width: 100%; }
 
-.song-queue {
-}
-
-.song-queue li {
-    position: relative;
-    padding-left: 32px;
-    padding-bottom: 4px;
-    list-style-image: none;
-
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'Open Sans';
-
-    border-bottom: 1px solid #333;
-}
-
-.song-queue li:first-child {
-    background: linear-gradient(to bottom, #7e868c 0%,#374044 100%);
-
-}
-
-.song-queue .song-title, .song-queue .song-album, .song-queue .song-artist {
-    display: block;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.song-queue .song-album, .song-queue .song-artist {
-    font-size: 10px;
-    font-weight: 400;
-}
-
-.song-queue .song-vote {
-    position: absolute;
-    top: 16px;
-    left: 8px;
-    vertical-align: middle;
-}
+.playlist-area {
+  background-color: #333;
+  box-shadow: 0 0 17px 3px black;
+  flex: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2; }
 
 table.playlist {
-    table-layout: fixed;
-    width: 100%;
-
-    border-collapse: collapse;
-    color: white;
-    font-size: 14px;
-    font-weight: 300;
-    font-family: 'Arial';
-}
-
-table.playlist thead {
-    background:  linear-gradient(to bottom, #b5bdc8 0%, #56707f 100%);
-}
-
-table.playlist th {
+  border-collapse: collapse;
+  color: white;
+  font-family: 'Arial';
+  font-size: 14px;
+  font-weight: 300;
+  table-layout: fixed;
+  width: 100%; }
+  table.playlist thead {
+    background: linear-gradient(to bottom, #b5bdc8 0%, #56707f 100%); }
+  table.playlist th {
     padding: 4px;
-    border-right: 1px solid black;
-}
-
-table.playlist th:last-child {
-    border: none;
-}
-
-table.playlist tr:nth-child(even)
-{
-    background-color: #666;
-}
-
-table.playlist td, table.playlist th {
+    border-right: 1px solid black; }
+  table.playlist th:last-child {
+    border: none; }
+  table.playlist tr:nth-child(even) {
+    background-color: #666; }
+  table.playlist td, table.playlist th {
     overflow-x: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 4px; }
 
-    padding: 4px;
-}
+.queue-area {
+  background-color: #222;
+  box-shadow: 0 0 17px 3px black;
+  flex: 1;
+  min-width: 150px;
+  overflow: auto;
+  position: relative;
+  z-index: 3; }
+
+.song-queue li {
+  border-bottom: 1px solid #333;
+  color: white;
+  font-family: 'Open Sans';
+  font-size: 14px;
+  font-weight: 700;
+  list-style-image: none;
+  padding-bottom: 4px;
+  padding-left: 32px;
+  position: relative; }
+  .song-queue li:first-child {
+    background: linear-gradient(to bottom, #7e868c 0%, #374044 100%); }
+.song-queue .title, .song-queue .album, .song-queue .artist {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block; }
+.song-queue .album, .song-queue .artist {
+  font-size: 10px;
+  font-weight: 400; }
+.song-queue .vote {
+  left: 8px;
+  position: absolute;
+  top: 16px; }
+
+.bottom-area {
+  align-items: center;
+  background: linear-gradient(to bottom, #777777 0%, #333333 100%);
+  border-top: 1px solid #333;
+  box-shadow: 0 0 17px 3px black;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  max-height: 64px;
+  min-height: 30px;
+  position: relative;
+  vertical-align: middle;
+  width: 100%;
+  z-index: 10; }
 
 .control {
-    margin-left: 32px;
-    color: #D0D9E5;
+  color: #D0D9E5;
+  cursor: default; }
+  .control.button {
     font-size: 24px;
+    margin: 0 10px;
     text-shadow: 1px 1px 1px black;
-    transition: text-shadow 0.2s, box-shadow 0.2s;
-}
-
-div.control {
-    /* Allow input controls to have cursors */
-    cursor: default;
-}
-
-.control:hover {
-    text-shadow: 0 0 8px #D0D9E5;
-}
-
-.control.label {
+    transition: text-shadow 0.2s, box-shadow 0.2s; }
+    .control.button:hover {
+      text-shadow: 0 0 4px #d0d9e5; }
+  .control.label {
     font-size: 12px;
-    margin-right: -16px;
-}
+    margin-left: 8px;
+    margin-right: 8px; }
+  .control.bar {
+    background: linear-gradient(to bottom, #374044 0%, #7e868c 100%);
+    border-radius: 5px;
+    border: 1px solid #444;
+    height: 10px;
+    position: relative; }
+    .control.bar:hover {
+      box-shadow: 0 0 4px #D0D9E5; }
+    .control.bar .cover {
+      background-color: #B0B7C1;
+      border-radius: 5px;
+      height: 10px;
+      position: absolute;
+      transition: width 1s linear; }
+    .control.bar .handle {
+      background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
+      border-radius: 8px;
+      border: 1px solid #444;
+      box-shadow: 0 0 2px black;
+      height: 16px;
+      margin-left: -8px;
+      margin-top: -4px;
+      position: relative;
+      transition: box-shadow 0.1s;
+      width: 16px; }
+      .control.bar .handle:hover {
+        box-shadow: 0 0 4px #d0d9e5; }
+  .control.volume {
+    width: 150px; }
+  .control.track {
+    width: 100%; }
+  .control.current-time-label {
+    margin-right: 16px; }
+  .control.duration-label {
+    margin-right: 16px; }
 
 input.control {
-
-    padding: 4px;
-    margin-left: 16px;
-
-    border-radius: 12px;
-    border: 1px solid #777;
-
-    color: black;
-    font-size: 14px;
-    text-shadow: none;
-}
-
-input.control:hover {
-    box-shadow: 0 0 4px #D0D9E5;
-}
-
-.control.bar {
-    position: relative;
-    height: 10px;
-
-    background: linear-gradient(to bottom, #374044 0%, #7e868c 100%);
-    border: 1px solid #444;
-    border-radius: 5px;
-}
-
-.control.bar:hover {
-    box-shadow: 0 0 4px #D0D9E5;
-}
-
-.control.bar .cover {
-    position: absolute;
-    height: 10px;
-    background-color: #B0B7C1;
-    border-radius: 5px;
-    transition: width 1s linear;
-}
-
-.control.bar .handle {
-    position: relative;
-    width: 16px;
-    height: 16px;
-    margin-top: -4px;
-    margin-left: -8px;
-    background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
-    border: 1px solid #444;
-    border-radius: 8px;
-    box-shadow: 0 0 2px black;
-    transition:  box-shadow 0.1s;
-}
-
-.control.bar .handle:hover {
-    box-shadow: 0 0 4px #D0D9E5;
-}
-
-.control.volume {
-    width: 150px;
-}
-
-.control.track {
-    margin-left: 32px;
-    margin-right: 32px;
-    width: 100%;
-}
-
-.control.duration-label {
-    position: relative;
-    margin-left: 18px;
-    left: -32px;
-}
+  border-radius: 12px;
+  border: 1px solid #777;
+  color: black;
+  cursor: auto;
+  font-size: 14px;
+  padding: 4px;
+  text-shadow: none; }
+  input.control:hover {
+    box-shadow: 0 0 4px #d0d9e5; }

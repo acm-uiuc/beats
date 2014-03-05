@@ -16,7 +16,7 @@
       <div class="middle-area">
         <div class="side-area">
           <div class="playlists">
-            <ul class="playlists">
+            <ul>
               <li ng-repeat="section in sections"><span data-icon="{{ section.icon }}"></span>{{ section.title }}</li>
             </ul>
             <hr />
@@ -56,24 +56,24 @@
         <div class="queue-area">
           <ul class="song-queue">
               <li ng-repeat="song in queue">
-                <span class="song-title" title="{{ song.title }}">{{ song.title }}</span>
-                <span class="song-album" title="{{ song.album }}">{{ song.album }}</span>
-                <span class="song-artist" title="{{ song.artist }}">{{ song.artist }}</span>
-                <span ng-show="!$first" class="song-vote" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span>
+                <span class="title" title="{{ song.title }}">{{ song.title }}</span>
+                <span class="album" title="{{ song.album }}">{{ song.album }}</span>
+                <span class="artist" title="{{ song.artist }}">{{ song.artist }}</span>
+                <span ng-show="!$first" class="vote" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span>
               </li>
           </ul>
         </div>
       </div>
       <div class="bottom-area">
-        <div class="control" title="Play" data-icon="&#xf04b;"></div>
-        <div class="control" title="Stop" data-icon="&#xf04d;"></div>
-        <div class="control" title="Skip" data-icon="&#xf051;" ng-click="skipSong()"></div>
+        <div class="control button" title="Play" data-icon="&#xf04b;"></div>
+        <div class="control button" title="Stop" data-icon="&#xf04d;"></div>
+        <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
         <div class="control bar volume" title="Volume">
           <div class="cover" style="width: {{ volumePercentage * 100 }}%"></div>
           <div class="handle" style="left: {{ volumePercentage * 100 }}%"></div>
         </div>
-        <div class="control label" title="Track">{{ playbackTime|momentFormat }}</div>
+        <div class="control label current-time-label" title="Track">{{ playbackTime|momentFormat }}</div>
         <div class="control bar track" title="Track">
           <div class="cover" style="width: {{ playbackTime / playbackDuration * 100 }}%"></div>
         </div>
