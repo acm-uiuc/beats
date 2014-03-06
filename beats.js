@@ -13,11 +13,12 @@ angular.module('Beats.filters', [])
     };
 });
 
-angular.module('BeatsApp', ['Beats.filters'])
-.controller('BeatsController', ['$scope', '$http', '$interval', function($scope, $http, $interval)
+angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
+.controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
 {
+    var backendBase = 'http://127.0.0.1:5000'
     $scope.showDialog = false;
-    $scope.loggedIn = false;
+    $scope.loggedIn = null;
     $scope.playlist = [];
     $scope.queue = [];
     $scope.volumePercentage = 0.5;
@@ -42,9 +43,43 @@ angular.module('BeatsApp', ['Beats.filters'])
         { title: 'Witch-Hop' },
     ];
 
+
+    $scope.login = function(username, password)
+    {
+        $http.post(backendBase + '/v1/session', 'username=' + username + '&password=' + password,
+        {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data)
+        {
+            $cookies['crowd.token_key'] = data['token'];
+            $scope.requestUser();
+        });
+    };
+
+    $scope.logout = function()
+    {
+        $cookies['crowd.token_key'] = '';
+        $scope.loggedIn = null;
+    };
+
+    $scope.requestUser = function()
+    {
+        $http.get(backendBase + '/v1/session/' + $cookies['crowd.token_key'])
+        .success(function(data)
+        {
+            $scope.loggedIn = data.user;
+        });
+    };
+
+    if ($cookies['crowd.token_key'] != undefined && $cookies['crowd.token_key'].length > 0)
+    {
+        $scope.requestUser();
+    }
+
     $scope.searchSongs = function(query)
     {
-        $http.get('/v1/songs/search',
+        $http.get(backendBase + '/v1/songs/search',
         {
             params: { 'q': query }
         })
@@ -62,8 +97,7 @@ angular.module('BeatsApp', ['Beats.filters'])
 
     $scope.voteSong = function(song)
     {
-        console.log(song);
-        $http.post('/v1/queue/add', 'id=' + song._id,
+        $http.post(backendBase + '/v1/queue/add', 'id=' + song._id,
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
@@ -75,24 +109,24 @@ angular.module('BeatsApp', ['Beats.filters'])
 
     $scope.pauseSong = function()
     {
-        $http.post('/v1/player/pause');
+        $http.post(backendBase + '/v1/player/pause');
     };
 
     $scope.skipSong = function()
     {
-        $http.post('/v1/player/play_next');
+        $http.post(backendBase + '/v1/player/play_next');
     };
 
     $interval(function()
     {
-        $http.get('/v1/player/status')
+        $http.get(backendBase + '/v1/player/status')
         .success(function(data)
         {
             $scope.playbackTime = data['current_time'] / 1000;
             $scope.playbackDuration = data['duration'] / 1000;
         });
 
-        $http.get('/v1/queue')
+        $http.get(backendBase + '/v1/queue')
         .success(function(data)
         {
             $scope.queue = data['queue'].slice(data['position']);

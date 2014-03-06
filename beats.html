@@ -11,10 +11,14 @@
     <div class="dialog-container" ng-show="showDialog">
       <div class="dialog-area">
         <div class="login">
-          <input name="username" placeholder="Username" />
-          <input type="password" name="password" placeholder="Password" />
-          <button class="cancel" title="Cancel" ng-click="showDialog = false"><div data-icon="&#xf00d;">Cancel</button>
-          <button class="confirm" title="Login"><div data-icon="&#xf090;">Login</button>
+          <input name="username" placeholder="Username" ng-model="formUsername" />
+          <input type="password" name="password" placeholder="Password" ng-model="formPassword"  />
+          <button class="cancel" title="Cancel" ng-click="showDialog = false">
+            <span data-icon="&#xf00d;"></span>Cancel
+          </button>
+          <button class="confirm" title="Login" ng-click="login(formUsername, formPassword); showDialog = false">
+            <span data-icon="&#xf090;"></span>Login
+          </button>
         </div>
       </div>
     </div>
@@ -22,8 +26,10 @@
       <div class="top-area">
         <div class="control label" title="Search" data-icon="&#xf002;"></div>
         <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Seach" ng-model="searchText"  /></form>
-        <button class="control logout" title="Logout" ng-click="logout" ng-show="loggedIn"><div data-icon="&#xf08b;">Logout</button>
-        <button class="control login" title="Login" ng-click="showDialog = true" ng-show="!loggedIn"><div data-icon="&#xf090;">Login</button>
+        <button class="control logout" title="Logout" ng-click="logout()" ng-show="loggedIn"><span  data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
+        <button class="control login" title="Login" ng-click="showDialog = true" ng-show="!loggedIn">
+          <span data-icon="&#xf090;"></span>Login
+        </button>
       </div>
       <div class="middle-area">
         <div class="side-area">
@@ -93,6 +99,7 @@
       </div>
     </div>
     <script src="angular.min.js"></script>
+    <script src="angular-cookies.min.js"></script>
     <script src="beats.js"></script>
   </body>
 </html>
