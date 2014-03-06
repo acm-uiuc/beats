@@ -11,9 +11,12 @@ from mutagen.mp4 import MP4
 
 class Song(Media):
     def __init__(self, song_id):
-        song = db.songs.find_one(ObjectId(song_id))
+        try:
+            song = db.songs.find_one(ObjectId(song_id))
+        except Exception:
+            raise
         if song is None:
-            raise Exception('Song does not exist')
+            raise Exception('Song does not exist: ' + song_id)
         song['_id'] = str(song['_id'])
         self.song = song
 

@@ -17,9 +17,9 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         token = request.form.get('token')
         if token is None:
-            return jsonify({'message': 'No SSO token provided'}), 403
+            return jsonify({'message': 'No SSO token provided'}), 401
         if not user.valid_session(token):
-            return jsonify({'message': 'Invalid SSO token: ' + token}), 403
+            return jsonify({'message': 'Invalid SSO token: ' + token}), 401
         return f(*args, **kwargs)
     return decorated_function
 
@@ -43,8 +43,10 @@ def player_status():
 @app.route('/v1/songs/<song_id>', methods=['GET'])
 @crossdomain(origin='*')
 def show_song(song_id):
-    song = Song(song_id)
-    return jsonify(song.dictify() or {})
+    try:
+        return jsonify(Song(song_id).dictify())
+    except Exception, e:
+        return jsonify({'message': str(e)}), 404
 
 @app.route('/v1/songs/search', methods=['GET'])
 @crossdomain(origin='*')
@@ -79,11 +81,14 @@ def queue_clear():
 def queue_add():
     if request.form.get('id'):
         song_id = request.form.get('id')
-        return jsonify(queue.add(Song(song_id)))
+        try:
+            return jsonify(queue.add(Song(song_id)))
+        except Exception, e:
+            return jsonify({'message': str(e)}), 404
     elif request.form.get('url'):
         url = request.form.get('url')
         return jsonify(queue.add(YTVideo(url)))
-    return jsonify({})
+    return jsonify({'message': 'No id or url parameter'}), 400
 
 @app.route('/v1/now_playing', methods=['GET'])
 @crossdomain(origin='*')
