@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from config import config
 
 DB_HOST = config.get('Database', 'host')
-DB_PORT = int(config.get('Database', 'port'))
+DB_PORT = config.getint('Database', 'port')
 
 client = MongoClient(DB_HOST, DB_PORT)
 db = client.acoustics
