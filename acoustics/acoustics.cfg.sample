@@ -1,3 +1,6 @@
+[Authentication]
+enabled = true
+
 [Crowd]
 server = replace_me:port
 application_name = replace_me

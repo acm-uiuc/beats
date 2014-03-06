@@ -4,8 +4,11 @@ from crossdomain import crossdomain
 from song import Song, search_songs
 from youtube import YTVideo
 from queue import Queue
+from config import config
 import player
 import user
+
+AUTHENTICATION_ENABLED = config.getboolean('Authentication', 'enabled')
 
 app = Flask(__name__)
 app.debug = True
@@ -13,6 +16,9 @@ app.debug = True
 queue = Queue()
 
 def login_required(f):
+    if not AUTHENTICATION_ENABLED:
+        return f
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.form.get('token')
@@ -21,6 +27,7 @@ def login_required(f):
         if not user.valid_session(token):
             return jsonify({'message': 'Invalid SSO token: ' + token}), 401
         return f(*args, **kwargs)
+
     return decorated_function
 
 @app.route('/v1/player/play_next', methods=['POST'])
