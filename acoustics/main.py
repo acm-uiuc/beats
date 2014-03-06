@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+from functools import wraps
 from crossdomain import crossdomain
 from song import Song, search_songs
 from youtube import YTVideo
@@ -11,12 +12,25 @@ app.debug = True
 
 queue = Queue()
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.form.get('token')
+        if token is None:
+            return jsonify({'message': 'No SSO token provided'}), 403
+        if not user.valid_session(token):
+            return jsonify({'message': 'Invalid SSO token: ' + token}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/v1/player/play_next', methods=['POST'])
+@login_required
 @crossdomain(origin='*')
 def play_next():
     return jsonify(queue.play_next(force=True) or {})
 
 @app.route('/v1/player/pause', methods=['POST'])
+@login_required
 @crossdomain(origin='*')
 def pause():
     return jsonify(player.pause())
@@ -48,16 +62,19 @@ def show_queue():
     return jsonify(queue.get_queue())
 
 @app.route('/v1/queue/<int:pos>', methods=['DELETE'])
+@login_required
 @crossdomain(origin='*')
 def queue_remove(pos):
     return jsonify(queue.remove(pos))
 
 @app.route('/v1/queue', methods=['DELETE'])
+@login_required
 @crossdomain(origin='*')
 def queue_clear():
     return jsonify(queue.clear())
 
 @app.route('/v1/queue/add', methods=['POST'])
+@login_required
 @crossdomain(origin='*')
 def queue_add():
     if request.form.get('id'):

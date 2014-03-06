@@ -33,3 +33,6 @@ def delete_session(token):
             headers=CROWD_HEADERS,
             auth=(CROWD_APPLICATION_NAME, CROWD_PASSWORD))
     return r
+
+def valid_session(token):
+    return get_session(token).status_code == requests.codes.ok
