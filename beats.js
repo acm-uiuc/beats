@@ -62,7 +62,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         $http.delete(backendBase + '/v1/session/' + $cookies['crowd.token_key'])
         .success(function(data)
         {
-            delete $cookies['crowd.token_key']
+            delete $cookies['crowd.token_key'];
             $scope.loggedIn = null;
         });
     };
