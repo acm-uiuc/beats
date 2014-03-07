@@ -14,6 +14,7 @@ app = Flask(__name__)
 app.debug = True
 
 queue = Queue()
+queue.start_autoplay()
 
 def login_required(f):
     if not AUTHENTICATION_ENABLED:
@@ -132,5 +133,4 @@ def delete_session(token):
 if __name__ == '__main__':
     print 'Acoustics Media Player'
     print 'VLC version: ' + player.get_vlc_version()
-    queue.start_autoplay()
     app.run()
