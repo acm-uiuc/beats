@@ -73,6 +73,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         .success(function(data)
         {
             $scope.loggedIn = data.user;
+        })
+        .error(function(data, status)
+        {
+            // Session expired
+            delete $cookies['crowd.token_key'];
         });
     };
 
