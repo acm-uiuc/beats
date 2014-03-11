@@ -11,14 +11,16 @@
     <div class="dialog-container" ng-show="showDialog">
       <div class="dialog-area">
         <div class="login">
-          <input name="username" placeholder="Username" ng-model="formUsername" />
-          <input type="password" name="password" placeholder="Password" ng-model="formPassword"  />
-          <button class="cancel" title="Cancel" ng-click="showDialog = false">
-            <span data-icon="&#xf00d;"></span>Cancel
-          </button>
-          <button class="confirm" title="Login" ng-click="login(formUsername, formPassword); showDialog = false">
-            <span data-icon="&#xf090;"></span>Login
-          </button>
+          <form ng-submit="login(formUsername, formPassword); formUsername=''; formPassword=''; showDialog = false" class="simple-form">
+            <input name="username" placeholder="Username" ng-model="formUsername" required />
+            <input type="password" name="password" placeholder="Password" ng-model="formPassword" required />
+            <button type="button" class="cancel" title="Cancel" ng-click="showDialog = false">
+              <span data-icon="&#xf00d;"></span>Cancel
+            </button>
+            <button type="submit" class="confirm" title="Login">
+              <span data-icon="&#xf090;"></span>Login
+            </button>
+          </form>
         </div>
       </div>
     </div>
