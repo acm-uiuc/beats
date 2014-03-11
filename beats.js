@@ -81,7 +81,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         });
     };
 
-    if ($cookies['crowd.token_key'] != undefined && $cookies['crowd.token_key'].length > 0)
+    if ($cookies['crowd.token_key'])
     {
         $scope.requestUser();
     }
@@ -106,7 +106,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.voteSong = function(song)
     {
-        $http.post(backendBase + '/v1/queue/add', 'id=' + song._id,
+        if (!$cookies['crowd.token_key']) {
+            $scope.showDialog = true;
+            return;
+        }
+        $http.post(backendBase + '/v1/queue/add', 'id=' + song._id + '&token=' + $cookies['crowd.token_key'],
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
@@ -118,12 +122,26 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.pauseSong = function()
     {
-        $http.post(backendBase + '/v1/player/pause');
+        if (!$cookies['crowd.token_key']) {
+            $scope.showDialog = true;
+            return;
+        }
+        $http.post(backendBase + '/v1/player/pause', 'token=' + $cookies['crowd.token_key'],
+        {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
     };
 
     $scope.skipSong = function()
     {
-        $http.post(backendBase + '/v1/player/play_next');
+        if (!$cookies['crowd.token_key']) {
+            $scope.showDialog = true;
+            return;
+        }
+        $http.post(backendBase + '/v1/player/play_next', 'token=' + $cookies['crowd.token_key'],
+        {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
     };
 
     $interval(function()
