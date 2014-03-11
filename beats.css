@@ -146,6 +146,8 @@ table.playlist {
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 4px; }
+  table.playlist td:first-child {
+    cursor: pointer; }
 
 .queue-area {
   background-color: #222;
@@ -179,7 +181,8 @@ table.playlist {
 .song-queue .vote {
   left: 8px;
   position: absolute;
-  top: 16px; }
+  top: 16px;
+  cursor: pointer; }
 
 .bottom-area {
   align-items: center;

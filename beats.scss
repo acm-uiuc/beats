@@ -192,6 +192,10 @@ table.playlist {
 
         padding: 4px;
     }
+
+    td:first-child {
+        cursor: pointer;
+    }
 }
 
 .queue-area {
@@ -236,6 +240,7 @@ table.playlist {
         left: 8px;
         position: absolute;
         top: 16px;
+        cursor: pointer;
     }
 }
 
