@@ -29,3 +29,9 @@ class Packet(Base):
     user = Column(String)
     arrival_time = Column(Float)
     finish_time = Column(Float)
+
+def init_db():
+    Base.metadata.create_all(engine)
+
+if __name__ == '__main__':
+    init_db()
