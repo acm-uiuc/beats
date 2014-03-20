@@ -28,3 +28,4 @@ class Packet(Base):
     song_id = Column(Integer, ForeignKey('songs.id'), primary_key=True)
     user = Column(String)
     arrival_time = Column(Float)
+    finish_time = Column(Float)
