@@ -1,43 +1,15 @@
-import db
-from media import Media
-from bson.objectid import ObjectId
+from db import Song, Session, engine
 from os import walk
 from os.path import splitext, join
-import re
 from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
 from mutagen.mp4 import MP4
 
-class Song(Media):
-    def __init__(self, song_id):
-        try:
-            song = db.songs.find_one(ObjectId(song_id))
-        except Exception:
-            raise
-        if song is None:
-            raise Exception('Song does not exist: ' + song_id)
-        song['_id'] = str(song['_id'])
-        self.song = song
-
-    def mrl(self):
-        return urlify(self.song['path'])
-
-    def dictify(self):
-        return self.song
-
-    def __eq__(self, other):
-        return other is not None and self.song['_id'] == other.song['_id']
-
-def urlify(path):
-    return 'file://' + path
-
-def pathify(mrl):
-    return re.sub(r'^file://', '', mrl)
-
 def remove_songs_in_dir(path):
-    pattern = re.compile('^%s.*' % path)
-    return db.songs.remove({'path': pattern})['n']
+    session = Session()
+    session.query(Song).filter(Song.path.like(path + '%')).delete(synchronize_session='fetch')
+    session.commit()
 
 def add_songs_in_dir(path):
     remove_songs_in_dir(path)
@@ -86,27 +58,33 @@ def add_songs_in_dir(path):
                     else:
                         song_obj['tracknumber'] = int(song.tags['tracknumber'][0])
                 except Exception:
-                    pass
+                    song_obj['tracknumber'] = None
 
                 songs.append(song_obj)
     if not songs:
         return 0
-    db.songs.insert(songs)
+
+    table = Song.__table__
+    conn = engine.connect()
+    conn.execute(table.insert(), songs)
+    conn.close()
+
     return len(songs)
 
 def search_songs(query, limit=20):
-    songs = []
-    if query:
-        pattern = re.compile('.*%s.*' % query, re.IGNORECASE)
-        res = db.songs.find(
-                {"$or":[
-                    {"title": pattern},
-                    {"artist": pattern},
-                    {"album": pattern}
-                    ]
-                    }
-                ).limit(limit)
-        for song in res:
-            song['_id'] = str(song['_id'])
-            songs.append(song)
-    return {'query': query, 'limit': limit, 'results': songs}
+    pass
+    #songs = []
+    #if query:
+        #pattern = re.compile('.*%s.*' % query, re.IGNORECASE)
+        #res = db.songs.find(
+                #{"$or":[
+                    #{"title": pattern},
+                    #{"artist": pattern},
+                    #{"album": pattern}
+                    #]
+                    #}
+                #).limit(limit)
+        #for song in res:
+            #song['_id'] = str(song['_id'])
+            #songs.append(song)
+    #return {'query': query, 'limit': limit, 'results': songs}
