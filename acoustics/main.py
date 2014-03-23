@@ -3,6 +3,7 @@ from functools import wraps
 from crossdomain import crossdomain
 from song import Song, search_songs
 from youtube import YTVideo
+from scheduler import Scheduler
 from queue import Queue
 from config import config
 import player
@@ -13,8 +14,8 @@ AUTHENTICATION_ENABLED = config.getboolean('Authentication', 'enabled')
 app = Flask(__name__)
 app.debug = True
 
-queue = Queue()
-queue.start_autoplay()
+scheduler = Scheduler()
+scheduler.start()
 
 def login_required(f):
     if not AUTHENTICATION_ENABLED:

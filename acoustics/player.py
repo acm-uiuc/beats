@@ -48,7 +48,8 @@ def get_status():
     return status
 
 def has_ended():
-    return player.get_state() == vlc.State.Ended
+    return player.get_state() == vlc.State.Ended \
+            or player.get_state() == vlc.State.NothingSpecial
 
 def is_youtube_video(m=None):
     if m is None:

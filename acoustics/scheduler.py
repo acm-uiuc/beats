@@ -13,6 +13,7 @@ from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError
 import threading
 import time
+import player
 
 SCHEDULER_INTERVAL_SEC = 0.25
 """Interval at which to run the scheduler loop"""
@@ -60,6 +61,44 @@ class Scheduler(object):
         session.commit()
         return num_songs
 
+    def get_queue(self, user=None):
+        """
+        Returns the current ordering of songs
+
+        If user is specified, return given user's queue.
+        """
+        session = Session()
+
+        if user:
+            queued_songs = session.query(Song).join(Song.packet).filter_by(user=user).order_by(Packet.finish_time).all()
+        else:
+            queued_songs = session.query(Song).join(Song.packet).order_by(Packet.finish_time).all()
+
+        session.commit()
+        return {'queue': [song.dictify() for song in queued_songs]}
+
+    def remove_song(self, song_id):
+        """Removes the packet with the given id"""
+        session = Session()
+        session.query(Packet).filter_by(song_id=song_id).delete()
+        session.commit()
+        self._update_active_sessions()
+
+    def play_next(self):
+        if player.vlc_play_youtube():
+            return player.now_playing.dictify()
+
+        if not self.empty():
+            session = Session()
+            if player.now_playing:
+                self.remove_song(player.now_playing.id)
+                player.now_playing = None
+            next_song = session.query(Song).join(Song.packet).order_by(Packet.finish_time).first()
+            session.commit()
+            if next_song:
+                player.play_media(next_song)
+                return next_song.dictify()
+
     def empty(self):
         """Returns true if there are no queued songs"""
         # If there are no queued songs, there are also no active sessions
@@ -104,6 +143,9 @@ class Scheduler(object):
     def _scheduler_thread(self):
         """Main scheduler loop"""
         while True:
+            if player.has_ended() and \
+                    (not self.empty() or player.is_youtube_video()):
+                        self.play_next()
             self._increment_virtual_time()
             time.sleep(SCHEDULER_INTERVAL_SEC)
 
@@ -123,4 +165,7 @@ if __name__ == '__main__':
         s.vote_song('bezault2', 2);
     while True:
         print 'Virtual time: %.3f\tActive sessions: %d' % (s.virtual_time, s.active_sessions)
+        #print s.get_queue()
+        if player.now_playing:
+            print player.now_playing.dictify()
         time.sleep(SCHEDULER_INTERVAL_SEC)

@@ -23,6 +23,13 @@ class Song(Base):
     def mrl(self):
         return 'file://' + self.path
 
+    def dictify(self):
+        return {'title': self.title,
+                'album': self.album,
+                'length': self.length,
+                'path': self.path,
+                'tracknumber': self.tracknumber}
+
 class Packet(Base):
     __tablename__ = 'packets'
 
