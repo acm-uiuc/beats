@@ -29,8 +29,8 @@ class Scheduler(object):
     def vote_song(self, user, song_id):
         """Vote for a song"""
         session = Session()
-        packet = session.query(Packet).filter_by(song_id=song_id).first()
-        if packet:
+        packet = session.query(Packet).get(song_id)
+        if packet: # Song is already queued; add a vote
             if user == packet.user:
                 session.rollback()
                 raise Exception('User ' + user + ' has already voted for this song')
@@ -40,12 +40,15 @@ class Scheduler(object):
             except IntegrityError:
                 session.rollback()
                 raise Exception('User ' + user + ' has already voted for this song')
-        else:
-            packet = Packet(song_id=song_id,
-                    user=user,
-                    arrival_time=self.virtual_time)
-            session.add(packet)
-            session.commit()
+        else: # Song is not queued; queue it
+            try:
+                packet = Packet(song_id=song_id,
+                        user=user,
+                        arrival_time=self.virtual_time)
+                session.add(packet)
+                session.commit()
+            except IntegrityError:
+                raise Exception('Song with id ' + str(song_id) + ' does not exist')
             self._update_active_sessions()
 
     def num_songs_queued(self):
