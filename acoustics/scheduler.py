@@ -66,7 +66,11 @@ class Scheduler(object):
         return self.active_sessions == 0
 
     def _update_finish_times(self, user=None):
-        """Updates finish times for packets"""
+        """
+        Updates finish times for packets
+
+        If a user is specified, only update given user's queue.
+        """
         session = Session()
 
         if user:
