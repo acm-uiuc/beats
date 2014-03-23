@@ -35,6 +35,10 @@ class Packet(Base):
     def num_votes(self):
         return 1 + len(self.additional_votes)
 
+    def weight(self):
+        # The 1 denotes the user weight
+        return 1 * 2 ** (self.num_votes() - 1)
+
 class Vote(Base):
     __tablename__ = 'votes'
 

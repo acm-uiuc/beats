@@ -40,6 +40,7 @@ class Scheduler(object):
             except IntegrityError:
                 session.rollback()
                 raise Exception('User ' + user + ' has already voted for this song')
+            self._update_finish_times(packet.user)
         else: # Song is not queued; queue it
             try:
                 packet = Packet(song_id=song_id,
@@ -49,6 +50,7 @@ class Scheduler(object):
                 session.commit()
             except IntegrityError:
                 raise Exception('Song with id ' + str(song_id) + ' does not exist')
+            self._update_finish_times(user)
             self._update_active_sessions()
 
     def num_songs_queued(self):
@@ -62,6 +64,27 @@ class Scheduler(object):
         """Returns true if there are no queued songs"""
         # If there are no queued songs, there are also no active sessions
         return self.active_sessions == 0
+
+    def _update_finish_times(self, user=None):
+        """Updates finish times for packets"""
+        session = Session()
+
+        if user:
+            queued_songs = session.query(Song).join(Song.packet).filter_by(user=user).order_by(Packet.arrival_time).all()
+        else:
+            queued_songs = session.query(Song).join(Song.packet).order_by(Packet.arrival_time).all()
+
+        last_finish_time = {}
+        for song in queued_songs:
+            packet = song.packet
+            user = packet.user
+            if user in last_finish_time:
+                packet.finish_time = last_finish_time[user] + song.length / packet.weight()
+            else:
+                packet.finish_time = packet.arrival_time + song.length / packet.weight()
+            last_finish_time[user] = packet.finish_time
+
+        session.commit()
 
     def _update_active_sessions(self):
         """Updates the active_sessions member variable"""
