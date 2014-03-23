@@ -29,6 +29,7 @@ class Packet(Base):
     user = Column(String)
     arrival_time = Column(Float)
     finish_time = Column(Float)
+    num_votes = Column(Integer)
 
 def init_db():
     Base.metadata.create_all(engine)
