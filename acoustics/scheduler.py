@@ -7,8 +7,10 @@ approach to flow control in integrated services networks: the single-node case.
 IEEE/ACM Trans. Netw. 1, 3 (June 1993), 344-357. DOI=10.1109/90.234856
 http://dx.doi.org/10.1109/90.234856
 """
-from db import Session, Song, Packet
+
+from db import Session, Song, Packet, Vote
 from sqlalchemy import func, distinct
+from sqlalchemy.exc import IntegrityError
 import threading
 import time
 
@@ -29,15 +31,22 @@ class Scheduler(object):
         session = Session()
         packet = session.query(Packet).filter_by(song_id=song_id).first()
         if packet:
-            packet.num_votes += 1
+            if user == packet.user:
+                session.rollback()
+                raise Exception('User ' + user + ' has already voted for this song')
+            try:
+                packet.additional_votes.append(Vote(user=user))
+                session.commit()
+            except IntegrityError:
+                session.rollback()
+                raise Exception('User ' + user + ' has already voted for this song')
         else:
             packet = Packet(song_id=song_id,
                     user=user,
-                    num_votes=1,
                     arrival_time=self.virtual_time)
             session.add(packet)
+            session.commit()
             self._update_active_sessions()
-        session.commit()
 
     def num_songs_queued(self):
         """Returns the number of songs that are queued"""
@@ -83,5 +92,5 @@ if __name__ == '__main__':
         s.vote_song('bezault2', 3);
         s.vote_song('bezault2', 2);
     while True:
-        print s.virtual_time
+        print 'Virtual time: %.3f\tActive sessions: %d' % (s.virtual_time, s.active_sessions)
         time.sleep(SCHEDULER_INTERVAL_SEC)
