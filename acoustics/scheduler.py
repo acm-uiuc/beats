@@ -25,6 +25,7 @@ class Scheduler(object):
     """Number of users with currently queued songs"""
 
     def __init__(self):
+        self._initialize_virtual_time()
         self._update_active_sessions()
 
     def vote_song(self, user, song_id):
@@ -86,23 +87,26 @@ class Scheduler(object):
         player.stop()
         return self.get_queue()
 
-    def remove_song(self, song_id):
+    def remove_song(self, song_id, skip=False):
         """Removes the packet with the given id"""
         session = Session()
-        session.query(Packet).filter_by(song_id=song_id).delete()
-        session.commit()
+        packet = session.query(Packet).get(song_id)
         if player.now_playing.id == song_id:
             player.stop()
+            if skip:
+                self.virtual_time = packet.finish_time
+        session.delete(packet)
+        session.commit()
         self._update_active_sessions()
         return self.get_queue()
 
-    def play_next(self):
+    def play_next(self, skip=False):
         if player.vlc_play_youtube():
             return player.now_playing.dictify()
 
         if not self.empty():
             if player.now_playing:
-                self.remove_song(player.now_playing.id)
+                self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
             next_song = session.query(Song).join(Song.packet).order_by(Packet.finish_time).first()
             session.commit()
@@ -133,10 +137,12 @@ class Scheduler(object):
             packet = song.packet
             user = packet.user
             if user in last_finish_time:
-                packet.finish_time = last_finish_time[user] + song.length / packet.weight()
+                last_finish = max(last_finish_time[user], packet.arrival_time)
+                packet.finish_time = last_finish + song.length / packet.weight()
+                last_finish_time[user] = last_finish
             else:
                 packet.finish_time = packet.arrival_time + song.length / packet.weight()
-            last_finish_time[user] = packet.finish_time
+                last_finish_time[user] = packet.finish_time
 
         session.commit()
 
@@ -146,6 +152,13 @@ class Scheduler(object):
         self.active_sessions = session.query(Packet.user).distinct().count()
         session.commit()
 
+    def _initialize_virtual_time(self):
+        """Initializes virtual time to the latest packet arrival time"""
+        session = Session()
+        last_arrived_packet = session.query(Packet).order_by(Packet.arrival_time.desc()).first()
+        if last_arrived_packet:
+            self.virtual_time = last_arrived_packet.arrival_time
+
     def _increment_virtual_time(self):
         """Increments the virtual time"""
         if not self.empty():
@@ -154,6 +167,7 @@ class Scheduler(object):
     def _scheduler_thread(self):
         """Main scheduler loop"""
         while True:
+            #print 'Virtual time: %.3f\tActive sessions: %d' % (self.virtual_time, self.active_sessions)
             if player.has_ended() and \
                     (not self.empty() or player.is_youtube_video()):
                         self.play_next()
@@ -175,8 +189,6 @@ if __name__ == '__main__':
         s.vote_song('bezault2', 3);
         s.vote_song('bezault2', 2);
     while True:
-        print 'Virtual time: %.3f\tActive sessions: %d' % (s.virtual_time, s.active_sessions)
-        #print s.get_queue()
         if player.now_playing:
             print player.now_playing
         time.sleep(SCHEDULER_INTERVAL_SEC)

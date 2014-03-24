@@ -35,7 +35,7 @@ def login_required(f):
 @login_required
 @crossdomain(origin='*')
 def play_next():
-    return jsonify(scheduler.play_next() or {})
+    return jsonify(scheduler.play_next(skip=True) or {})
 
 @app.route('/v1/player/pause', methods=['POST'])
 @login_required
