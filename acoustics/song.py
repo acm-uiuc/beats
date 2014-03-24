@@ -5,6 +5,7 @@ from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
 from mutagen.mp4 import MP4
+from sqlalchemy.sql.expression import or_
 
 def remove_songs_in_dir(path):
     session = Session()
@@ -72,19 +73,14 @@ def add_songs_in_dir(path):
     return len(songs)
 
 def search_songs(query, limit=20):
-    pass
-    #songs = []
-    #if query:
-        #pattern = re.compile('.*%s.*' % query, re.IGNORECASE)
-        #res = db.songs.find(
-                #{"$or":[
-                    #{"title": pattern},
-                    #{"artist": pattern},
-                    #{"album": pattern}
-                    #]
-                    #}
-                #).limit(limit)
-        #for song in res:
-            #song['_id'] = str(song['_id'])
-            #songs.append(song)
-    #return {'query': query, 'limit': limit, 'results': songs}
+    songs = []
+    if query:
+        session = Session()
+        res = session.query(Song).filter(or_(
+            Song.title.like('%' + query + '%'),
+            Song.artist.like('%' + query + '%'),
+            Song.album.like('%' + query + '%'))) \
+                    .limit(limit).all()
+        session.commit()
+        songs = [song.dictify() for song in res]
+    return {'query': query, 'limit': limit, 'results': songs}
