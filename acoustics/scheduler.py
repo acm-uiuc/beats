@@ -158,6 +158,7 @@ class Scheduler(object):
         last_arrived_packet = session.query(Packet).order_by(Packet.arrival_time.desc()).first()
         if last_arrived_packet:
             self.virtual_time = last_arrived_packet.arrival_time
+        session.commit()
 
     def _increment_virtual_time(self):
         """Increments the virtual time"""
