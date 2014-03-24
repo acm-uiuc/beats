@@ -1,5 +1,6 @@
 [Authentication]
 enabled = true
+test_username = test_user
 
 [Crowd]
 server = replace_me:port

@@ -9,6 +9,8 @@ import player
 import user
 
 AUTHENTICATION_ENABLED = config.getboolean('Authentication', 'enabled')
+if not AUTHENTICATION_ENABLED:
+    TEST_USERNAME = config.get('Authentication', 'test_username')
 
 app = Flask(__name__)
 #app.debug = True
@@ -92,7 +94,7 @@ def queue_clear():
 def queue_add():
     token = request.form.get('token')
     if not AUTHENTICATION_ENABLED:
-        username = 'test_user'
+        username = TEST_USERNAME
     else:
         session = user.get_session(token)
         username = session.json()['user']['name']
