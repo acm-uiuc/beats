@@ -4,7 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, relationship
 
-engine = create_engine('sqlite:///acoustics.db', echo=True)
+engine = create_engine('sqlite:///acoustics.db',
+        connect_args={'check_same_thread': False})
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -24,7 +25,8 @@ class Song(Base):
         return 'file://' + self.path
 
     def dictify(self):
-        return {'title': self.title,
+        return {'id': self.id,
+                'title': self.title,
                 'album': self.album,
                 'length': self.length,
                 'path': self.path,

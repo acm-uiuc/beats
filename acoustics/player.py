@@ -47,9 +47,16 @@ def get_status():
         status['duration'] = media.get_duration()
     return status
 
+def get_now_playing():
+    global now_playing
+    obj = {'player_status': get_status()}
+    if now_playing:
+        obj['media'] = now_playing.dictify()
+    return obj
+
 def has_ended():
-    return player.get_state() == vlc.State.Ended \
-            or player.get_state() == vlc.State.NothingSpecial
+    return player.get_state() in \
+            [vlc.State.Ended, vlc.State.Stopped, vlc.State.NothingSpecial]
 
 def is_youtube_video(m=None):
     if m is None:

@@ -4,7 +4,6 @@ from crossdomain import crossdomain
 from song import Song, search_songs
 from youtube import YTVideo
 from scheduler import Scheduler
-from queue import Queue
 from config import config
 import player
 import user
@@ -12,7 +11,7 @@ import user
 AUTHENTICATION_ENABLED = config.getboolean('Authentication', 'enabled')
 
 app = Flask(__name__)
-app.debug = True
+#app.debug = True
 
 scheduler = Scheduler()
 scheduler.start()
@@ -36,7 +35,7 @@ def login_required(f):
 @login_required
 @crossdomain(origin='*')
 def play_next():
-    return jsonify(queue.play_next(force=True) or {})
+    return jsonify(scheduler.play_next() or {})
 
 @app.route('/v1/player/pause', methods=['POST'])
 @login_required
@@ -70,39 +69,48 @@ def search():
 @app.route('/v1/queue', methods=['GET'])
 @crossdomain(origin='*')
 def show_queue():
-    return jsonify(queue.get_queue())
+    user = request.args.get('user')
+    if user:
+        return jsonify(scheduler.get_queue(user))
+    return jsonify(scheduler.get_queue())
 
-@app.route('/v1/queue/<int:pos>', methods=['DELETE'])
+@app.route('/v1/queue/<int:song_id>', methods=['DELETE'])
 @login_required
 @crossdomain(origin='*')
-def queue_remove(pos):
-    return jsonify(queue.remove(pos))
+def queue_remove(song_id):
+    return jsonify(scheduler.remove_song(song_id))
 
 @app.route('/v1/queue', methods=['DELETE'])
 @login_required
 @crossdomain(origin='*')
 def queue_clear():
-    return jsonify(queue.clear())
+    return jsonify(scheduler.clear())
 
 @app.route('/v1/queue/add', methods=['POST'])
 @login_required
 @crossdomain(origin='*')
 def queue_add():
+    token = request.form.get('token')
+    if not AUTHENTICATION_ENABLED:
+        username = 'test_user'
+    else:
+        session = user.get_session(token)
+        username = session.json()['user']['name']
     if request.form.get('id'):
         song_id = request.form.get('id')
         try:
-            return jsonify(queue.add(Song(song_id)))
+            return jsonify(scheduler.vote_song(username, song_id))
         except Exception, e:
-            return jsonify({'message': str(e)}), 404
-    elif request.form.get('url'):
-        url = request.form.get('url')
-        return jsonify(queue.add(YTVideo(url)))
+            return jsonify({'message': str(e)}), 400
+    #elif request.form.get('url'):
+        #url = request.form.get('url')
+        #return jsonify(queue.add(YTVideo(url)))
     return jsonify({'message': 'No id or url parameter'}), 400
 
 @app.route('/v1/now_playing', methods=['GET'])
 @crossdomain(origin='*')
 def now_playing():
-    return jsonify(queue.now_playing() or {})
+    return jsonify(player.get_now_playing() or {})
 
 @app.route('/v1/user', methods=['GET'])
 @crossdomain(origin='*')

@@ -50,9 +50,11 @@ class Scheduler(object):
                 session.add(packet)
                 session.commit()
             except IntegrityError:
+                session.rollback()
                 raise Exception('Song with id ' + str(song_id) + ' does not exist')
             self._update_finish_times(user)
             self._update_active_sessions()
+        return self.get_queue()
 
     def num_songs_queued(self):
         """Returns the number of songs that are queued"""
@@ -77,22 +79,31 @@ class Scheduler(object):
         session.commit()
         return {'queue': [song.dictify() for song in queued_songs]}
 
+    def clear(self):
+        session = Session()
+        session.query(Packet).delete()
+        session.commit()
+        player.stop()
+        return self.get_queue()
+
     def remove_song(self, song_id):
         """Removes the packet with the given id"""
         session = Session()
         session.query(Packet).filter_by(song_id=song_id).delete()
         session.commit()
+        if player.now_playing.id == song_id:
+            player.stop()
         self._update_active_sessions()
+        return self.get_queue()
 
     def play_next(self):
         if player.vlc_play_youtube():
             return player.now_playing.dictify()
 
         if not self.empty():
-            session = Session()
             if player.now_playing:
                 self.remove_song(player.now_playing.id)
-                player.now_playing = None
+            session = Session()
             next_song = session.query(Song).join(Song.packet).order_by(Packet.finish_time).first()
             session.commit()
             if next_song:
@@ -167,5 +178,5 @@ if __name__ == '__main__':
         print 'Virtual time: %.3f\tActive sessions: %d' % (s.virtual_time, s.active_sessions)
         #print s.get_queue()
         if player.now_playing:
-            print player.now_playing.dictify()
+            print player.now_playing
         time.sleep(SCHEDULER_INTERVAL_SEC)
