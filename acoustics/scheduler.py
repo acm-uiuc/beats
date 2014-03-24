@@ -68,7 +68,8 @@ class Scheduler(object):
         """
         Returns the current ordering of songs
 
-        If user is specified, return given user's queue.
+        If there is a song currently playing, puts it at the front of the list.
+        If user is specified, returns given user's queue.
         """
         session = Session()
 
@@ -78,7 +79,16 @@ class Scheduler(object):
             queued_songs = session.query(Song).join(Song.packet).order_by(Packet.finish_time).all()
 
         session.commit()
-        return {'queue': [song.dictify() for song in queued_songs]}
+
+        queue = [song.dictify() for song in queued_songs]
+
+        # Put now playing song at front of list
+        if player.now_playing:
+            for i, song in enumerate(queue):
+                if player.now_playing.id == song['id']:
+                    return {'queue': [queue[i]] + queue[:i] + queue[i+1:]}
+
+        return {'queue': queue}
 
     def clear(self):
         session = Session()
