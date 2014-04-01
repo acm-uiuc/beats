@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+from gevent.wsgi import WSGIServer
 from functools import wraps
 from crossdomain import crossdomain
 from song import Song, search_songs
@@ -144,4 +145,5 @@ def delete_session(token):
 if __name__ == '__main__':
     print 'Acoustics Media Player'
     print 'VLC version: ' + player.get_vlc_version()
-    app.run()
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
