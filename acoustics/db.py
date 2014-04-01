@@ -3,8 +3,11 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, relationship
+from config import config
 
-engine = create_engine('mysql://root@localhost/acoustics2', pool_recycle=3600)
+DATABASE_URL = config.get('Database', 'url')
+
+engine = create_engine(DATABASE_URL, pool_recycle=3600)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 

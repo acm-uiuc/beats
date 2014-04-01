@@ -6,3 +6,6 @@ test_username = testuser
 server = replace_me:port
 application_name = replace_me
 password = replace_me
+
+[Database]
+url = mysql://root@localhost/acoustics2
