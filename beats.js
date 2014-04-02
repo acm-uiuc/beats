@@ -110,7 +110,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             $scope.showDialog = true;
             return;
         }
-        $http.post(backendBase + '/v1/queue/add', 'id=' + song._id + '&token=' + $cookies['crowd.token_key'],
+        $http.post(backendBase + '/v1/queue/add', 'id=' + song.id + '&token=' + $cookies['crowd.token_key'],
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
