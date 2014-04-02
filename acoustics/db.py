@@ -29,6 +29,7 @@ class Song(Base):
     def dictify(self):
         return {'id': self.id,
                 'title': self.title,
+                'artist': self.artist,
                 'album': self.album,
                 'length': self.length,
                 'path': self.path,
