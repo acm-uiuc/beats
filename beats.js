@@ -23,7 +23,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.queue = [];
     $scope.volumePercentage = 0.5;
     $scope.playbackTime = 0;
-    $scope.playbackDuration = 100;
+    $scope.playbackDuration = 0;
 
     $scope.sections =
     [
@@ -146,11 +146,17 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $interval(function()
     {
-        $http.get(backendBase + '/v1/player/status')
+        $http.get(backendBase + '/v1/now_playing')
         .success(function(data)
         {
-            $scope.playbackTime = data['current_time'] / 1000;
-            $scope.playbackDuration = data['duration'] / 1000;
+            if (data['media']) {
+                $scope.playbackTime = data['player_status']['current_time'] / 1000;
+                $scope.playbackDuration = data['player_status']['duration'] / 1000;
+            }
+            else {
+                $scope.playbackTime = 0;
+                $scope.playbackDuration = 0;
+            }
         });
 
         $http.get(backendBase + '/v1/queue')
