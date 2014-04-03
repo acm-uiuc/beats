@@ -3,11 +3,12 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.pool import NullPool
 from config import config
 
 DATABASE_URL = config.get('Database', 'url')
 
-engine = create_engine(DATABASE_URL, pool_recycle=3600)
+engine = create_engine(DATABASE_URL, poolclass=NullPool)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
