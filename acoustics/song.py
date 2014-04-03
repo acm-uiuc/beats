@@ -38,22 +38,27 @@ def add_songs_in_dir(path):
                     if ext in {'.m4a', '.mp4'}:
                         title = song.tags['\xa9nam'][0]
                         artist = song.tags['\xa9ART'][0]
-                        album = song.tags['\xa9alb'][0]
                     else:
                         title = song.tags['title'][0]
                         artist = song.tags['artist'][0]
-                        album = song.tags['album'][0]
                 except Exception:
                     print 'Skipped: ' + filepath
                     continue
 
                 song_obj = {'title': title,
                     'artist': artist,
-                    'album': album,
                     'length': song.info.length,
                     'path': filepath}
 
-                try:
+                try: # Album optional for singles
+                    if ext in {'.m4a', '.mp4'}:
+                        song_obj['album'] = song.tags['\xa9alb'][0]
+                    else:
+                        song_obj['album'] = song.tags['album'][0]
+                except Exception:
+                    song_obj['album'] = None
+
+                try: # Track number optional
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['tracknumber'] = song.tags['trkn'][0][0]
                     else:
