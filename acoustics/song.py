@@ -14,7 +14,9 @@ def remove_songs_in_dir(path):
 
 def add_songs_in_dir(path):
     remove_songs_in_dir(path)
-    songs = []
+    table = Song.__table__
+    conn = engine.connect()
+    num_songs = 0
     for root, _, files in walk(path):
         for f in files:
             ext = splitext(f)[1]
@@ -66,16 +68,12 @@ def add_songs_in_dir(path):
                 except Exception:
                     song_obj['tracknumber'] = None
 
-                songs.append(song_obj)
-    if not songs:
-        return 0
+                print filepath
+                conn.execute(table.insert().values(song_obj))
+                num_songs += 1
 
-    table = Song.__table__
-    conn = engine.connect()
-    conn.execute(table.insert(), songs)
     conn.close()
-
-    return len(songs)
+    return num_songs
 
 def search_songs(query, limit=20):
     songs = []
