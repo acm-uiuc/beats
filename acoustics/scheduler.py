@@ -27,6 +27,7 @@ class Scheduler(object):
     def __init__(self):
         self._initialize_virtual_time()
         self._update_active_sessions()
+        self._update_finish_times()
 
     def vote_song(self, user, song_id):
         """Vote for a song"""
@@ -149,7 +150,7 @@ class Scheduler(object):
             if user in last_finish_time:
                 last_finish = max(last_finish_time[user], packet.arrival_time)
                 packet.finish_time = last_finish + song.length / packet.weight()
-                last_finish_time[user] = last_finish
+                last_finish_time[user] = packet.finish_time
             else:
                 packet.finish_time = packet.arrival_time + song.length / packet.weight()
                 last_finish_time[user] = packet.finish_time
