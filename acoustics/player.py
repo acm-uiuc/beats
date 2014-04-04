@@ -3,6 +3,7 @@ import vlc
 instance = vlc.Instance('--no-video')
 player = instance.media_player_new()
 now_playing = None
+volume = 100
 
 def play(mrl):
     m = instance.media_new(mrl)
@@ -41,6 +42,7 @@ def stop():
 def get_status():
     media = player.get_media()
     status = {'state': str(player.get_state())}
+    status['volume'] = volume
     if media:
         status['media'] = vlc.bytes_to_str(media.get_mrl())
         status['current_time'] = player.get_time()
@@ -53,6 +55,12 @@ def get_now_playing():
     if now_playing:
         obj['media'] = now_playing.dictify()
     return obj
+
+def set_volume(vol):
+    global volume
+    volume = vol
+    player.audio_set_volume(vol)
+    return get_status()
 
 def has_ended():
     return player.get_state() in \

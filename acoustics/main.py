@@ -51,6 +51,18 @@ def pause():
 def player_status():
     return jsonify(player.get_status())
 
+@app.route('/v1/player/volume', methods=['POST'])
+@login_required
+@crossdomain(origin='*')
+def player_set_volume():
+    if request.form.get('volume'):
+        vol = int(request.form.get('volume'))
+        if 0 <= vol <= 100:
+            return jsonify(player.set_volume(vol))
+        else:
+            return jsonify({'message': 'Volume must be between 0 and 100'}), 400
+    return jsonify({'message': 'No volume parameter'}), 400
+
 @app.route('/v1/songs/<song_id>', methods=['GET'])
 @crossdomain(origin='*')
 def show_song(song_id):
