@@ -55,12 +55,8 @@ class Packet(Base):
 class Vote(Base):
     __tablename__ = 'votes'
 
-    id = Column(Integer, primary_key=True)
-    packet_id = Column(Integer, ForeignKey('packets.song_id', ondelete='CASCADE'))
-    user = Column(String(8))
-
-    __table_args__ = (UniqueConstraint('packet_id', 'user'),
-            )
+    packet_id = Column(Integer, ForeignKey('packets.song_id', ondelete='CASCADE'), primary_key=True)
+    user = Column(String(8), primary_key=True)
 
 def init_db():
     Base.metadata.create_all(engine)

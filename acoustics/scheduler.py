@@ -11,6 +11,7 @@ http://dx.doi.org/10.1109/90.234856
 from db import Session, Song, Packet, Vote
 from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
 import threading
 import time
 import player
@@ -40,7 +41,7 @@ class Scheduler(object):
             try:
                 packet.additional_votes.append(Vote(user=user))
                 session.commit()
-            except IntegrityError:
+            except FlushError:
                 session.rollback()
                 raise Exception('User ' + user + ' has already voted for this song')
             self._update_finish_times(packet.user)
