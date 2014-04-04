@@ -71,18 +71,21 @@ class Scheduler(object):
         Returns the current ordering of songs
 
         If there is a song currently playing, puts it at the front of the list.
-        If user is specified, returns given user's queue.
+        If user is specified, returns whether or not the user has voted for each song.
         """
         session = Session()
-
-        if user:
-            queued_songs = session.query(Song).join(Song.packet).filter_by(user=user).order_by(Packet.finish_time).all()
-        else:
-            queued_songs = session.query(Song).join(Song.packet).order_by(Packet.finish_time).all()
-
+        queued_songs = session.query(Song).join(Song.packet).order_by(Packet.finish_time).all()
         session.commit()
 
-        queue = [song.dictify() for song in queued_songs]
+        queue = []
+        for song in queued_songs:
+            song_obj = song.dictify()
+            song_obj['packet'] = {
+                    'num_votes': song.packet.num_votes(),
+                    'user': song.packet.user,
+                    'has_voted': song.packet.has_voted(user) if user else False
+                    }
+            queue.append(song_obj)
 
         # Put now playing song at front of list
         if player.now_playing:

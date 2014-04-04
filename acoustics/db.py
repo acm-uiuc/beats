@@ -52,6 +52,9 @@ class Packet(Base):
         # The 1 denotes the user weight
         return 1 * 2 ** (self.num_votes() - 1)
 
+    def has_voted(self, user):
+        return self.user == user or any(vote.user == user for vote in self.additional_votes)
+
 class Vote(Base):
     __tablename__ = 'votes'
 
