@@ -79,7 +79,7 @@
                 <span class="title" title="{{ song.title }}">{{ song.title }}</span>
                 <span class="album" title="{{ song.album }}">{{ song.album }}</span>
                 <span class="artist" title="{{ song.artist }}">{{ song.artist }}</span>
-                <span ng-show="!$first" class="vote" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span>
+                <span ng-show="!$first" class="vote" ng-click="voteSong(song)" data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span>
               </li>
           </ul>
         </div>
