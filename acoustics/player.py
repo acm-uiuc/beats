@@ -56,7 +56,7 @@ def get_now_playing():
 
 def has_ended():
     return player.get_state() in \
-            [vlc.State.Ended, vlc.State.Stopped, vlc.State.NothingSpecial]
+            [vlc.State.Ended, vlc.State.Stopped, vlc.State.NothingSpecial, vlc.State.Error]
 
 def is_youtube_video(m=None):
     if m is None:
