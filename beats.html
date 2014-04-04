@@ -90,8 +90,8 @@
         <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
         <div class="control bar volume" title="Volume">
-          <div class="cover" style="width: {{ volumePercentage * 100 }}%"></div>
-          <div class="handle" style="left: {{ volumePercentage * 100 }}%"></div>
+          <div class="cover" style="width: {{ volume }}%"></div>
+          <div class="handle" style="left: {{ volume }}%"></div>
         </div>
         <div class="control label current-time-label" title="Track">{{ playbackTime|momentFormat }}</div>
         <div class="control bar track" title="Track">

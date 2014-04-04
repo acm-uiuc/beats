@@ -21,7 +21,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.loggedIn = null;
     $scope.playlist = [];
     $scope.queue = [];
-    $scope.volumePercentage = 0.5;
+    $scope.volume = 100;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
 
@@ -157,6 +157,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 $scope.playbackTime = 0;
                 $scope.playbackDuration = 0;
             }
+            $scope.volume = data['player_status']['volume'];
         });
 
         $http.get(backendBase + '/v1/queue')
