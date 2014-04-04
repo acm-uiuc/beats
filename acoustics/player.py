@@ -50,7 +50,6 @@ def get_status():
     return status
 
 def get_now_playing():
-    global now_playing
     obj = {'player_status': get_status()}
     if now_playing:
         obj['media'] = now_playing.dictify()
