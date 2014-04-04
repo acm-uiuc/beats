@@ -46,11 +46,6 @@ def play_next():
 def pause():
     return jsonify(player.pause())
 
-@app.route('/v1/player/status', methods=['GET'])
-@crossdomain(origin='*')
-def player_status():
-    return jsonify(player.get_status())
-
 @app.route('/v1/player/volume', methods=['POST'])
 @login_required
 @crossdomain(origin='*')
