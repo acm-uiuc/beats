@@ -9,6 +9,7 @@ http://dx.doi.org/10.1109/90.234856
 """
 
 from db import Session, Song, Packet, Vote
+from song import random_songs
 from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
@@ -119,7 +120,10 @@ class Scheduler(object):
         if player.vlc_play_youtube():
             return player.now_playing.dictify()
 
-        if not self.empty():
+        if self.empty():
+            random_song = random_songs(1)['results'][0]
+            self.vote_song('RANDOM', random_song['id'])
+        else:
             if player.now_playing:
                 self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
@@ -184,9 +188,8 @@ class Scheduler(object):
         """Main scheduler loop"""
         while True:
             #print 'Virtual time: %.3f\tActive sessions: %d' % (self.virtual_time, self.active_sessions)
-            if player.has_ended() and \
-                    (not self.empty() or player.is_youtube_video()):
-                        self.play_next()
+            if player.has_ended():
+                self.play_next()
             self._increment_virtual_time()
             time.sleep(SCHEDULER_INTERVAL_SEC)
 
