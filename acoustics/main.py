@@ -78,6 +78,14 @@ def search():
             return jsonify(song.search_songs(query, int(limit)))
         return jsonify(song.search_songs(query))
 
+@app.route('/v1/songs/random', methods=['GET'])
+@crossdomain(origin='*')
+def random_songs():
+    limit = request.args.get('limit')
+    if limit and int(limit) != 0:
+        return jsonify(song.random_songs(int(limit)))
+    return jsonify(song.random_songs())
+
 @app.route('/v1/queue', methods=['GET'])
 @crossdomain(origin='*')
 def show_queue():

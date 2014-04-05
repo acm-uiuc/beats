@@ -5,7 +5,7 @@ from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
 from mutagen.mp4 import MP4
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import or_, func
 
 def remove_songs_in_dir(path):
     session = Session()
@@ -87,6 +87,13 @@ def search_songs(query, limit=20):
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': query, 'limit': limit, 'results': songs}
+
+def random_songs(limit=20):
+    session = Session()
+    res = session.query(Song).order_by(func.rand()).limit(limit).all()
+    session.commit()
+    songs = [song.dictify() for song in res]
+    return {'query': '', 'limit': limit, 'results': songs}
 
 def get_album(album):
     songs = []
