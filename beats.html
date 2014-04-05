@@ -66,7 +66,7 @@
                 <td style="text-align: center" ng-click="voteSong(song)"><span data-icon="{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}"></span></td>
                 <td>{{ song.tracknumber }}</td>
                 <td>{{ song.title }}</td>
-                <td>{{ song.album }}</td>
+                <td><span ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
                 <td>{{ song.artist }}</td>
                 <td>{{ song.length|momentFormat }}</td>
               </tr>
