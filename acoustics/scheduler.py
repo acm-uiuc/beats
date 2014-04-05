@@ -121,8 +121,9 @@ class Scheduler(object):
             return player.now_playing.dictify()
 
         if self.empty():
-            random_song = random_songs(1)['results'][0]
-            self.vote_song('RANDOM', random_song['id'])
+            random_song = random_songs(1)['results']
+            if len(random_song) == 1:
+                self.vote_song('RANDOM', random_song[0]['id'])
 
         if not self.empty():
             if player.now_playing:
