@@ -123,7 +123,8 @@ class Scheduler(object):
         if self.empty():
             random_song = random_songs(1)['results'][0]
             self.vote_song('RANDOM', random_song['id'])
-        else:
+
+        if not self.empty():
             if player.now_playing:
                 self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
