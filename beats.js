@@ -88,6 +88,10 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.searchSongs = function(query)
     {
+        if (!query) {
+            $scope.randomSongs();
+            return;
+        }
         $http.get(backendBase + '/v1/songs/search',
         {
             params: { 'q': query }
@@ -104,6 +108,24 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             $scope.searchText = query;
         });
     }
+
+    $scope.randomSongs = function()
+    {
+        $http.get(backendBase + '/v1/songs/random')
+        .success(function(data)
+        {
+            var songs = [];
+            for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
+            {
+                var result = data.results[resultIndex];
+                songs[resultIndex] = result;
+            }
+            $scope.playlist = songs;
+            $scope.searchText = query;
+        });
+    }
+
+    $scope.randomSongs();
 
     $scope.voteSong = function(song)
     {
