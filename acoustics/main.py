@@ -2,10 +2,10 @@ from flask import Flask, request, jsonify, Response
 from gevent.wsgi import WSGIServer
 from functools import wraps
 from crossdomain import crossdomain
-from song import Song, search_songs
 from youtube import YTVideo
 from scheduler import Scheduler
 from config import config
+import song
 import player
 import user
 
@@ -70,11 +70,13 @@ def show_song(song_id):
 @crossdomain(origin='*')
 def search():
     query = request.args.get('q')
-    limit = request.args.get('limit')
-    if limit and int(limit) != 0:
-        return jsonify(search_songs(query, int(limit)))
-    return jsonify(search_songs(query))
-
+    if query.startswith('album:'):
+        return jsonify(song.get_album(query[6:].lstrip()))
+    else:
+        limit = request.args.get('limit')
+        if limit and int(limit) != 0:
+            return jsonify(song.search_songs(query, int(limit)))
+        return jsonify(song.search_songs(query))
 
 @app.route('/v1/queue', methods=['GET'])
 @crossdomain(origin='*')

@@ -87,3 +87,12 @@ def search_songs(query, limit=20):
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': query, 'limit': limit, 'results': songs}
+
+def get_album(album):
+    songs = []
+    if album:
+        session = Session()
+        res = session.query(Song).filter_by(album=album).order_by(Song.tracknumber, Song.path).all()
+        session.commit()
+        songs = [song.dictify() for song in res]
+    return {'query': album, 'results': songs}
