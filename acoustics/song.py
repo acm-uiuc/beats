@@ -1,4 +1,4 @@
-from db import Song, Session, engine
+from db import Song, PlayHistory, Session, engine
 from os import walk
 from os.path import splitext, join
 from mutagen.mp3 import EasyMP3
@@ -103,3 +103,14 @@ def get_album(album):
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': album, 'results': songs}
+
+def get_history(limit=20):
+    session = Session()
+    history_items = session.query(PlayHistory).order_by(PlayHistory.id.desc()).limit(limit).all()
+    session.commit()
+    history = []
+    for item in history_items:
+        song_obj = session.query(Song).get(item.song_id).dictify()
+        history_obj = {'played': str(item.played), 'song': song_obj}
+        history.append(history_obj)
+    return {'limit': limit, 'results': history}

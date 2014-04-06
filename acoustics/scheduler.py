@@ -8,7 +8,7 @@ IEEE/ACM Trans. Netw. 1, 3 (June 1993), 344-357. DOI=10.1109/90.234856
 http://dx.doi.org/10.1109/90.234856
 """
 
-from db import Session, Song, Packet, Vote
+from db import Session, Song, PlayHistory, Packet, Vote
 from song import random_songs
 from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError
@@ -130,10 +130,13 @@ class Scheduler(object):
                 self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
             next_song = session.query(Song).join(Song.packet).order_by(Packet.finish_time).first()
-            session.commit()
             if next_song:
                 player.play_media(next_song)
+                next_song.history.append(PlayHistory())
+                session.commit()
                 return next_song.dictify()
+            else:
+                session.commit()
 
     def empty(self):
         """Returns true if there are no queued songs"""

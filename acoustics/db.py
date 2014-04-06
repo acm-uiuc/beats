@@ -1,10 +1,11 @@
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.pool import NullPool
 from config import config
+import datetime
 
 DATABASE_URL = config.get('Database', 'url')
 
@@ -23,6 +24,7 @@ class Song(Base):
     path = Column(String(500))
     tracknumber = Column(Integer)
     packet = relationship('Packet', uselist=False, cascade='all,delete-orphan', passive_deletes=True, backref='songs')
+    history = relationship('PlayHistory', cascade='all,delete-orphan', passive_deletes=True, backref='songs')
 
     def mrl(self):
         return 'file://' + self.path
@@ -34,7 +36,29 @@ class Song(Base):
                 'album': self.album,
                 'length': self.length,
                 'path': self.path,
-                'tracknumber': self.tracknumber}
+                'tracknumber': self.tracknumber,
+                'play_count': self.play_count(),
+                'last_played': str(self.last_played())}
+
+    def play_count(self):
+        session = Session()
+        count = session.query(PlayHistory).filter_by(song_id=self.id).count()
+        session.commit()
+        return count
+
+    def last_played(self):
+        session = Session()
+        history_item = session.query(PlayHistory).filter_by(song_id=self.id).order_by(PlayHistory.id.desc()).first()
+        session.commit()
+        if history_item:
+            return history_item.played
+
+class PlayHistory(Base):
+    __tablename__ = 'play_history'
+
+    id = Column(Integer, primary_key=True)
+    song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'))
+    played = Column(DateTime, default=datetime.datetime.utcnow)
 
 class Packet(Base):
     __tablename__ = 'packets'
