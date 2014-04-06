@@ -34,6 +34,14 @@ def login_required(f):
 
     return decorated_function
 
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'message': str(error)}), 404
+
+@app.errorhandler(500)
+def not_found(error):
+    return jsonify({'message': str(error)}), 500
+
 @app.route('/v1/player/play_next', methods=['POST'])
 @login_required
 @crossdomain(origin='*')
