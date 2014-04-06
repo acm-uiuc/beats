@@ -5,6 +5,7 @@ from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
 from mutagen.mp4 import MP4
+from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import or_, func
 
 def remove_songs_in_dir(path):
@@ -114,3 +115,32 @@ def get_history(limit=20):
         history_obj = {'played': str(item.played), 'song': song_obj}
         history.append(history_obj)
     return {'limit': limit, 'results': history}
+
+def top_songs(limit=20):
+    songs = Song.__table__
+    play_history = PlayHistory.__table__
+    conn = engine.connect()
+    s = select([songs.c.id, func.count(play_history.c.id).label('play_count')]) \
+            .select_from(songs.join(play_history)) \
+            .group_by(songs.c.id) \
+            .order_by('play_count DESC') \
+            .limit(limit)
+    res = conn.execute(s)
+    conn.close()
+    session = Session()
+    songs = [session.query(Song).get(song[0]).dictify() for song in res]
+    session.commit()
+    return {'limit': limit, 'results': songs}
+
+def top_artists(limit=20):
+    songs = Song.__table__
+    play_history = PlayHistory.__table__
+    conn = engine.connect()
+    s = select([songs.c.artist, func.count(play_history.c.id).label('play_count')]) \
+            .select_from(songs.join(play_history)) \
+            .group_by(songs.c.artist) \
+            .order_by('play_count DESC') \
+            .limit(limit)
+    res = [{'artist': row[0], 'play_count': row[1]} for row in conn.execute(s)]
+    conn.close()
+    return {'limit': limit, 'results': res}
