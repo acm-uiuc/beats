@@ -59,6 +59,7 @@ class PlayHistory(Base):
 
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'))
+    user = Column(String(8))
     played_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class Packet(Base):

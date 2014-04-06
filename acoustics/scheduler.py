@@ -132,7 +132,7 @@ class Scheduler(object):
             next_song = session.query(Song).join(Song.packet).order_by(Packet.finish_time).first()
             if next_song:
                 player.play_media(next_song)
-                next_song.history.append(PlayHistory())
+                next_song.history.append(PlayHistory(user=next_song.packet.user))
                 session.commit()
                 return next_song.dictify()
             else:
