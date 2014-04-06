@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, Response
 from gevent.wsgi import WSGIServer
 from functools import wraps
 from crossdomain import crossdomain
-from youtube import YTVideo
 from scheduler import Scheduler
 from config import config
 import song
@@ -163,12 +162,15 @@ def queue_add():
     if request.form.get('id'):
         song_id = request.form.get('id')
         try:
-            return jsonify(scheduler.vote_song(username, song_id))
+            return jsonify(scheduler.vote_song(username, song_id=song_id))
         except Exception, e:
             return jsonify({'message': str(e)}), 400
-    #elif request.form.get('url'):
-        #url = request.form.get('url')
-        #return jsonify(queue.add(YTVideo(url)))
+    elif request.form.get('url'):
+        url = request.form.get('url')
+        try:
+            return jsonify(scheduler.vote_song(username, video_url=url))
+        except Exception, e:
+            return jsonify({'message': str(e)}), 400
     return jsonify({'message': 'No id or url parameter'}), 400
 
 @app.route('/v1/now_playing', methods=['GET'])

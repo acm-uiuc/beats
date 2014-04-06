@@ -10,12 +10,14 @@ http://dx.doi.org/10.1109/90.234856
 
 from db import Session, Song, PlayHistory, Packet, Vote
 from song import random_songs
+from youtube import get_youtube_video_details, YouTubeVideo
 from sqlalchemy import func, distinct
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 import threading
 import time
 import player
+import re
 
 SCHEDULER_INTERVAL_SEC = 0.25
 """Interval at which to run the scheduler loop"""
@@ -31,10 +33,17 @@ class Scheduler(object):
         self._update_active_sessions()
         self._update_finish_times()
 
-    def vote_song(self, user, song_id):
+    def vote_song(self, user, song_id=None, video_url=None):
         """Vote for a song"""
         session = Session()
-        packet = session.query(Packet).filter_by(song_id=song_id).first()
+
+        if video_url:
+            packet = session.query(Packet).filter_by(video_url=video_url).first()
+        elif song_id is not None:
+            packet = session.query(Packet).filter_by(song_id=song_id).first()
+        else:
+            raise Exception('Must specify either song_id or video_url')
+
         if packet: # Song is already queued; add a vote
             if user == packet.user:
                 session.rollback()
@@ -47,15 +56,34 @@ class Scheduler(object):
                 raise Exception('User ' + user + ' has already voted for this song')
             self._update_finish_times(packet.user)
         else: # Song is not queued; queue it
-            try:
-                packet = Packet(song_id=song_id,
-                        user=user,
-                        arrival_time=self.virtual_time)
-                session.add(packet)
-                session.commit()
-            except IntegrityError:
-                session.rollback()
-                raise Exception('Song with id ' + str(song_id) + ' does not exist')
+            if video_url:
+                if 'www.youtube.com' in video_url:
+                    try:
+                        video_url = re.sub('^https', 'http', video_url)
+                        video_details = get_youtube_video_details(video_url)
+                        packet = Packet(video_url=video_url,
+                                video_title=video_details['title'],
+                                video_length=video_details['length'],
+                                user=user,
+                                arrival_time=self.virtual_time)
+                        session.add(packet)
+                        session.commit()
+                    except Exception, e:
+                        session.rollback()
+                        raise e
+                else:
+                    session.rollback()
+                    raise Exception('Unsupported website')
+            else:
+                try:
+                    packet = Packet(song_id=song_id,
+                            user=user,
+                            arrival_time=self.virtual_time)
+                    session.add(packet)
+                    session.commit()
+                except IntegrityError:
+                    session.rollback()
+                    raise Exception('Song with id ' + str(song_id) + ' does not exist')
             self._update_finish_times(user)
             self._update_active_sessions()
         return self.get_queue()
@@ -75,24 +103,43 @@ class Scheduler(object):
         If user is specified, returns whether or not the user has voted for each song.
         """
         session = Session()
-        queued_songs = session.query(Song).join(Song.packet).order_by(Packet.finish_time).all()
+        packets = session.query(Packet).order_by(Packet.finish_time).all()
         session.commit()
 
         queue = []
-        for song in queued_songs:
-            song_obj = song.dictify()
-            song_obj['packet'] = {
-                    'num_votes': song.packet.num_votes(),
-                    'user': song.packet.user,
-                    'has_voted': song.packet.has_voted(user) if user else False
-                    }
-            queue.append(song_obj)
+        for packet in packets:
+            if packet.video_url:
+                video = YouTubeVideo(packet)
+                video_obj = video.dictify()
+                video_obj['packet'] = {
+                        'num_votes': packet.num_votes(),
+                        'user': packet.user,
+                        'has_voted': packet.has_voted(user) if user else False
+                        }
+                queue.append(video_obj)
+            else:
+                song = session.query(Song).get(packet.song_id)
+                song_obj = song.dictify()
+                song_obj['packet'] = {
+                        'num_votes': packet.num_votes(),
+                        'user': packet.user,
+                        'has_voted': packet.has_voted(user) if user else False
+                        }
+                queue.append(song_obj)
 
         # Put now playing song at front of list
         if player.now_playing:
             for i, song in enumerate(queue):
-                if player.now_playing.id == song['id']:
-                    return {'queue': [queue[i]] + queue[:i] + queue[i+1:]}
+                try:
+                    if player.now_playing.id == song['id']:
+                        return {'queue': [queue[i]] + queue[:i] + queue[i+1:]}
+                except:
+                    pass
+                try:
+                    if player.now_playing.url == song['url']:
+                        return {'queue': [queue[i]] + queue[:i] + queue[i+1:]}
+                except:
+                    pass
 
         return {'queue': queue}
 
@@ -107,7 +154,20 @@ class Scheduler(object):
         """Removes the packet with the given id"""
         session = Session()
         packet = session.query(Packet).filter_by(song_id=song_id).first()
-        if player.now_playing.id == song_id:
+        if isinstance(player.now_playing, Song) and player.now_playing.id == song_id:
+            player.stop()
+            if skip:
+                self.virtual_time = packet.finish_time
+        session.delete(packet)
+        session.commit()
+        self._update_active_sessions()
+        return self.get_queue()
+
+    def remove_video(self, url, skip=False):
+        """Removes the packet with the given video_url"""
+        session = Session()
+        packet = session.query(Packet).filter_by(video_url=url).first()
+        if isinstance(player.now_playing, YouTubeVideo) and player.now_playing.url == url:
             player.stop()
             if skip:
                 self.virtual_time = packet.finish_time
@@ -127,16 +187,24 @@ class Scheduler(object):
 
         if not self.empty():
             if player.now_playing:
-                self.remove_song(player.now_playing.id, skip=skip)
+                if isinstance(player.now_playing, YouTubeVideo):
+                    self.remove_video(player.now_playing.url, skip=skip)
+                else:
+                    self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
-            next_song = session.query(Song).join(Song.packet).order_by(Packet.finish_time).first()
-            if next_song:
-                player.play_media(next_song)
-                next_song.history.append(PlayHistory(user=next_song.packet.user))
-                session.commit()
-                return next_song.dictify()
-            else:
-                session.commit()
+            next_packet = session.query(Packet).order_by(Packet.finish_time).first()
+            if next_packet:
+                if next_packet.video_url:
+                    video = YouTubeVideo(next_packet)
+                    player.play_media(video)
+                    session.commit()
+                    return video.dictify()
+                else:
+                    next_song = session.query(Song).get(next_packet.song_id)
+                    player.play_media(next_song)
+                    next_song.history.append(PlayHistory(user=next_packet.user))
+                    session.commit()
+                    return next_song.dictify()
 
     def empty(self):
         """Returns true if there are no queued songs"""
@@ -152,20 +220,21 @@ class Scheduler(object):
         session = Session()
 
         if user:
-            queued_songs = session.query(Song).join(Song.packet).filter_by(user=user).order_by(Packet.arrival_time).all()
+            packets = session.query(Packet).filter_by(user=user).order_by(Packet.arrival_time).all()
         else:
-            queued_songs = session.query(Song).join(Song.packet).order_by(Packet.arrival_time).all()
+            packets = session.query(Packet).order_by(Packet.arrival_time).all()
 
         last_finish_time = {}
-        for song in queued_songs:
-            packet = song.packet
+        for packet in packets:
+            length = packet.video_length or session.query(Song).get(packet.song_id).length
             user = packet.user
+
             if user in last_finish_time:
                 last_finish = max(last_finish_time[user], packet.arrival_time)
-                packet.finish_time = last_finish + song.length / packet.weight()
+                packet.finish_time = last_finish + length / packet.weight()
                 last_finish_time[user] = packet.finish_time
             else:
-                packet.finish_time = packet.arrival_time + song.length / packet.weight()
+                packet.finish_time = packet.arrival_time + length / packet.weight()
                 last_finish_time[user] = packet.finish_time
 
         session.commit()
