@@ -109,12 +109,12 @@ def get_history(limit=20):
     session = Session()
     history_items = session.query(PlayHistory).order_by(PlayHistory.id.desc()).limit(limit).all()
     session.commit()
-    history = []
+    songs = []
     for item in history_items:
         song_obj = session.query(Song).get(item.song_id).dictify()
-        history_obj = {'played_at': str(item.played_at), 'song': song_obj}
-        history.append(history_obj)
-    return {'limit': limit, 'results': history}
+        song_obj['played_at'] = str(item.played_at)
+        songs.append(song_obj)
+    return {'limit': limit, 'results': songs}
 
 def top_songs(limit=20):
     songs = Song.__table__
