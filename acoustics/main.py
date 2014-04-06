@@ -86,6 +86,30 @@ def random_songs():
         return jsonify(song.random_songs(int(limit)))
     return jsonify(song.random_songs())
 
+@app.route('/v1/songs/history', methods=['GET'])
+@crossdomain(origin='*')
+def get_history():
+    limit = request.args.get('limit')
+    if limit and int(limit) != 0:
+        return jsonify(song.get_history(int(limit)))
+    return jsonify(song.get_history())
+
+@app.route('/v1/songs/top_songs', methods=['GET'])
+@crossdomain(origin='*')
+def top_songs():
+    limit = request.args.get('limit')
+    if limit and int(limit) != 0:
+        return jsonify(song.top_songs(int(limit)))
+    return jsonify(song.top_songs())
+
+@app.route('/v1/songs/top_artists', methods=['GET'])
+@crossdomain(origin='*')
+def top_artists():
+    limit = request.args.get('limit')
+    if limit and int(limit) != 0:
+        return jsonify(song.top_artists(int(limit)))
+    return jsonify(song.top_artists())
+
 @app.route('/v1/queue', methods=['GET'])
 @crossdomain(origin='*')
 def show_queue():
