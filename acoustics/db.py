@@ -64,7 +64,9 @@ class PlayHistory(Base):
 class Packet(Base):
     __tablename__ = 'packets'
 
-    song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'), unique=True)
+    url = Column(String(100), unique=True)
     user = Column(String(8))
     arrival_time = Column(Float)
     finish_time = Column(Float)
@@ -83,7 +85,7 @@ class Packet(Base):
 class Vote(Base):
     __tablename__ = 'votes'
 
-    packet_id = Column(Integer, ForeignKey('packets.song_id', ondelete='CASCADE'), primary_key=True)
+    packet_id = Column(Integer, ForeignKey('packets.id', ondelete='CASCADE'), primary_key=True)
     user = Column(String(8), primary_key=True)
 
 def init_db():

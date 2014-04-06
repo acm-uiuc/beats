@@ -34,7 +34,7 @@ class Scheduler(object):
     def vote_song(self, user, song_id):
         """Vote for a song"""
         session = Session()
-        packet = session.query(Packet).get(song_id)
+        packet = session.query(Packet).filter_by(song_id=song_id).first()
         if packet: # Song is already queued; add a vote
             if user == packet.user:
                 session.rollback()
@@ -106,7 +106,7 @@ class Scheduler(object):
     def remove_song(self, song_id, skip=False):
         """Removes the packet with the given id"""
         session = Session()
-        packet = session.query(Packet).get(song_id)
+        packet = session.query(Packet).filter_by(song_id=song_id).first()
         if player.now_playing.id == song_id:
             player.stop()
             if skip:
