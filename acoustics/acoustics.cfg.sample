@@ -9,3 +9,6 @@ password = replace_me
 
 [Database]
 url = mysql://root@localhost/acoustics2
+
+[YouTube]
+api_key = replace_me
