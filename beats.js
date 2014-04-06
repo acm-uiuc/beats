@@ -121,7 +121,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 songs[resultIndex] = result;
             }
             $scope.playlist = songs;
-            $scope.searchText = query;
+            $scope.searchText = '';
         });
     }
 
