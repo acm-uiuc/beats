@@ -80,6 +80,18 @@ def search():
     query = request.args.get('q')
     if query.startswith('album:'):
         return jsonify(song.get_album(query[6:].lstrip()))
+    elif query.startswith('play-history'):
+        try:
+            limit = int(query[13:])
+            return jsonify(song.get_history(limit))
+        except ValueError:
+            return jsonify(song.get_history())
+    elif query.startswith('top-songs'):
+        try:
+            limit = int(query[10:])
+            return jsonify(song.top_songs(limit))
+        except ValueError:
+            return jsonify(song.top_songs())
     else:
         limit = request.args.get('limit')
         if limit and int(limit) != 0:
