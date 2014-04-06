@@ -39,7 +39,7 @@ class Song(Base):
                 'path': self.path,
                 'tracknumber': self.tracknumber,
                 'play_count': self.play_count(),
-                'last_played': str(last) if last else None}
+                'last_played_at': str(last) if last else None}
 
     def play_count(self):
         session = Session()
@@ -52,14 +52,14 @@ class Song(Base):
         history_item = session.query(PlayHistory).filter_by(song_id=self.id).order_by(PlayHistory.id.desc()).first()
         session.commit()
         if history_item:
-            return history_item.played
+            return history_item.played_at
 
 class PlayHistory(Base):
     __tablename__ = 'play_history'
 
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'))
-    played = Column(DateTime, default=datetime.datetime.utcnow)
+    played_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class Packet(Base):
     __tablename__ = 'packets'

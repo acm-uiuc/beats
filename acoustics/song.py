@@ -112,7 +112,7 @@ def get_history(limit=20):
     history = []
     for item in history_items:
         song_obj = session.query(Song).get(item.song_id).dictify()
-        history_obj = {'played': str(item.played), 'song': song_obj}
+        history_obj = {'played_at': str(item.played_at), 'song': song_obj}
         history.append(history_obj)
     return {'limit': limit, 'results': history}
 
