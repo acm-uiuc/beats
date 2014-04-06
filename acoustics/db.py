@@ -30,16 +30,13 @@ class Song(Base):
         return 'file://' + self.path
 
     def dictify(self):
-        last = self.last_played()
         return {'id': self.id,
                 'title': self.title,
                 'artist': self.artist,
                 'album': self.album,
                 'length': self.length,
                 'path': self.path,
-                'tracknumber': self.tracknumber,
-                'play_count': self.play_count(),
-                'last_played_at': str(last) if last else None}
+                'tracknumber': self.tracknumber}
 
     def play_count(self):
         session = Session()
