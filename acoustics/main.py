@@ -156,12 +156,6 @@ def queue_add():
 def now_playing():
     return jsonify(player.get_now_playing() or {})
 
-@app.route('/v1/user', methods=['GET'])
-@crossdomain(origin='*')
-def get_user():
-    r = user.get_user()
-    return jsonify(r.json()), r.status_code
-
 @app.route('/v1/session', methods=['POST'])
 @crossdomain(origin='*')
 def create_session():
