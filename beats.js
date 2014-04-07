@@ -14,6 +14,31 @@ angular.module('Beats.filters', [])
 });
 
 angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
+.directive('takeFocus', function($timeout)
+{
+    // Directive used to focus on an element when the variable under takeFocus becomes true
+    return {
+        link: function(scope, element, attrs)
+        {
+            // Watch the variable under takeFocus
+            scope.$watch(attrs.takeFocus, function(value)
+            {
+                // We should take focus to this element
+                if (value === true)
+                {
+                    // A tiny timeout is required for the element to be rendered and be able to take
+                    // focus
+                    $timeout(function()
+                    {
+                        element[0].focus();
+                        // Reset the focus variable so this action can be repeated
+                        scope[attrs.takeFocus] = false;
+                    });
+                }
+            });
+        }
+    };
+})
 .controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
 {
     var backendBase = 'http://127.0.0.1:5000'
@@ -46,12 +71,14 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.login = function(username, password)
     {
+        $scope.hideLoginDialog();
         $http.post(backendBase + '/v1/session', 'username=' + username + '&password=' + password,
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
         .success(function(data)
         {
+            console.log(data);
             $cookies['crowd.token_key'] = data['token'];
             $scope.requestUser();
         });
@@ -66,6 +93,24 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             $scope.loggedIn = null;
         });
     };
+
+    $scope.ensureLogin = function()
+    {
+        console.log('crowd.token_key = ' + $cookies['crowd.token_key']);
+        if (!$cookies['crowd.token_key']) {
+            $scope.showDialog = true;
+            $scope.usernameFocus = true;
+            return false;
+        }
+        return true;
+    };
+
+    $scope.hideLoginDialog = function()
+    {
+        $scope.formUsername = '';
+        $scope.formPassword = '';
+        $scope.showDialog = false;
+    }
 
     $scope.requestUser = function()
     {
@@ -129,10 +174,10 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.voteSong = function(song)
     {
-        if (!$cookies['crowd.token_key']) {
-            $scope.showDialog = true;
+        if (!$scope.ensureLogin()) {
             return;
         }
+
         $http.post(backendBase + '/v1/queue/add', 'id=' + song.id + '&token=' + $cookies['crowd.token_key'],
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -145,8 +190,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.pauseSong = function()
     {
-        if (!$cookies['crowd.token_key']) {
-            $scope.showDialog = true;
+        if (!$scope.ensureLogin()) {
             return;
         }
         $http.post(backendBase + '/v1/player/pause', 'token=' + $cookies['crowd.token_key'],
@@ -157,8 +201,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.skipSong = function()
     {
-        if (!$cookies['crowd.token_key']) {
-            $scope.showDialog = true;
+        if (!$scope.ensureLogin()) {
             return;
         }
         $http.post(backendBase + '/v1/player/play_next', 'token=' + $cookies['crowd.token_key'],

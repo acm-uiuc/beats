@@ -11,10 +11,10 @@
     <div class="dialog-container" ng-show="showDialog">
       <div class="dialog-area">
         <div class="login">
-          <form ng-submit="login(formUsername, formPassword); formUsername=''; formPassword=''; showDialog = false" class="simple-form">
-            <input name="username" placeholder="Username" ng-model="formUsername" required />
+          <form ng-submit="login(formUsername, formPassword)" class="simple-form">
+            <input name="username" placeholder="Username" ng-model="formUsername" take-focus="usernameFocus" required />
             <input type="password" name="password" placeholder="Password" ng-model="formPassword" required />
-            <button type="button" class="cancel" title="Cancel" ng-click="showDialog = false">
+            <button type="button" class="cancel" title="Cancel" ng-click="hideLoginDialog()">
               <span data-icon="&#xf00d;"></span>Cancel
             </button>
             <button type="submit" class="confirm" title="Login">
@@ -29,7 +29,7 @@
         <div class="control label" title="Search" data-icon="&#xf002;"></div>
         <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText"  /></form>
         <button class="control logout" title="Logout" ng-click="logout()" ng-show="loggedIn"><span  data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
-        <button class="control login" title="Login" ng-click="showDialog = true" ng-show="!loggedIn">
+        <button class="control login" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">
           <span data-icon="&#xf090;"></span>Login
         </button>
       </div>
