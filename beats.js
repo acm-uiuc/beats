@@ -27,11 +27,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.sections =
     [
-        { title: 'Queue', icon: '\uf03a' },
-        { title: 'Recently Added', icon: '\uf017' },
-        { title: 'Recently Played', icon: '\uf04b' },
-        { title: 'Random', icon: '\uf074' },
-        { title: 'Top 100', icon: '\uf01b' },
+        { title: 'Queue', icon: '\uf03a', query: '' },
+        { title: 'Recently Added', icon: '\uf017', query: '' },
+        { title: 'Recently Played', icon: '\uf04b', query: 'play-history' },
+        { title: 'Random', icon: '\uf074', query: '' },
+        { title: 'Top 100', icon: '\uf01b', query: 'top-songs:100' },
     ];
 
     $scope.playlists =

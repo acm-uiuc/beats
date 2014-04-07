@@ -37,7 +37,7 @@
         <div class="side-area">
           <div class="playlists">
             <ul>
-              <li ng-repeat="section in sections"><span data-icon="{{ section.icon }}"></span>{{ section.title }}</li>
+                <li ng-repeat="section in sections" ng-click="searchSongs(section.query)"><span data-icon="{{ section.icon }}"></span>{{ section.title }}</li>
             </ul>
             <hr />
             <ul class="playlists">
