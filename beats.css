@@ -266,8 +266,7 @@ table.playlist {
       background-color: #B0B7C1;
       border-radius: 5px;
       height: 10px;
-      position: absolute;
-      transition: width 1s linear; }
+      position: absolute; }
     .control.bar .handle {
       background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
       border-radius: 8px;

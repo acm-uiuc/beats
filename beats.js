@@ -39,6 +39,73 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         }
     };
 })
+.directive('barControl', function()
+{
+    // Directive for having bar slider based input controls
+    return {
+        link: function(scope, element, attrs)
+        {
+            // Get the parameters that determine how to set the value
+            var barMin = attrs.barMin | 0;
+            var barMax = attrs.barMax | 0;
+
+            var dragging = false;
+
+            var handleDragging = function(event)
+            {
+                if (dragging)
+                {
+                    // Prevent browser's default dragging behaviour
+                    event.preventDefault();
+
+                    // Determine ratio from 0 to 1 over the control
+                    var ratioX = (event.clientX - element[0].offsetLeft) / (element[0].offsetWidth);
+
+                    // Linearly map that ratio to between barMax and barMin
+                    scope[attrs.barControl] = ratioX * (barMax - barMin) + barMin;
+                    if (scope[attrs.barControl] < barMin)
+                    {
+                        scope[attrs.barControl] = barMin;
+                    }
+                    if (scope[attrs.barControl] > barMax)
+                    {
+                        scope[attrs.barControl] = barMax;
+                    }
+
+                    // Update the view
+                    scope.$digest();
+                }
+            };
+
+            var finishDragging = function()
+            {
+                if (dragging)
+                {
+                    // Call the callback for whenever the bar is set
+                    scope.$eval(attrs.barSet);
+                    dragging = false;
+
+                    // Indicate that dragging has stopped
+                    scope[attrs.barDragging] = false;
+                }
+            }
+
+            element[0].addEventListener('mousedown', function(event)
+            {
+                dragging = true;
+
+                // Indicate that dragging has started
+                scope[attrs.barDragging] = true;
+
+                handleDragging(event);
+            });
+
+            element[0].addEventListener('mouseup', finishDragging);
+            element[0].addEventListener('mouseleave', finishDragging);
+            element[0].addEventListener('mousemove', handleDragging);
+        }
+    };
+})
 .controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
 {
     var backendBase = 'http://127.0.0.1:5000'
@@ -47,6 +114,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.playlist = [];
     $scope.queue = [];
     $scope.volume = 100;
+    $scope.holdVolumeUpdate = false;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
 
@@ -78,7 +146,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         })
         .success(function(data)
         {
-            console.log(data);
             $cookies['crowd.token_key'] = data['token'];
             $scope.requestUser();
         });
@@ -96,7 +163,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.ensureLogin = function()
     {
-        console.log('crowd.token_key = ' + $cookies['crowd.token_key']);
         if (!$cookies['crowd.token_key']) {
             $scope.showDialog = true;
             $scope.usernameFocus = true;
@@ -172,6 +238,20 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.randomSongs();
 
+    $scope.setVolume = function(volume)
+    {
+        // Set the volume on the client and send it to the server
+        if (!$scope.ensureLogin()) {
+            return;
+        }
+
+        $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
+        $http.post(backendBase + '/v1/player/volume', 'volume=' + $scope.volume + '&token=' + $cookies['crowd.token_key'],
+        {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+    };
+
     $scope.voteSong = function(song)
     {
         if (!$scope.ensureLogin()) {
@@ -181,10 +261,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         $http.post(backendBase + '/v1/queue/add', 'id=' + song.id + '&token=' + $cookies['crowd.token_key'],
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
-        .success(function(data)
-        {
-            console.log(data);
         });
     };
 
@@ -223,7 +299,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 $scope.playbackTime = 0;
                 $scope.playbackDuration = 0;
             }
-            $scope.volume = data['player_status']['volume'];
+            // Prevent setting the volume while the user is changing it
+            if (!$scope.holdVolumeUpdate)
+            {
+                $scope.volume = data['player_status']['volume'];
+            }
         });
 
         $http.get(backendBase + '/v1/queue')

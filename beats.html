@@ -90,7 +90,7 @@
         <div class="control button" title="Pause" data-icon="&#xf04c;" ng-click="pauseSong()"></div>
         <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
-        <div class="control bar volume" title="Volume">
+        <div class="control bar volume" bar-control="volume" bar-set="setVolume(volume)" bar-dragging="holdVolumeUpdate" bar-min="0" bar-max="100" title="Volume">
           <div class="cover" style="width: {{ volume }}%"></div>
           <div class="handle" style="left: {{ volume }}%"></div>
         </div>
