@@ -109,11 +109,17 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 .controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
 {
     var backendBase = 'http://127.0.0.1:5000'
-    $scope.showDialog = false;
+
+    $scope.showLoginDialog = false;
+    $scope.formUsername = '';
+    $scope.formPassword = '';
+    $scope.showYouTubeDialog = false;
+    $scope.formYouTubeURL = '';
+
     $scope.loggedIn = null;
     $scope.playlist = [];
     $scope.queue = [];
-    $scope.volume = 100;
+    $scope.volume = 0;
     $scope.holdVolumeUpdate = false;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
@@ -136,6 +142,40 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         { title: 'Witch-Hop' },
     ];
 
+    $scope.isShowingDialog = function()
+    {
+        return $scope.showLoginDialog || $scope.showYouTubeDialog;
+    };
+
+    $scope.startYouTubeDialog = function()
+    {
+        if (!$scope.ensureLogin())
+        {
+            return;
+        }
+        $scope.formYouTubeURL = '';
+        $scope.showYouTubeDialog = true;
+        $scope.youTubeFocus = true;
+    };
+
+    $scope.hideYouTubeDialog = function()
+    {
+        $scope.showYouTubeDialog = false;
+    };
+
+    $scope.playYouTube = function(url)
+    {
+        $scope.hideYouTubeDialog();
+        if (!$scope.ensureLogin()) {
+            return;
+        }
+
+        $http.post(backendBase + '/v1/queue/add', 'url=' + encodeURIComponent(url) + '&token=' + $cookies['crowd.token_key'],
+        {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+    };
 
     $scope.login = function(username, password)
     {
@@ -164,7 +204,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.ensureLogin = function()
     {
         if (!$cookies['crowd.token_key']) {
-            $scope.showDialog = true;
+            $scope.showLoginDialog = true;
             $scope.usernameFocus = true;
             return false;
         }
@@ -175,7 +215,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     {
         $scope.formUsername = '';
         $scope.formPassword = '';
-        $scope.showDialog = false;
+        $scope.showLoginDialog = false;
     }
 
     $scope.requestUser = function()
@@ -313,15 +353,3 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         });
     }, 1000);
 }]);
-
-function makeSong(title, albumTitle, trackNum, artist, length)
-{
-    return {
-        title:      title,
-        albumTitle: albumTitle,
-        trackNum:   trackNum,
-        artist:     artist,
-        length:     length,
-    };
-}
-

@@ -9,28 +9,40 @@
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
   </head>
   <body ng-app="BeatsApp" ng-controller="BeatsController">
-    <div class="dialog-container" ng-show="showDialog">
-      <div class="dialog-area">
-        <div class="login">
-          <form ng-submit="login(formUsername, formPassword)" class="simple-form">
-            <input name="username" placeholder="Username" ng-model="formUsername" take-focus="usernameFocus" required />
-            <input type="password" name="password" placeholder="Password" ng-model="formPassword" required />
-            <button type="button" class="cancel" title="Cancel" ng-click="hideLoginDialog()">
-              <span data-icon="&#xf00d;"></span>Cancel
-            </button>
-            <button type="submit" class="confirm" title="Login">
-              <span data-icon="&#xf090;"></span>Login
-            </button>
-          </form>
-        </div>
+    <div class="dialog-container" ng-show="isShowingDialog()">
+      <div class="dialog-area top" ng-show="showLoginDialog">
+        <form ng-submit="login(formUsername, formPassword)">
+          <input name="username" placeholder="Username" ng-model="formUsername" take-focus="usernameFocus" required />
+          <input type="password" name="password" placeholder="Password" ng-model="formPassword" required />
+          <button type="button" class="cancel" title="Cancel" ng-click="hideLoginDialog()">
+            <span data-icon="&#xf00d;"></span>Cancel
+          </button>
+          <button type="submit" class="confirm" title="Login">
+            <span data-icon="&#xf090;"></span>Login
+          </button>
+        </form>
+      </div>
+      <div class="dialog-area center" ng-show="showYouTubeDialog">
+        <form ng-submit="playYouTube(formYouTubeURL)">
+          <input placeholder="YouTube Video URL" ng-model="formYouTubeURL" take-focus="youTubeFocus" required />
+          <button type="button" class="cancel" title="Cancel" ng-click="hideYouTubeDialog()">
+            <span data-icon="&#xf00d;"></span>Cancel
+          </button>
+          <button type="submit" class="confirm" title="Play">
+            <span data-icon="&#xf16a;"></span>Play
+          </button>
+        </form>
       </div>
     </div>
     <div class="main-container">
       <div class="top-area">
         <div class="control label" title="Search" data-icon="&#xf002;"></div>
-        <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText"  /></form>
-        <button class="control logout" title="Logout" ng-click="logout()" ng-show="loggedIn"><span  data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
-        <button class="control login" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">
+        <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText" /></form>
+        <button class="control rect-button youtube" title="YouTube" ng-click="startYouTubeDialog()">
+          <span data-icon="&#xf167;"></span>Play YouTube
+        </button>
+        <button class="control rect-button login" title="Logout" ng-click="logout()" ng-show="loggedIn"><span data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
+        <button class="control rect-button login" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">
           <span data-icon="&#xf090;"></span>Login
         </button>
       </div>
