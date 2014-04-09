@@ -346,7 +346,15 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             }
         });
 
-        $http.get(backendBase + '/v1/queue')
+        var params = {};
+        if ($scope.loggedIn)
+        {
+            params['user'] = $scope.loggedIn['name'];
+        }
+        $http.get(backendBase + '/v1/queue',
+        {
+            params: params
+        })
         .success(function(data)
         {
             $scope.queue = data['queue'].slice(data['position']);

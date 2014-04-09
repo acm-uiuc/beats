@@ -1,5 +1,6 @@
 $area-shadow: 0 0 17px 3px black;
 $hover-blur: 0 0 4px #D0D9E5;
+$blue: #448AA6;
 
 @mixin ellipsis-overflow() {
     overflow-x: hidden;
@@ -68,7 +69,7 @@ html, body {
     }
 
     .confirm {
-        background-color: #3598ce;
+        background-color: $blue;
     }
 
     .cancel {
@@ -86,7 +87,7 @@ html, body {
 
 .top-area {
     align-items: center;
-    background: linear-gradient(to bottom, #AAA 0%,#777 100%);
+    background: linear-gradient(to bottom, #383838 0%, #222 100%);
     border-bottom: 1px solid #333;
     display: flex;
     flex: 1;
@@ -118,10 +119,11 @@ html, body {
 }
 
 .playlists {
+    margin-top: 8px;
     overflow-y: auto;
 
     hr {
-        border-color: #374044;
+        border-color: #888;
         margin: 4px 0;
     }
 
@@ -140,13 +142,14 @@ html, body {
         position: relative;
 
         &:hover {
-            background: linear-gradient(to bottom, #7e868c 0%,#374044 100%);
+            background: $blue;
         }
     }
 }
 
 .album-art {
     width: 100%;
+    margin-bottom: -54px;
 
     img {
         height: 100%;
@@ -155,7 +158,7 @@ html, body {
 }
 
 .playlist-area {
-    background-color: #333;
+    background-color: #444;
     box-shadow: $area-shadow;
     flex: 5;
     overflow-x: hidden;
@@ -174,7 +177,7 @@ table.playlist {
     width: 100%;
 
     thead {
-        background:  linear-gradient(to bottom, #b5bdc8 0%, #56707f 100%);
+        background:  linear-gradient(to bottom, #448AA6 0%, #356B8C 100%);
     }
 
     th {
@@ -219,12 +222,12 @@ table.playlist {
         font-size: 14px;
         font-weight: 700;
         list-style-image: none;
-        padding-bottom: 4px;
         padding-left: 32px;
         position: relative;
+        height: 50px;
 
         &:first-child {
-            background: linear-gradient(to bottom, #7e868c 0%,#374044 100%);
+            background: rgba(0, 0, 0, 0.5)
         }
     }
 
@@ -242,14 +245,14 @@ table.playlist {
     .vote {
         left: 8px;
         position: absolute;
-        top: 16px;
+        top: 18px;
         cursor: pointer;
     }
 }
 
 .bottom-area {
     align-items: center;
-    background: linear-gradient(to bottom, #777 0%,#333 100%);
+    background: linear-gradient(to bottom, #444 0%, #333 100%);
     border-top: 1px solid #333;
     box-shadow: $area-shadow;
     display: flex;
@@ -276,7 +279,7 @@ table.playlist {
     }
 
     &.button {
-        font-size: 24px;
+        font-size: 12px;
         margin: 0 10px;
         text-shadow: 1px 1px 1px black;
         transition: text-shadow 0.2s, box-shadow 0.2s;
@@ -287,8 +290,8 @@ table.playlist {
     }
 
     &.rect-button {
-        background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
-        border-radius: 2px;
+        background: #555;
+        border-radius: 4px;
         border: 1px solid #222;
         color: white;
         padding: 6px;
@@ -299,15 +302,10 @@ table.playlist {
         }
 
         &:active {
-            background: linear-gradient(to bottom, #374044 0%, #7e868c 100%);
+
+            background: #448AA6;
         }
 
-    }
-
-    &.login {
-        left: -16px;
-        margin-left: auto;
-        position: relative;
     }
 
     &.label {
@@ -335,7 +333,7 @@ table.playlist {
     }
 
     &.bar {
-        background: linear-gradient(to bottom, #374044 0%, #7e868c 100%);
+        background: linear-gradient(to bottom, #AAA 0%, #FFF 100%);
         border-radius: 5px;
         border: 1px solid #444;
         height: 10px;
@@ -346,8 +344,8 @@ table.playlist {
         }
 
         .cover {
-            background-color: #B0B7C1;
-            border-radius: 5px;
+            background-color: $blue;
+            border-radius: 4px;
             height: 10px;
             position: absolute;
         }
@@ -379,6 +377,7 @@ table.playlist {
     }
 
     &.current-time-label {
+        margin-left: 16px;
         margin-right: 16px;
     }
 }

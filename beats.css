@@ -46,7 +46,7 @@ html, body {
     padding: 8px;
     text-shadow: 0 0 1px black; }
   .dialog-area .confirm {
-    background-color: #3598ce; }
+    background-color: #448aa6; }
   .dialog-area .cancel {
     background-color: #d44637; }
 
@@ -61,7 +61,7 @@ html, body {
 
 .top-area {
   align-items: center;
-  background: linear-gradient(to bottom, #aaaaaa 0%, #777777 100%);
+  background: linear-gradient(to bottom, #383838 0%, #222222 100%);
   border-bottom: 1px solid #333;
   display: flex;
   flex: 1;
@@ -90,9 +90,10 @@ html, body {
   z-index: 1; }
 
 .playlists {
+  margin-top: 8px;
   overflow-y: auto; }
   .playlists hr {
-    border-color: #374044;
+    border-color: #888;
     margin: 4px 0; }
   .playlists li {
     overflow-x: hidden;
@@ -110,16 +111,17 @@ html, body {
     padding-top: 4px;
     position: relative; }
     .playlists li:hover {
-      background: linear-gradient(to bottom, #7e868c 0%, #374044 100%); }
+      background: #448aa6; }
 
 .album-art {
-  width: 100%; }
+  width: 100%;
+  margin-bottom: -54px; }
   .album-art img {
     height: 100%;
     width: 100%; }
 
 .playlist-area {
-  background-color: #333;
+  background-color: #444;
   box-shadow: 0 0 17px 3px black;
   flex: 5;
   overflow-x: hidden;
@@ -136,7 +138,7 @@ table.playlist {
   table-layout: fixed;
   width: 100%; }
   table.playlist thead {
-    background: linear-gradient(to bottom, #b5bdc8 0%, #56707f 100%); }
+    background: linear-gradient(to bottom, #448aa6 0%, #356b8c 100%); }
   table.playlist th {
     padding: 4px;
     border-right: 1px solid black; }
@@ -168,11 +170,11 @@ table.playlist {
   font-size: 14px;
   font-weight: 700;
   list-style-image: none;
-  padding-bottom: 4px;
   padding-left: 32px;
-  position: relative; }
+  position: relative;
+  height: 50px; }
   .song-queue li:first-child {
-    background: linear-gradient(to bottom, #7e868c 0%, #374044 100%); }
+    background: rgba(0, 0, 0, 0.5); }
 .song-queue .title, .song-queue .album, .song-queue .artist {
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -184,12 +186,12 @@ table.playlist {
 .song-queue .vote {
   left: 8px;
   position: absolute;
-  top: 16px;
+  top: 18px;
   cursor: pointer; }
 
 .bottom-area {
   align-items: center;
-  background: linear-gradient(to bottom, #777777 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   border-top: 1px solid #333;
   box-shadow: 0 0 17px 3px black;
   display: flex;
@@ -210,15 +212,15 @@ table.playlist {
   .control:last-child {
     padding-right: 16px; }
   .control.button {
-    font-size: 24px;
+    font-size: 12px;
     margin: 0 10px;
     text-shadow: 1px 1px 1px black;
     transition: text-shadow 0.2s, box-shadow 0.2s; }
     .control.button:hover {
       text-shadow: 0 0 4px #d0d9e5; }
   .control.rect-button {
-    background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
-    border-radius: 2px;
+    background: #555;
+    border-radius: 4px;
     border: 1px solid #222;
     color: white;
     padding: 6px;
@@ -226,11 +228,7 @@ table.playlist {
     .control.rect-button:focus {
       outline: none; }
     .control.rect-button:active {
-      background: linear-gradient(to bottom, #374044 0%, #7e868c 100%); }
-  .control.login {
-    left: -16px;
-    margin-left: auto;
-    position: relative; }
+      background: #448AA6; }
   .control.label {
     font-size: 12px;
     margin-left: 8px;
@@ -248,7 +246,7 @@ table.playlist {
     .control input:hover {
       box-shadow: 0 0 4px #d0d9e5; }
   .control.bar {
-    background: linear-gradient(to bottom, #374044 0%, #7e868c 100%);
+    background: linear-gradient(to bottom, #aaaaaa 0%, white 100%);
     border-radius: 5px;
     border: 1px solid #444;
     height: 10px;
@@ -256,8 +254,8 @@ table.playlist {
     .control.bar:hover {
       box-shadow: 0 0 4px #D0D9E5; }
     .control.bar .cover {
-      background-color: #B0B7C1;
-      border-radius: 5px;
+      background-color: #448aa6;
+      border-radius: 4px;
       height: 10px;
       position: absolute; }
     .control.bar .handle {
@@ -278,4 +276,5 @@ table.playlist {
   .control.track {
     width: 100%; }
   .control.current-time-label {
+    margin-left: 16px;
     margin-right: 16px; }
