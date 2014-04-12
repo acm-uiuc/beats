@@ -27,6 +27,19 @@ html, body {
     speak: none;
 }
 
+// Use this one when the icon is not part of text
+[data-image-icon]:before {
+    content: attr(data-image-icon);
+    font-family: 'FontAwesome';
+    speak: none;
+}
+
+[data-image-icon='\f110'] {
+    display: inline-block;
+    animation: spin 1s infinite linear;
+    -webkit-animation: spin 1s infinite linear;
+}
+
 .dialog-container {
     align-items: flex-start;
     justify-content: space-around;
@@ -309,9 +322,14 @@ table.playlist {
     }
 
     &.label {
+        font-family: Arial;
         font-size: 12px;
         margin-left: 8px;
         margin-right: 8px;
+
+        &.large {
+            font-size: 22px;
+        }
     }
 
     input {

@@ -299,10 +299,42 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             return;
         }
 
+        song.vote = true;
+
         $http.post(backendBase + '/v1/queue/add', 'id=' + song.id + '&token=' + $cookies['crowd.token_key'],
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
+    };
+
+    $scope.getSongIcon = function(song)
+    {
+        var playingIcon = '\uf028';
+        var votedIcon   = '\uf00c';
+        var voteIcon    = '\uf067';
+        var waitingIcon = '\uf110';
+
+        if ($scope.queue.length >= 1 && song['id'] == $scope.queue[0]['id'])
+        {
+            return playingIcon;
+        }
+
+        for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
+        {
+            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
+            {
+                delete song.vote;
+                console.log($scope.queue[queueIndex]);
+                return votedIcon;
+            }
+        }
+
+        if (song.vote)
+        {
+            return waitingIcon;
+        }
+
+        return voteIcon;
     };
 
     $scope.pauseSong = function()

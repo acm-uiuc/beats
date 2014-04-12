@@ -14,6 +14,16 @@ html, body {
   margin-right: .5em;
   speak: none; }
 
+[data-image-icon]:before {
+  content: attr(data-image-icon);
+  font-family: 'FontAwesome';
+  speak: none; }
+
+[data-image-icon='\f110'] {
+  display: inline-block;
+  animation: spin 1s infinite linear;
+  -webkit-animation: spin 1s infinite linear; }
+
 .dialog-container {
   align-items: flex-start;
   justify-content: space-around;
@@ -230,9 +240,12 @@ table.playlist {
     .control.rect-button:active {
       background: #448AA6; }
   .control.label {
+    font-family: Arial;
     font-size: 12px;
     margin-left: 8px;
     margin-right: 8px; }
+    .control.label.large {
+      font-size: 22px; }
   .control input {
     border-radius: 12px;
     border: 1px solid #777;

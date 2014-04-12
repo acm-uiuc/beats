@@ -36,7 +36,7 @@
     </div>
     <div class="main-container">
       <div class="top-area">
-        <div class="control label" title="Search" data-icon="&#xf002;"></div>
+        <div class="control label large" title="Search" data-image-icon="&#xf002;"></div>
         <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText" /></form>
         <button class="control rect-button youtube" title="YouTube" ng-click="startYouTubeDialog()">
           <span data-icon="&#xf167;"></span>Play YouTube
@@ -73,7 +73,7 @@
             </thead>
             <tbody>
               <tr ng-repeat="song in playlist track by $index">
-                <td style="text-align: center" ng-click="voteSong(song)"><span style="font-family: 'FontAwesome'">{{ ['\uf00c', '\uf067'][song.vote ? 0 : 1] }}</span></td>
+                <td style="text-align: center" ng-click="voteSong(song)"><span data-image-icon="{{ getSongIcon(song) }}"></span></td>
                 <td>{{ song.tracknumber }}</td>
                 <td>{{ song.title }}</td>
                 <td><span ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
@@ -92,19 +92,41 @@
                 <span class="title" title="{{ song.title }}">{{ song.title }}</span>
                 <span class="album" title="{{ song.album }}">{{ song.album }}</span>
                 <span class="artist" title="{{ song.artist }}">{{ song.artist }}</span>
-                <span class="vote" ng-click="voteSong(song)" data-icon="{{ ['\uf00c', '\uf067', '\uf028'][$first ? 2 : song.packet.has_voted ? 0 : 1] }}"></span>
+                <span class="vote" ng-click="voteSong(song)" data-image-icon="{{ getSongIcon(song) }}"></span>
               </li>
           </ul>
         </div>
       </div>
       <div class="bottom-area">
-        <div class="control button" title="Pause" ng-click="pauseSong()" data-icon="{{ ['\uf04b', '\uf04c'][isPlaying ? 1 : 0] }}" ></div>
-
-        <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()" style="margin-right: 14px"></div>
-        <div class="control label" title="Volume" data-icon="&#xf028;"></div>
-        <div class="control bar volume" bar-control="volume" bar-set="setVolume(volume)" bar-dragging="holdVolumeUpdate" bar-min="0" bar-max="100" title="Volume">
-          <div class="cover" style="width: {{ volume }}%"></div>
-          <div class="handle" style="left: {{ volume }}%"></div>
+        <div class="control button"
+             title="Pause"
+             ng-click="pauseSong()"
+             data-image-icon="{{ ['\uf04b', '\uf04c'][isPlaying ? 1 : 0] }}">
+        </div>
+        <div class="control button"
+             title="Skip"
+             data-image-icon="&#xf051;"
+             ng-click="skipSong()"
+             style="margin-right: 20px">
+         </div>
+        <div class="control label"
+             title="Volume"
+             data-image-icon="&#xf028;"
+             style="margin-right: 14px">
+        </div>
+        <div class="control bar volume"
+             title="Volume"
+             bar-control="volume"
+             bar-set="setVolume(volume)"
+             bar-dragging="holdVolumeUpdate"
+             bar-min="0"
+             bar-max="100">
+          <div class="cover"
+               style="width: {{ volume }}%">
+          </div>
+          <div class="handle"
+               style="left: {{ volume }}%">
+          </div>
         </div>
         <div class="control label current-time-label" title="Track">{{ playbackTime|momentFormat }}</div>
         <div class="control bar track" title="Track">
