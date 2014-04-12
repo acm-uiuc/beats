@@ -123,6 +123,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.holdVolumeUpdate = false;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
+    $scope.isPlaying = false;
 
     $scope.sections =
     [
@@ -344,6 +345,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             {
                 $scope.volume = data['player_status']['volume'];
             }
+            $scope.isPlaying = data['player_status']['state'] == "State.Playing";
         });
 
         var params = {};
