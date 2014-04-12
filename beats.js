@@ -299,6 +299,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             return;
         }
 
+        if (!$scope.isSongVotable(song))
+        {
+            return;
+        }
+
         song.vote = true;
 
         $http.post(backendBase + '/v1/queue/add', 'id=' + song.id + '&token=' + $cookies['crowd.token_key'],
@@ -306,6 +311,19 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
     };
+
+    $scope.isSongVotable = function(song)
+    {
+        // Songs in the queue can not be voted for if the user voted for them
+        for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
+        {
+            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     $scope.getSongIcon = function(song)
     {
@@ -324,7 +342,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
             {
                 delete song.vote;
-                console.log($scope.queue[queueIndex]);
                 return votedIcon;
             }
         }
