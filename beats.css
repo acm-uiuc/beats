@@ -208,9 +208,9 @@ table.playlist {
   color: #D0D9E5;
   cursor: default; }
   .control:first-child {
-    padding-left: 16px; }
+    padding-left: 22px; }
   .control:last-child {
-    padding-right: 16px; }
+    padding-right: 22px; }
   .control.button {
     font-size: 12px;
     margin: 0 10px;

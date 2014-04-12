@@ -98,9 +98,11 @@
         </div>
       </div>
       <div class="bottom-area">
-        <div class="control button" title="Play" data-icon="&#xf04b;"></div>
-        <div class="control button" title="Pause" data-icon="&#xf04c;" ng-click="pauseSong()"></div>
-        <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()" style="margin-right: 32px"></div>
+        <!--<div class="control button" title="Play" data-icon="&#xf04b;"></div>-->
+        <!--<div class="control button" title="Pause" data-icon="&#xf04c;" ng-click="pauseSong()"></div>-->
+        <div class="control button" title="Pause" ng-click="pauseSong()" data-icon="{{ ['\uf04b', '\uf04c'][isPlaying ? 1 : 0] }}" ></div>
+
+        <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()" style="margin-right: 14px"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
         <div class="control bar volume" bar-control="volume" bar-set="setVolume(volume)" bar-dragging="holdVolumeUpdate" bar-min="0" bar-max="100" title="Volume">
           <div class="cover" style="width: {{ volume }}%"></div>
@@ -116,5 +118,7 @@
     <script src="angular.min.js"></script>
     <script src="angular-cookies.min.js"></script>
     <script src="beats.js"></script>
+
+    <script src="jquery-1.11.0.min.js"></script>
   </body>
 </html>
