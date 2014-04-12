@@ -108,7 +108,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 })
 .controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
 {
-    var backendBase = 'http://172.22.118.77:5000'
+    var backendBase = 'http://127.0.0.1:5000'
 
     $scope.showLoginDialog = false;
     $scope.formUsername = '';
@@ -123,7 +123,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.holdVolumeUpdate = false;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
-
     $scope.isPlaying = false;
 
     $scope.sections =
@@ -346,7 +345,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             {
                 $scope.volume = data['player_status']['volume'];
             }
-
             $scope.isPlaying = data['player_status']['state'] == "State.Playing";
         });
 
