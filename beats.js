@@ -106,9 +106,13 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         }
     };
 })
-.controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
+.controller('BeatsController', ['$scope', '$http', '$interval', '$cookies',
+function($scope, $http, $interval, $cookies)
 {
+    //
     // Data
+    //
+
     var backendBase = 'http://127.0.0.1:5000'
 
     $scope.showLoginDialog = false;
@@ -144,201 +148,9 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         { title: 'Witch-Hop' },
     ];
 
-    // UI Functions
-    $scope.isShowingDialog = function()
-    {
-        return $scope.showLoginDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
-    };
-
-    $scope.startYouTubeDialog = function()
-    {
-        if (!$scope.ensureLogin())
-        {
-            return;
-        }
-        $scope.formYouTubeURL = '';
-        $scope.showYouTubeDialog = true;
-        $scope.youTubeFocus = true;
-    };
-
-    $scope.hideYouTubeDialog = function()
-    {
-        $scope.showYouTubeDialog = false;
-    };
-
-    $scope.login = function(username, password)
-    {
-        $scope.hideLoginDialog();
-        $http.post(backendBase + '/v1/session', 'username=' + username + '&password=' + password,
-        {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
-        .success(function(data)
-        {
-            $cookies['crowd.token_key'] = data['token'];
-            $scope.requestUser();
-        })
-        .error(function(data)
-        {
-            $scope.errorMessage = 'Your login failed. Please try again.';
-        });
-    };
-
-    $scope.logout = function()
-    {
-        $http.delete(backendBase + '/v1/session/' + $cookies['crowd.token_key'])
-        .success(function(data)
-        {
-            delete $cookies['crowd.token_key'];
-            $scope.loggedIn = null;
-        });
-    };
-
-    $scope.ensureLogin = function()
-    {
-        if (!$cookies['crowd.token_key']) {
-            $scope.showLoginDialog = true;
-            $scope.usernameFocus = true;
-            return false;
-        }
-        return true;
-    };
-
-    $scope.showSessionExpireMessage = function()
-    {
-        $scope.errorMessage = 'Your session has expired. Please login again.';
-    }
-
-    // Wraps a POST request done by an authenticated user
-    $scope.userRequest = function(endpoint, data)
-    {
-        if (!$scope.ensureLogin()) {
-            return false;
-        }
-
-        if (!data)
-        {
-            data = '';
-        }
-
-        $http({
-            method: 'POST',
-            url: backendBase + endpoint,
-            data: 'token=' + $cookies['crowd.token_key'] + '&' + data,
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
-        .error(function(data, status)
-        {
-            // Session expired
-            $scope.showSessionExpireMessage();
-            delete $cookies['crowd.token_key'];
-        });
-
-        return true;
-    };
-
-    $scope.hideLoginDialog = function()
-    {
-        $scope.formUsername = '';
-        $scope.formPassword = '';
-        $scope.showLoginDialog = false;
-    }
-
-    $scope.requestUser = function()
-    {
-        if (!$cookies['crowd.token_key'])
-        {
-            // Ensure the key is actually gone
-            delete $cookies['crowd.token_key'];
-            return;
-        }
-
-        $http.get(backendBase + '/v1/session/' + $cookies['crowd.token_key'])
-        .success(function(data)
-        {
-            $scope.loggedIn = data.user;
-        })
-        .error(function(data, status)
-        {
-            // Session expired
-            $scope.showSessionExpireMessage();
-            delete $cookies['crowd.token_key'];
-        });
-    };
-
-    $scope.requestUser();
-
-    $scope.searchSongs = function(query)
-    {
-        if (!query) {
-            $scope.randomSongs();
-            return;
-        }
-        $http.get(backendBase + '/v1/songs/search',
-        {
-            params: { 'q': query }
-        })
-        .success(function(data)
-        {
-            var songs = [];
-            for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
-            {
-                var result = data.results[resultIndex];
-                songs[resultIndex] = result;
-            }
-            $scope.playlist = songs;
-            $scope.searchText = query;
-        });
-    }
-
-    $scope.randomSongs = function()
-    {
-        $http.get(backendBase + '/v1/songs/random')
-        .success(function(data)
-        {
-            var songs = [];
-            for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
-            {
-                var result = data.results[resultIndex];
-                songs[resultIndex] = result;
-            }
-            $scope.playlist = songs;
-            $scope.searchText = '';
-        });
-    }
-
-    $scope.randomSongs();
-
-    $scope.setVolume = function(volume)
-    {
-        $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
-        $scope.userRequest('/v1/player/volume', 'volume=' + $scope.volume);
-    };
-
-    $scope.voteSong = function(song)
-    {
-        if (!$scope.isSongVotable(song))
-        {
-            return;
-        }
-
-        if ($scope.userRequest('/v1/queue/add', 'id=' + song.id))
-        {
-            // Show the UI that the song was voted for
-            song.vote = true;
-        }
-    };
-
-    $scope.playYouTube = function(url)
-    {
-        $scope.hideYouTubeDialog();
-        if (!$scope.ensureLogin()) {
-            return;
-        }
-
-        $scope.userRequest('/v1/queue/add', 'url=' + encodeURIComponent(url));
-
-    };
+    //
+    // Utility Functions
+    //
 
     $scope.isSongVotable = function(song)
     {
@@ -382,6 +194,199 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         return voteIcon;
     };
 
+    //
+    // UI Functions
+    //
+
+    $scope.isShowingDialog = function()
+    {
+        return $scope.showLoginDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
+    };
+
+    $scope.startYouTubeDialog = function()
+    {
+        if (!$scope.ensureLogin())
+        {
+            return;
+        }
+        $scope.formYouTubeURL = '';
+        $scope.showYouTubeDialog = true;
+        $scope.youTubeFocus = true;
+    };
+
+    $scope.hideYouTubeDialog = function()
+    {
+        $scope.showYouTubeDialog = false;
+    };
+
+    $scope.hideLoginDialog = function()
+    {
+        $scope.formUsername = '';
+        $scope.formPassword = '';
+        $scope.showLoginDialog = false;
+    }
+
+    $scope.ensureLogin = function()
+    {
+        if (!$cookies['crowd.token_key']) {
+            $scope.showLoginDialog = true;
+            $scope.usernameFocus = true;
+            return false;
+        }
+        return true;
+    };
+
+     $scope.showSessionExpireMessage = function()
+    {
+        $scope.errorMessage = 'Your session has expired. Please login again.';
+    };
+
+    //
+    // Requests
+    //
+
+    // Wraps a POST request done by an authenticated user
+    $scope.userRequest = function(endpoint, data)
+    {
+        if (!$scope.ensureLogin()) {
+            return false;
+        }
+
+        if (!data)
+        {
+            data = '';
+        }
+
+        $http({
+            method: 'POST',
+            url: backendBase + endpoint,
+            data: 'token=' + $cookies['crowd.token_key'] + '&' + data,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .error(function(data, status)
+        {
+            // Session expired
+            $scope.showSessionExpireMessage();
+            delete $cookies['crowd.token_key'];
+        });
+
+        return true;
+    };
+
+    $scope.login = function(username, password)
+    {
+        $scope.hideLoginDialog();
+        $http.post(backendBase + '/v1/session', 'username=' + username + '&password=' + password,
+        {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .success(function(data)
+        {
+            $cookies['crowd.token_key'] = data['token'];
+            $scope.requestUser();
+        })
+        .error(function(data)
+        {
+            $scope.errorMessage = 'Your login failed. Please try again.';
+        });
+    };
+
+    $scope.logout = function()
+    {
+        $http.delete(backendBase + '/v1/session/' + $cookies['crowd.token_key'])
+        .success(function(data)
+        {
+            delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
+        });
+    };
+
+    $scope.requestUser = function()
+    {
+        if (!$cookies['crowd.token_key'])
+        {
+            // Ensure the key is actually gone
+            delete $cookies['crowd.token_key'];
+            return;
+        }
+
+        $http.get(backendBase + '/v1/session/' + $cookies['crowd.token_key'])
+        .success(function(data)
+        {
+            $scope.loggedIn = data.user;
+        })
+        .error(function(data, status)
+        {
+            // Session expired
+            $scope.showSessionExpireMessage();
+            delete $cookies['crowd.token_key'];
+        });
+    };
+
+    $scope.searchSongs = function(query)
+    {
+        if (!query) {
+            $scope.randomSongs();
+            return;
+        }
+        $http.get(backendBase + '/v1/songs/search',
+        {
+            params: { 'q': query }
+        })
+        .success(function(data)
+        {
+            var songs = [];
+            for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
+            {
+                var result = data.results[resultIndex];
+                songs[resultIndex] = result;
+            }
+            $scope.playlist = songs;
+            $scope.searchText = query;
+        });
+    }
+
+    $scope.randomSongs = function()
+    {
+        $http.get(backendBase + '/v1/songs/random')
+        .success(function(data)
+        {
+            var songs = [];
+            for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
+            {
+                var result = data.results[resultIndex];
+                songs[resultIndex] = result;
+            }
+            $scope.playlist = songs;
+            $scope.searchText = '';
+        });
+    }
+
+    $scope.voteSong = function(song)
+    {
+        if (!$scope.isSongVotable(song))
+        {
+            return;
+        }
+
+        if ($scope.userRequest('/v1/queue/add', 'id=' + song.id))
+        {
+            // Show the UI that the song was voted for
+            song.vote = true;
+        }
+    };
+
+    $scope.playYouTube = function(url)
+    {
+        $scope.hideYouTubeDialog();
+        if (!$scope.ensureLogin()) {
+            return;
+        }
+
+        $scope.userRequest('/v1/queue/add', 'url=' + encodeURIComponent(url));
+
+    };
+
     $scope.pauseSong = function()
     {
         $scope.userRequest('/v1/player/pause');
@@ -392,6 +397,17 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         $scope.userRequest('/v1/player/play_next');
     };
 
+    $scope.setVolume = function(volume)
+    {
+        $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
+        $scope.userRequest('/v1/player/volume', 'volume=' + $scope.volume);
+    };
+
+    //
+    // Intervals
+    //
+
+    // Frequency, check the the status of the player and queue
     $interval(function()
     {
         $http.get(backendBase + '/v1/now_playing')
@@ -434,4 +450,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     {
         $scope.requestUser();
     }, 60 * 1000);
+
+    //
+    // Initial Setup
+    //
+
+    $scope.requestUser();
+    $scope.randomSongs();
 }]);
