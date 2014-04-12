@@ -75,9 +75,9 @@
               <tr ng-repeat="song in playlist track by $index">
                 <td style="text-align: center" ng-click="voteSong(song)"><span data-image-icon="{{ getSongIcon(song) }}"></span></td>
                 <td>{{ song.tracknumber }}</td>
-                <td>{{ song.title }}</td>
-                <td><span ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
-                <td>{{ song.artist }}</td>
+                <td title="{{ song.title }}">{{ song.title }}</td>
+                <td title="{{ song.album }}"><span ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
+                <td title="{{ song.artist }}">{{ song.artist }}</td>
                 <td>{{ song.length|momentFormat }}</td>
               </tr>
             </tbody>
