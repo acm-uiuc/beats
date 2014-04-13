@@ -197,7 +197,6 @@ html, body {
     z-index: 2;
     font-family: 'Open Sans';
     color: white;
-    padding: 25px;
 
     .album-artist{
         width: 100%;
@@ -207,9 +206,7 @@ html, body {
     .album-art{
         width: 150px;
         height: 235px;
-        padding-left: 20px;
-        padding-right: 20px;
-        margin: 20px;
+        padding: 20px;
         justify-content:center;
 
         .art{
