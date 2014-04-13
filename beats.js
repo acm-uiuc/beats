@@ -384,6 +384,3 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         });
     }, 1000);
 }]);
-
-
-
