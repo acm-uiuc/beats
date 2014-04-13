@@ -268,6 +268,7 @@ function($scope, $http, $interval, $cookies)
             // Session expired
             $scope.showSessionExpireMessage();
             delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
         });
 
         return true;
@@ -307,6 +308,7 @@ function($scope, $http, $interval, $cookies)
         {
             // Ensure the key is actually gone
             delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
             return;
         }
 
@@ -320,6 +322,7 @@ function($scope, $http, $interval, $cookies)
             // Session expired
             $scope.showSessionExpireMessage();
             delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
         });
     };
 
