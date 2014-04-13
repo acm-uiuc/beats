@@ -96,6 +96,20 @@ def random_songs(limit=20):
     songs = [song.dictify() for song in res]
     return {'query': '', 'limit': limit, 'results': songs}
 
+def get_albums_for_artist(artist):
+    songs = Song.__table__
+    albums = []
+    if artist:
+        conn = engine.connect()
+        s = select([songs.c.album, func.count(songs.c.album).label('num_songs')]) \
+                .where(songs.c.artist == artist) \
+                .group_by(songs.c.album) \
+                .order_by(songs.c.album)
+        res = conn.execute(s)
+        albums = [{'name': row[0], 'num_songs': row[1]} for row in res]
+        conn.close()
+    return {'query': artist, 'results': albums}
+
 def get_album(album):
     songs = []
     if album:
