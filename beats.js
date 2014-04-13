@@ -107,9 +107,13 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         }
     };
 })
-.controller('BeatsController', ['$scope', '$http', '$interval', '$cookies', function($scope, $http, $interval, $cookies)
+.controller('BeatsController', ['$scope', '$http', '$interval', '$cookies',
+function($scope, $http, $interval, $cookies)
 {
+    //
     // Data
+    //
+
     var backendBase = 'http://127.0.0.1:5000'
 
     $scope.showLoginDialog = false;
@@ -147,7 +151,56 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         { title: 'Witch-Hop' },
     ];
 
+    //
+    // Utility Functions
+    //
+
+    $scope.isSongVotable = function(song)
+    {
+        // Songs in the queue can not be voted for if the user voted for them
+        for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
+        {
+            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    $scope.getSongIcon = function(song)
+    {
+        var playingIcon = '\uf028';
+        var votedIcon   = '\uf00c';
+        var voteIcon    = '\uf067';
+        var waitingIcon = '\uf110';
+
+        if ($scope.queue.length >= 1 && song['id'] == $scope.queue[0]['id'])
+        {
+            return playingIcon;
+        }
+
+        for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
+        {
+            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
+            {
+                delete song.vote;
+                return votedIcon;
+            }
+        }
+
+        if (song.vote)
+        {
+            return waitingIcon;
+        }
+
+        return voteIcon;
+    };
+
+    //
     // UI Functions
+    //
+
     $scope.isShowingDialog = function()
     {
         return $scope.showLoginDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
@@ -167,6 +220,61 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     $scope.hideYouTubeDialog = function()
     {
         $scope.showYouTubeDialog = false;
+    };
+
+    $scope.hideLoginDialog = function()
+    {
+        $scope.formUsername = '';
+        $scope.formPassword = '';
+        $scope.showLoginDialog = false;
+    }
+
+    $scope.ensureLogin = function()
+    {
+        if (!$cookies['crowd.token_key']) {
+            $scope.showLoginDialog = true;
+            $scope.usernameFocus = true;
+            return false;
+        }
+        return true;
+    };
+
+     $scope.showSessionExpireMessage = function()
+    {
+        $scope.errorMessage = 'Your session has expired. Please login again.';
+    };
+
+    //
+    // Requests
+    //
+
+    // Wraps a POST request done by an authenticated user
+    $scope.userRequest = function(endpoint, data)
+    {
+        if (!$scope.ensureLogin()) {
+            return false;
+        }
+
+        if (!data)
+        {
+            data = '';
+        }
+
+        $http({
+            method: 'POST',
+            url: backendBase + endpoint,
+            data: 'token=' + $cookies['crowd.token_key'] + '&' + data,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .error(function(data, status)
+        {
+            // Session expired
+            $scope.showSessionExpireMessage();
+            delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
+        });
+
+        return true;
     };
 
     $scope.login = function(username, password)
@@ -197,62 +305,13 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         });
     };
 
-    $scope.ensureLogin = function()
-    {
-        if (!$cookies['crowd.token_key']) {
-            $scope.showLoginDialog = true;
-            $scope.usernameFocus = true;
-            return false;
-        }
-        return true;
-    };
-
-    $scope.showSessionExpireMessage = function()
-    {
-        $scope.errorMessage = 'Your session has expired. Please login again.';
-    }
-
-    // Wraps a POST request done by an authenticated user
-    $scope.userRequest = function(endpoint, data)
-    {
-        if (!$scope.ensureLogin()) {
-            return false;
-        }
-
-        if (!data)
-        {
-            data = '';
-        }
-
-        $http({
-            method: 'POST',
-            url: backendBase + endpoint,
-            data: 'token=' + $cookies['crowd.token_key'] + '&' + data,
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
-        .error(function(data, status)
-        {
-            // Session expired
-            $scope.showSessionExpireMessage();
-            delete $cookies['crowd.token_key'];
-        });
-
-        return true;
-    };
-
-    $scope.hideLoginDialog = function()
-    {
-        $scope.formUsername = '';
-        $scope.formPassword = '';
-        $scope.showLoginDialog = false;
-    }
-
     $scope.requestUser = function()
     {
         if (!$cookies['crowd.token_key'])
         {
             // Ensure the key is actually gone
             delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
             return;
         }
 
@@ -266,10 +325,9 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             // Session expired
             $scope.showSessionExpireMessage();
             delete $cookies['crowd.token_key'];
+            $scope.loggedIn = null;
         });
     };
-
-    $scope.requestUser();
 
     $scope.searchSongs = function(query)
     {
@@ -328,14 +386,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         });
     }
 
-    $scope.randomSongs();
-
-    $scope.setVolume = function(volume)
-    {
-        $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
-        $scope.userRequest('/v1/player/volume', 'volume=' + $scope.volume);
-    };
-
     $scope.voteSong = function(song)
     {
         if (!$scope.isSongVotable(song))
@@ -361,48 +411,6 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     };
 
-    $scope.isSongVotable = function(song)
-    {
-        // Songs in the queue can not be voted for if the user voted for them
-        for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
-        {
-            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    $scope.getSongIcon = function(song)
-    {
-        var playingIcon = '\uf028';
-        var votedIcon   = '\uf00c';
-        var voteIcon    = '\uf067';
-        var waitingIcon = '\uf110';
-
-        if ($scope.queue.length >= 1 && song['id'] == $scope.queue[0]['id'])
-        {
-            return playingIcon;
-        }
-
-        for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
-        {
-            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
-            {
-                delete song.vote;
-                return votedIcon;
-            }
-        }
-
-        if (song.vote)
-        {
-            return waitingIcon;
-        }
-
-        return voteIcon;
-    };
-
     $scope.pauseSong = function()
     {
         $scope.userRequest('/v1/player/pause');
@@ -413,6 +421,17 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         $scope.userRequest('/v1/player/play_next');
     };
 
+    $scope.setVolume = function(volume)
+    {
+        $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
+        $scope.userRequest('/v1/player/volume', 'volume=' + $scope.volume);
+    };
+
+    //
+    // Intervals
+    //
+
+    // Frequency, check the the status of the player and queue
     $interval(function()
     {
         $http.get(backendBase + '/v1/now_playing')
@@ -455,4 +474,11 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
     {
         $scope.requestUser();
     }, 60 * 1000);
+
+    //
+    // Initial Setup
+    //
+
+    $scope.requestUser();
+    $scope.randomSongs();
 }]);
