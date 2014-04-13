@@ -79,6 +79,8 @@ def search():
     query = request.args.get('q')
     if query.startswith('album:'):
         return jsonify(song.get_album(query[6:].lstrip()))
+    elif query.startswith('artist:'):
+        return jsonify(song.get_albums_for_artist(query[7:].lstrip()))
     elif query.startswith('play-history'):
         try:
             limit = int(query[13:])
@@ -200,7 +202,7 @@ def delete_session(token):
     return Response(status=r.status_code)
 
 if __name__ == '__main__':
-    print 'Acoustics Media Player'
+    print 'Beats by ACM'
     print 'VLC version: ' + player.get_vlc_version()
     http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()

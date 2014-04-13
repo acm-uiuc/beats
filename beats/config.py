@@ -1,4 +1,4 @@
 import ConfigParser
 
 config = ConfigParser.RawConfigParser()
-config.read('acoustics.cfg')
+config.read('beats.cfg')
