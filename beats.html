@@ -78,7 +78,7 @@
                 <td>{{ song.tracknumber }}</td>
                 <td>{{ song.title }}</td>
                 <td><span ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
-                <td>{{ song.artist }}</td>
+                <td><span ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span></td>
                 <td>{{ song.length|momentFormat }}</td>
               </tr>
             </tbody>
