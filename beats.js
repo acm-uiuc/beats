@@ -1,4 +1,5 @@
 angular.module('Beats.filters', [])
+
 // A filter that takes a number of seconds and converts it to MM:SS format
 .filter('momentFormat', function()
 {
@@ -119,12 +120,14 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
     $scope.loggedIn = null;
     $scope.playlist = [];
+    $scope.albumlist = [];
     $scope.queue = [];
     $scope.volume = 0;
     $scope.holdVolumeUpdate = false;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
     $scope.isPlaying = false;
+    $scope.layout = 'list';
 
     $scope.sections =
     [
@@ -280,14 +283,31 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         })
         .success(function(data)
         {
-            var songs = [];
-            for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
+            // album search
+            if (query.substring(0,7) == "artist:")
             {
-                var result = data.results[resultIndex];
-                songs[resultIndex] = result;
+                var albums = [];
+                for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
+                {
+                    var result = data.results[resultIndex];
+                    albums[resultIndex] = result;
+                }
+                $scope.albumlist = albums;
+                $scope.layout = 'albumgrid';
+                $scope.searchText = query;
+            } 
+            else
+            {
+                var songs = [];
+                for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
+                {
+                    var result = data.results[resultIndex];
+                    songs[resultIndex] = result;
+                }
+                $scope.playlist = songs;
+                $scope.layout = 'songlist';
+                $scope.searchText = query;
             }
-            $scope.playlist = songs;
-            $scope.searchText = query;
         });
     }
 
@@ -303,6 +323,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 songs[resultIndex] = result;
             }
             $scope.playlist = songs;
+            $scope.layout = 'songlist';
             $scope.searchText = '';
         });
     }
