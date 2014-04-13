@@ -129,6 +129,42 @@ html, body {
   position: relative;
   z-index: 2; }
 
+.albumgrid-area {
+  background-color: #444;
+  box-shadow: 0 0 17px 3px black;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2;
+  font-family: 'Open Sans';
+  color: white;
+  padding: 25px; }
+  .albumgrid-area .album-artist {
+    width: 100%;
+    height: 50px;
+    font-size: 16px; }
+  .albumgrid-area .album-art {
+    width: 150px;
+    height: 235px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin: 20px;
+    justify-content: center; }
+    .albumgrid-area .album-art .art {
+      max-width: 150px;
+      max-height: 150px; }
+    .albumgrid-area .album-art .album-name {
+      width: 150px;
+      height: 50px;
+      font-size: 15px; }
+
 table.playlist {
   border-collapse: collapse;
   color: white;

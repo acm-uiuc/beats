@@ -56,9 +56,11 @@
             <ul class="playlists">
               <li ng-repeat="playlist in playlists"><span data-icon="&#xf001;"></span>{{ playlist.title }}</li>
             </ul>
+
           </div>
         </div>
-        <div class="playlist-area">
+
+        <div class="playlist-area" ng-show="layout == 'songlist'">
           <table class="playlist">
             <colgroup>
               <col span="1" style="width: 5%;">
@@ -83,6 +85,16 @@
             </tbody>
           </table>
         </div>
+        <ul class="albumgrid-area" ng-show="layout == 'albumgrid'">
+          <div ng-repeat="album in albumlist track by $index">
+            <!-- should click to get songs in album,
+                 instead gets all songs with album name inside -->
+            <div class="album-art" ng-click="searchSongs(album.name)">
+              <img class= "art" src= "{{['http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg', album.albumart][(album.albumart == undefined) ? 0 : 1]}}"/>
+              <p class="album-name" title="{{ [album.name,'No Album'][(album.name == null) ? 1 : 0] }}">{{[album.name,"Unknown"][(album.name == null) ? 1 : 0] }}</p>
+            </div>
+          </div>
+        </ul>
         <div class="queue-area">
           <div class="album-art">
             <img src="http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg" />
@@ -99,7 +111,6 @@
       </div>
       <div class="bottom-area">
         <div class="control button" title="Pause" ng-click="pauseSong()" data-icon="{{ ['\uf04b', '\uf04c'][isPlaying ? 1 : 0] }}" ></div>
-
         <div class="control button" title="Skip" data-icon="&#xf051;" ng-click="skipSong()" style="margin-right: 14px"></div>
         <div class="control label" title="Volume" data-icon="&#xf028;"></div>
         <div class="control bar volume" bar-control="volume" bar-set="setVolume(volume)" bar-dragging="holdVolumeUpdate" bar-min="0" bar-max="100" title="Volume">
@@ -116,5 +127,6 @@
     <script src="angular.min.js"></script>
     <script src="angular-cookies.min.js"></script>
     <script src="beats.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js"></script>
   </body>
 </html>
