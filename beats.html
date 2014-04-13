@@ -105,8 +105,8 @@
           <ul class="song-queue">
               <li ng-repeat="song in queue">
                 <span class="title" title="{{ song.title }}">{{ song.title }}</span>
-                <span class="album" title="{{ song.album }}">{{ song.album }}</span>
-                <span class="artist" title="{{ song.artist }}">{{ song.artist }}</span>
+                <span class="album" title="{{ song.album }}" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span>
+                <span class="artist" title="{{ song.artist }}" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span>
                 <span class="vote" ng-click="voteSong(song)" data-image-icon="{{ getSongIcon(song) }}"></span>
               </li>
           </ul>
