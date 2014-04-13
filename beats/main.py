@@ -202,7 +202,7 @@ def delete_session(token):
     return Response(status=r.status_code)
 
 if __name__ == '__main__':
-    print 'Acoustics Media Player'
+    print 'Beats by ACM'
     print 'VLC version: ' + player.get_vlc_version()
     http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()

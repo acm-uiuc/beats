@@ -1,5 +1,5 @@
-acoustics
-=========
+Beats by ACM
+============
 
 New Acoustics Media Player for ACM@UIUC.
 
@@ -19,17 +19,17 @@ Then install all the Python dependencies.
 
 Initialize the database.
 
-    python acoustics/db.py
+    python beats/db.py
 
-Add songs. From the Python interpreter (in the acoustics directory):
+Add songs. From the Python interpreter (in the beats directory):
 
 ```python
 import song
 song.add_songs_in_dir('/path/to/music')
 ```
 
-Finally, create an `acoustics.cfg` file from `acoustics.cfg.sample` and customize it.
+Finally, create an `beats.cfg` file from `beats.cfg.sample` and customize it.
 
 Now you're ready to start the Acoustics server.
 
-    python acoustics/main.py
+    python beats/main.py

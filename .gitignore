@@ -36,5 +36,5 @@ nosetests.xml
 .pydevproject
 
 venv
-acoustics.cfg
+beats.cfg
 *.db
