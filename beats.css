@@ -25,6 +25,9 @@ html, body {
   animation: spin 1s infinite linear;
   -webkit-animation: spin 1s infinite linear; }
 
+.cursor-pointer {
+  cursor: pointer; }
+
 .dialog-container {
   align-items: flex-start;
   justify-content: space-around;
@@ -55,7 +58,7 @@ html, body {
     display: inline;
     float: right;
     padding: 8px;
-    text-shadow: 0 0 1px black; }
+    text-shadow: 1px 1px 1px black; }
   .dialog-area .confirm {
     background-color: #448aa6; }
   .dialog-area .cancel {
@@ -141,37 +144,36 @@ html, body {
   z-index: 2; }
 
 .albumgrid-area {
+  align-items: flex-start;
   background-color: #444;
   box-shadow: 0 0 17px 3px black;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  flex-flow: row wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
+  color: white;
+  cursor: default;
   flex: 5;
+  list-style-type: none;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
-  z-index: 2;
-  font-family: 'Open Sans';
-  color: white; }
-  .albumgrid-area .album-artist {
-    width: 100%;
-    height: 50px;
-    font-size: 16px; }
-  .albumgrid-area .album-art {
-    width: 150px;
-    height: 235px;
-    padding: 20px;
-    justify-content: center; }
-    .albumgrid-area .album-art .art {
-      max-width: 150px;
-      max-height: 150px; }
-    .albumgrid-area .album-art .album-name {
-      width: 150px;
+  z-index: 2; }
+  .albumgrid-area li {
+    display: block;
+    float: left;
+    height: 220px;
+    margin: 10px;
+    padding: 10px;
+    width: 150px; }
+    .albumgrid-area li .art {
+      box-shadow: 0 0 10px 0 black;
+      max-height: 150px;
+      max-width: 150px; }
+    .albumgrid-area li .album-name {
+      font-size: 15px;
       height: 50px;
-      font-size: 15px; }
+      width: 150px;
+      text-shadow: 1px 1px 1px black; }
+    .albumgrid-area li:hover {
+      background: #448aa6;
+      box-shadow: 0 0 10px 0 black; }
 
 table.playlist {
   border-collapse: collapse;
@@ -195,8 +197,12 @@ table.playlist {
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 4px; }
-  table.playlist td:first-child {
-    cursor: pointer; }
+  table.playlist .dragover td {
+    box-shadow: inset 0 8px 4px -4px rgba(255, 255, 255, 0.4), inset 0 -8px 4px -4px rgba(255, 255, 255, 0.4); }
+  table.playlist .dragover td:first-child {
+    box-shadow: inset 8px 0 4px -4px rgba(255, 255, 255, 0.4), inset 0 8px 4px -4px rgba(255, 255, 255, 0.4), inset 0 -8px 4px -4px rgba(255, 255, 255, 0.4); }
+  table.playlist .dragover td:last-child {
+    box-shadow: inset -8px 0 4px -4px rgba(255, 255, 255, 0.4), inset 0 8px 4px -4px rgba(255, 255, 255, 0.4), inset 0 -8px 4px -4px rgba(255, 255, 255, 0.4); }
 
 .queue-area {
   background-color: #222;
@@ -325,6 +331,3 @@ table.playlist {
   .control.current-time-label {
     margin-left: 16px;
     margin-right: 16px; }
-
-#search {
-  width: 350px; }

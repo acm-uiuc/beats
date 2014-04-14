@@ -43,7 +43,7 @@
     <div class="main-container">
       <div class="top-area">
         <div class="control label large" title="Search" data-image-icon="&#xf002;"></div>
-        <form ng-submit="searchSongs(searchText)" class="control"><input id="search" type="search" placeholder="Search" ng-model="searchText" /></form>
+        <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText" /></form>
         <button class="control rect-button youtube" title="YouTube" ng-click="startYouTubeDialog()">
           <span data-icon="&#xf167;"></span>Play YouTube
         </button>
@@ -79,24 +79,22 @@
               <tr><th>Vote</th><th>Track</th><th>Title</th><th>Artist</th><th>Album</th><th>Length</th></tr>
             </thead>
             <tbody>
-              <tr ng-repeat="song in playlist track by $index">
-                <td style="text-align: center" ng-click="voteSong(song)"><span data-image-icon="{{ getSongIcon(song) }}"></span></td>
+              <tr ng-repeat="song in playlist track by $index" draggable="true" drag-song="true">
+                <td style="text-align: center" ng-click="voteSong(song)"><span class="cursor-pointer" data-image-icon="{{ getSongIcon(song) }}"></span></td>
                 <td>{{ song.tracknumber }}</td>
                 <td title="{{ song.title }}">{{ song.title }}</td>
-                <td title="{{ song.artist }}"><span ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span></td>
-                <td title="{{ song.album }}"><span ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
+                <td title="{{ song.artist }}"><span class="cursor-pointer" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span></td>
+                <td title="{{ song.album }}"><span class="cursor-pointer" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
                 <td>{{ song.length|momentFormat }}</td>
               </tr>
             </tbody>
           </table>
         </div>
         <ul class="albumgrid-area" ng-show="layout == 'albumgrid'">
-          <div ng-repeat="album in albumlist track by $index">
-            <div class="album-art" ng-click="searchSongs('album:' + album.name)">
-              <img class="art" ng-src="{{['http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg', album.albumart][(album.albumart == undefined) ? 0 : 1]}}"/>
-              <p class="album-name" title="{{ [album.name,'No Album'][(album.name == null) ? 1 : 0] }}">{{[album.name,"No Album"][(album.name == null) ? 1 : 0] }}</p>
-            </div>
-          </div>
+          <li ng-repeat="album in albumlist track by $index" ng-click="searchAlbum(album.name)">
+            <img class="art" ng-src="{{['http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg', album.albumart][(album.albumart == undefined) ? 0 : 1]}}"/>
+            <p class="album-name" title="{{ [album.name,'No Album'][(album.name == null) ? 1 : 0] }}">{{[album.name,"No Album"][(album.name == null) ? 1 : 0] }}</p>
+          </li>
         </ul>
         <div class="queue-area">
           <div class="album-art">
@@ -105,9 +103,9 @@
           <ul class="song-queue">
               <li ng-repeat="song in queue">
                 <span class="title" title="{{ song.title }}">{{ song.title }}</span>
-                <span class="album" title="{{ song.album }}" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span>
-                <span class="artist" title="{{ song.artist }}" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span>
-                <span class="vote" ng-click="voteSong(song)" data-image-icon="{{ getSongIcon(song) }}"></span>
+                <span class="album cursor-pointer" title="{{ song.album }}" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span>
+                <span class="artist cursor-pointer" title="{{ song.artist }}" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span>
+                <span class="vote cursor-pointer" ng-click="voteSong(song)" data-image-icon="{{ getSongIcon(song) }}"></span>
               </li>
           </ul>
         </div>

@@ -107,6 +107,52 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         }
     };
 })
+.directive('dragSong', function()
+{
+    // Directive for having bar slider based input controls
+    return {
+        link: function(scope, element, attrs)
+        {
+            var dragging = false;
+
+            var handleDragStart = function(event)
+            {
+                dragging = true;
+                element[0].style.opacity = 0.4;
+                event.dataTransfer.effectAllowed = 'all';
+                event.dataTransfer.setData('text/plain', null);
+                event.dataTransfer.setDragImage(element[0], 0, 0);
+            }
+
+            var handleDragOver = function(event)
+            {
+                if (!dragging)
+                {
+                    element[0].classList.add('dragover');
+                }
+            }
+
+            var handleDragLeave = function(event)
+            {
+                if (!dragging)
+                {
+                    element[0].classList.remove('dragover');
+                }
+            }
+
+            var handleDragFinish = function(event)
+            {
+                dragging = false;
+                element[0].style.opacity = 1.0;
+            }
+
+            element[0].addEventListener('dragstart', handleDragStart);
+            element[0].addEventListener('dragover', handleDragOver);
+            element[0].addEventListener('dragleave', handleDragLeave);
+            element[0].addEventListener('dragend', handleDragFinish);
+        }
+    };
+})
 .controller('BeatsController', ['$scope', '$http', '$interval', '$cookies',
 function($scope, $http, $interval, $cookies)
 {
@@ -329,6 +375,14 @@ function($scope, $http, $interval, $cookies)
         });
     };
 
+    $scope.searchAlbum = function(album)
+    {
+        if (album)
+        {
+            $scope.searchSongs('album:' + album);
+        }
+    }
+
     $scope.searchSongs = function(query)
     {
         if (!query) {
@@ -342,7 +396,7 @@ function($scope, $http, $interval, $cookies)
         .success(function(data)
         {
             // album search
-            if (query.substring(0,7) == "artist:")
+            if (query.substring(0,7) == 'artist:')
             {
                 var albums = [];
                 for (var resultIndex = 0; resultIndex < data.results.length; resultIndex++)
@@ -353,7 +407,7 @@ function($scope, $http, $interval, $cookies)
                 $scope.albumlist = albums;
                 $scope.layout = 'albumgrid';
                 $scope.searchText = query;
-            } 
+            }
             else
             {
                 var songs = [];

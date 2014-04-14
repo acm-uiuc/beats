@@ -1,4 +1,6 @@
 $area-shadow: 0 0 17px 3px black;
+$item-shadow: 0 0 10px 0 black;
+$text-highlight-shadow: 1px 1px 1px black;
 $hover-blur: 0 0 4px #D0D9E5;
 $blue: #448AA6;
 
@@ -41,6 +43,10 @@ html, body {
     -webkit-animation: spin 1s infinite linear;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .dialog-container {
     align-items: flex-start;
     justify-content: space-around;
@@ -79,7 +85,7 @@ html, body {
         display: inline;
         float: right;
         padding: 8px;
-        text-shadow: 0 0 1px black;
+        text-shadow: $text-highlight-shadow;
     }
 
     .confirm {
@@ -182,41 +188,42 @@ html, body {
 }
 
 .albumgrid-area {
+    align-items: flex-start;
     background-color: #444;
     box-shadow: $area-shadow;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex-flow: row wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
+    color: white;
+    cursor: default;
     flex: 5;
+    list-style-type: none;
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
     z-index: 2;
-    font-family: 'Open Sans';
-    color: white;
 
-    .album-artist{
-        width: 100%;
-        height: 50px;
-        font-size: 16px;
-    }
-    .album-art{
+    li {
+        display: block;
+        float: left;
+        height: 220px;
+        margin: 10px;
+        padding: 10px;
         width: 150px;
-        height: 235px;
-        padding: 20px;
-        justify-content:center;
 
-        .art{
-            max-width: 150px;
+        .art {
+            box-shadow: $item-shadow;
             max-height: 150px;
+            max-width: 150px;
         }
-        .album-name{
-            width: 150px;
-            height: 50px;
+
+        .album-name {
             font-size: 15px;
+            height: 50px;
+            width: 150px;
+            text-shadow: $text-highlight-shadow;
+        }
+
+        &:hover {
+            background: $blue;
+            box-shadow: $item-shadow;
         }
     }
 }
@@ -253,8 +260,26 @@ table.playlist {
         padding: 4px;
     }
 
-    td:first-child {
-        cursor: pointer;
+    .dragover {
+        $shadow-size: 4px;
+        $shadow-offset: $shadow-size * 2;
+        $shadow-color: rgba(255, 255, 255, 0.4);
+        td {
+            box-shadow: inset 0 $shadow-offset $shadow-size -1*$shadow-size $shadow-color,
+                        inset 0 -1 * $shadow-offset $shadow-size -1*$shadow-size $shadow-color;
+        }
+
+        td:first-child {
+            box-shadow: inset $shadow-offset 0 $shadow-size -1*$shadow-size $shadow-color,
+                        inset 0 $shadow-offset $shadow-size -1*$shadow-size $shadow-color,
+                        inset 0 -1 * $shadow-offset $shadow-size -1*$shadow-size $shadow-color;
+        }
+
+        td:last-child {
+            box-shadow: inset -1 * $shadow-offset 0 $shadow-size -1*$shadow-size $shadow-color,
+                        inset 0 $shadow-offset $shadow-size -1*$shadow-size $shadow-color,
+                        inset 0 -1 * $shadow-offset $shadow-size -1*$shadow-size $shadow-color;
+        }
     }
 }
 
@@ -438,8 +463,4 @@ table.playlist {
         margin-left: 16px;
         margin-right: 16px;
     }
-}
-
-#search {
-    width: 350px;
 }
