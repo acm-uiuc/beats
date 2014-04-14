@@ -126,6 +126,8 @@ html, body {
     position: relative; }
     .playlists li:hover {
       background: #448aa6; }
+    .playlists li.dragover {
+      background: #448aa6; }
 
 .album-art {
   width: 100%;

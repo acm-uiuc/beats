@@ -164,6 +164,10 @@ html, body {
         &:hover {
             background: $blue;
         }
+
+        &.dragover {
+            background: $blue;
+        }
     }
 }
 

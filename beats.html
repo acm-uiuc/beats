@@ -60,7 +60,7 @@
             </ul>
             <hr />
             <ul class="playlists">
-              <li ng-repeat="playlist in playlists"><span data-icon="&#xf001;"></span>{{ playlist.title }}</li>
+              <li ng-repeat="playlist in playlists" drop-song="addToPlayList(playlist, data)"><span data-icon="&#xf001;"></span>{{ playlist.title }}</li>
             </ul>
           </div>
         </div>
@@ -79,7 +79,7 @@
               <tr><th>Vote</th><th>Track</th><th>Title</th><th>Artist</th><th>Album</th><th>Length</th></tr>
             </thead>
             <tbody>
-              <tr ng-repeat="song in playlist track by $index" draggable="true" drag-song="true">
+              <tr ng-repeat="song in playlist track by $index" draggable="true" drag-song="song">
                 <td style="text-align: center" ng-click="voteSong(song)"><span class="cursor-pointer" data-image-icon="{{ getSongIcon(song) }}"></span></td>
                 <td>{{ song.tracknumber }}</td>
                 <td title="{{ song.title }}">{{ song.title }}</td>

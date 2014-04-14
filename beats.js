@@ -1,3 +1,15 @@
+function containsType(types, name)
+{
+    for (var typeIndex = 0; typeIndex < types.length; typeIndex++)
+    {
+        if (types[typeIndex] == name)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 angular.module('Beats.filters', [])
 
 // A filter that takes a number of seconds and converts it to MM:SS format
@@ -111,6 +123,10 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 {
     // Directive for having bar slider based input controls
     return {
+        scope:
+        {
+            dragSong: '='
+        },
         link: function(scope, element, attrs)
         {
             var dragging = false;
@@ -120,17 +136,16 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 dragging = true;
                 element[0].style.opacity = 0.4;
                 event.dataTransfer.effectAllowed = 'all';
-                event.dataTransfer.setData('text/plain', null);
-                event.dataTransfer.setDragImage(element[0], 0, 0);
-            }
+                event.dataTransfer.setData('application/x-song+json', JSON.stringify(scope.dragSong));
+            };
 
             var handleDragOver = function(event)
             {
-                if (!dragging)
+                if (!dragging && containsType(event.dataTransfer.types, 'application/x-song+json'))
                 {
                     element[0].classList.add('dragover');
                 }
-            }
+            };
 
             var handleDragLeave = function(event)
             {
@@ -138,18 +153,51 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 {
                     element[0].classList.remove('dragover');
                 }
-            }
+            };
 
             var handleDragFinish = function(event)
             {
                 dragging = false;
                 element[0].style.opacity = 1.0;
-            }
+            };
 
             element[0].addEventListener('dragstart', handleDragStart);
             element[0].addEventListener('dragover', handleDragOver);
             element[0].addEventListener('dragleave', handleDragLeave);
             element[0].addEventListener('dragend', handleDragFinish);
+        }
+    };
+})
+.directive('dropSong', function()
+{
+    // Directive for having things that can reieve songs
+    return {
+        link: function(scope, element, attrs)
+        {
+            var handleDragOver = function(event)
+            {
+                if (containsType(event.dataTransfer.types, 'application/x-song+json'))
+                {
+                    element[0].classList.add('dragover');
+                    // This indicates to the browser that the drag will work
+                    event.preventDefault();
+                }
+            };
+
+            var handleDragLeave = function(event)
+            {
+                element[0].classList.remove('dragover');
+            };
+
+            var handleDrop = function(event)
+            {
+                element[0].classList.remove('dragover');
+                scope.$eval(attrs.dropSong, { 'data': event.dataTransfer });
+            };
+
+            element[0].addEventListener('dragover', handleDragOver);
+            element[0].addEventListener('dragleave', handleDragLeave);
+            element[0].addEventListener('drop', handleDrop);
         }
     };
 })
@@ -285,9 +333,16 @@ function($scope, $http, $interval, $cookies)
         return true;
     };
 
-     $scope.showSessionExpireMessage = function()
+    $scope.showSessionExpireMessage = function()
     {
         $scope.errorMessage = 'Your session has expired. Please login again.';
+    };
+
+    $scope.addToPlayList = function(playlist, data)
+    {
+        var song = JSON.parse(data.getData('application/x-song+json'));
+        // Add the song to the given playlist
+        console.log(playlist.title + ' <- ' + song.title);
     };
 
     //
