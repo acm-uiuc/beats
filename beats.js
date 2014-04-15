@@ -192,7 +192,8 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             var handleDrop = function(event)
             {
                 element[0].classList.remove('dragover');
-                scope.$eval(attrs.dropSong, { 'data': event.dataTransfer });
+                var song = JSON.parse(event.dataTransfer.getData('application/x-song+json'));
+                scope.$eval(attrs.dropSong, { 'song': song });
             };
 
             element[0].addEventListener('dragover', handleDragOver);
@@ -209,6 +210,7 @@ function($scope, $http, $interval, $cookies)
     //
 
     var backendBase = 'http://127.0.0.1:5000'
+    var authentication = true;
 
     $scope.showLoginDialog = false;
     $scope.formUsername = '';
@@ -325,6 +327,11 @@ function($scope, $http, $interval, $cookies)
 
     $scope.ensureLogin = function()
     {
+        if (!authentication)
+        {
+            return true;
+        }
+
         if (!$cookies['crowd.token_key']) {
             $scope.showLoginDialog = true;
             $scope.usernameFocus = true;
@@ -338,9 +345,8 @@ function($scope, $http, $interval, $cookies)
         $scope.errorMessage = 'Your session has expired. Please login again.';
     };
 
-    $scope.addToPlayList = function(playlist, data)
+    $scope.addToPlayList = function(playlist, song)
     {
-        var song = JSON.parse(data.getData('application/x-song+json'));
         // Add the song to the given playlist
         console.log(playlist.title + ' <- ' + song.title);
     };

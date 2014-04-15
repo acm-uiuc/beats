@@ -171,16 +171,6 @@ html, body {
     }
 }
 
-.album-art {
-    width: 100%;
-    margin-bottom: -54px;
-
-    img {
-        height: 100%;
-        width: 100%;
-    }
-}
-
 .playlist-area {
     background-color: #444;
     box-shadow: $area-shadow;
@@ -265,24 +255,8 @@ table.playlist {
     }
 
     .dragover {
-        $shadow-size: 4px;
-        $shadow-offset: $shadow-size * 2;
-        $shadow-color: rgba(255, 255, 255, 0.4);
         td {
-            box-shadow: inset 0 $shadow-offset $shadow-size -1*$shadow-size $shadow-color,
-                        inset 0 -1 * $shadow-offset $shadow-size -1*$shadow-size $shadow-color;
-        }
-
-        td:first-child {
-            box-shadow: inset $shadow-offset 0 $shadow-size -1*$shadow-size $shadow-color,
-                        inset 0 $shadow-offset $shadow-size -1*$shadow-size $shadow-color,
-                        inset 0 -1 * $shadow-offset $shadow-size -1*$shadow-size $shadow-color;
-        }
-
-        td:last-child {
-            box-shadow: inset -1 * $shadow-offset 0 $shadow-size -1*$shadow-size $shadow-color,
-                        inset 0 $shadow-offset $shadow-size -1*$shadow-size $shadow-color,
-                        inset 0 -1 * $shadow-offset $shadow-size -1*$shadow-size $shadow-color;
+            box-shadow: inset 0 8px 0 -4px #AAA;
         }
     }
 }
@@ -295,40 +269,72 @@ table.playlist {
     overflow: auto;
     position: relative;
     z-index: 3;
-}
 
-.song-queue {
-    li {
-        border-bottom: 1px solid #333;
-        color: white;
-        font-family: 'Open Sans';
-        font-size: 14px;
-        font-weight: 700;
-        list-style-image: none;
-        padding-left: 32px;
-        position: relative;
-        height: 50px;
-
-        &:first-child {
-            background: rgba(0, 0, 0, 0.5)
+    &.dragover
+    {
+        // Inserts a full size '+' icon over the queue area with overlay
+        &::before {
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            // box-shadow: inset 0 0 16px 8px $blue;
+            color: white;
+            content: '\f067';
+            display: flex;
+            font-family: 'FontAwesome';
+            font-size: 100px;
+            height: 100%;
+            justify-content: center;
+            pointer-events: none;
+            position: absolute;
+            text-shadow: 0 0 20px white;
+            width: 100%;
+            z-index: 10;
         }
     }
 
-    .title, .album, .artist {
-        @include ellipsis-overflow();
-        display: block;
+    .album-art {
+        width: 100%;
+        margin-bottom: -54px;
+
+        img {
+            height: 100%;
+            width: 100%;
+        }
     }
 
-    .album, .artist {
-        font-size: 10px;
-        font-weight: 400;
-    }
+    .song-queue {
+        li {
+            border-bottom: 1px solid #333;
+            color: white;
+            font-family: 'Open Sans';
+            font-size: 14px;
+            font-weight: 700;
+            list-style-image: none;
+            padding-left: 32px;
+            position: relative;
+            height: 50px;
 
-    .vote {
-        left: 8px;
-        position: absolute;
-        top: 18px;
-        cursor: pointer;
+            &:first-child {
+                background: rgba(0, 0, 0, 0.5)
+            }
+        }
+
+        .title, .album, .artist {
+            @include ellipsis-overflow();
+            display: block;
+        }
+
+        .album, .artist {
+            font-size: 10px;
+            font-weight: 400;
+        }
+
+        .vote {
+            left: 8px;
+            position: absolute;
+            top: 18px;
+            cursor: pointer;
+        }
     }
 }
 
