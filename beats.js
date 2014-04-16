@@ -176,6 +176,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         {
             var handleDragOver = function(event)
             {
+                event.stopPropagation();
                 if (containsType(event.dataTransfer.types, 'application/x-song+json'))
                 {
                     element[0].classList.add('dragover');
@@ -191,6 +192,7 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
 
             var handleDrop = function(event)
             {
+                event.stopPropagation();
                 element[0].classList.remove('dragover');
                 var song = JSON.parse(event.dataTransfer.getData('application/x-song+json'));
                 scope.$eval(attrs.dropSong, { 'song': song });

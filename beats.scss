@@ -117,6 +117,13 @@ html, body {
     vertical-align: middle;
     width: 100%;
     z-index: 5;
+
+    img {
+        height: 40px;
+        opacity: 0.4;
+        margin-left: auto;
+        margin-right: 8px;
+    }
 }
 
 .middle-area {
@@ -290,9 +297,11 @@ table.playlist {
             width: 100%;
             z-index: 10;
         }
+
     }
 
     .album-art {
+        pointer-events: none;
         width: 100%;
         margin-bottom: -54px;
 
