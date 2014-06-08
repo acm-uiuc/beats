@@ -1,6 +1,7 @@
 from db import Song, PlayHistory, Session, engine
 from os import walk
-from os.path import splitext, join
+import hashlib
+from os.path import splitext, join, isfile
 from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
@@ -13,8 +14,54 @@ def remove_songs_in_dir(path):
     session.query(Song).filter(Song.path.like(path + '%')).delete(synchronize_session='fetch')
     session.commit()
 
-def add_songs_in_dir(path):
-    remove_songs_in_dir(path)
+def md5_for_file(f, block_size=2**20):
+    """Returns MD5 checksum for file.
+
+    Reads the file in chunks to limit memory usage.
+    Source: http://stackoverflow.com/a/1131255
+    """
+    md5 = hashlib.md5()
+    while True:
+        data = f.read(block_size)
+        if not data:
+            break
+        md5.update(data)
+    return md5.hexdigest()
+
+def _prune_dir(path, prune_modified=False):
+    """Prunes songs in directory and returns set of remaining songs."""
+    session = Session()
+
+    songs = session.query(Song).filter(Song.path.like(path + '%')).all()
+    remaining_paths = set()
+    for song in songs:
+        if not isfile(song.path):
+            session.delete(song)
+            print 'Pruned (deleted): ' + song.path
+            continue
+
+        if prune_modified:
+            with open(song.path, 'rb') as f:
+                if song.checksum != md5_for_file(f):
+                    session.delete(song)
+                    print 'Pruned (modified or no checksum): ' + song.path
+                    continue
+                else:
+                    remaining_paths.add(song.path)
+        else:
+            remaining_paths.add(song.path)
+
+    session.commit()
+    return remaining_paths
+
+def add_songs_in_dir(path, store_checksum=False):
+    """Update database to reflect the contents of the given directory.
+
+    store_checksum: Whether or not to store an MD5 file checksum in order to
+    update the song metadata in the database if the file is modified. Disabled
+    by default because it makes scanning a lot slower.
+    """
+    already_added = _prune_dir(path, prune_modified=store_checksum)
     table = Song.__table__
     conn = engine.connect()
     num_songs = 0
@@ -23,6 +70,10 @@ def add_songs_in_dir(path):
             ext = splitext(f)[1]
             filepath = join(root, f)
             if ext in {'.mp3', '.flac', '.ogg', '.m4a', '.mp4'}:
+                if filepath in already_added:
+                    print 'Already added: ' + filepath
+                    continue
+
                 try:
                     if ext == '.mp3':
                         song = EasyMP3(filepath)
@@ -45,13 +96,18 @@ def add_songs_in_dir(path):
                         title = song.tags['title'][0]
                         artist = song.tags['artist'][0]
                 except Exception:
-                    print 'Skipped: ' + filepath
+                    print 'Missing tags: ' + filepath
                     continue
 
                 song_obj = {'title': title,
                     'artist': artist,
                     'length': song.info.length,
                     'path': filepath}
+
+                # Calculate and store file checksum
+                if store_checksum:
+                    with open(filepath, 'rb') as f:
+                        song_obj['checksum'] = md5_for_file(f)
 
                 try: # Album optional for singles
                     if ext in {'.m4a', '.mp4'}:
@@ -69,7 +125,7 @@ def add_songs_in_dir(path):
                 except Exception:
                     song_obj['tracknumber'] = None
 
-                print filepath
+                print 'Added: ' + filepath
                 conn.execute(table.insert().values(song_obj))
                 num_songs += 1
 

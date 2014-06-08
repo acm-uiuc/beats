@@ -23,6 +23,10 @@ class Song(Base):
     length = Column(Float)
     path = Column(String(500))
     tracknumber = Column(Integer)
+
+    # MD5 checksum to verify file integrity
+    checksum = Column(String(32))
+
     packet = relationship('Packet', uselist=False, cascade='all,delete-orphan', passive_deletes=True, backref='songs')
     history = relationship('PlayHistory', cascade='all,delete-orphan', passive_deletes=True, backref='songs')
 
