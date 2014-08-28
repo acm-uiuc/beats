@@ -11,18 +11,6 @@ def play(mrl):
     player.play()
     return get_status()
 
-def vlc_play_youtube():
-    """Play the first subitem if the current media is a YouTube video.
-
-    Specific to VLC YouTube support.
-    """
-    m = player.get_media()
-    if is_youtube_video(m):
-        player.set_media(m.subitems()[0])
-        player.play()
-        return True
-    return False
-
 def play_media(media):
     play(media.mrl())
     global now_playing

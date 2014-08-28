@@ -17,7 +17,6 @@ from sqlalchemy.orm.exc import FlushError
 import threading
 import time
 import player
-import re
 
 SCHEDULER_INTERVAL_SEC = 0.25
 """Interval at which to run the scheduler loop"""
@@ -59,7 +58,6 @@ class Scheduler(object):
             if video_url:
                 if 'www.youtube.com' in video_url:
                     try:
-                        video_url = re.sub('^https', 'http', video_url)
                         video_details = get_youtube_video_details(video_url)
                         packet = Packet(video_url=video_url,
                                 video_title=video_details['title'],
@@ -177,9 +175,6 @@ class Scheduler(object):
         return self.get_queue()
 
     def play_next(self, skip=False):
-        if player.vlc_play_youtube():
-            return player.now_playing.dictify()
-
         if self.empty():
             random_song = random_songs(1)['results']
             if len(random_song) == 1:
