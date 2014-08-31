@@ -557,7 +557,7 @@ function($scope, $http, $interval, $cookies)
             if (data['media']) {
                 // Convert to seconds
                 $scope.playbackTime = data['player_status']['current_time'] / 1000;
-                $scope.playbackDuration = data['player_status']['duration'] / 1000;
+                $scope.playbackDuration = data['media']['length'];
             }
             else {
                 $scope.playbackTime = 0;
