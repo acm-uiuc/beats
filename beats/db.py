@@ -40,7 +40,8 @@ class Song(Base):
                 'album': self.album,
                 'length': self.length,
                 'path': self.path,
-                'tracknumber': self.tracknumber}
+                'tracknumber': self.tracknumber,
+                'art_uri': self.art_uri}
 
     def play_count(self):
         session = Session()
