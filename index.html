@@ -106,6 +106,7 @@
                 <span class="title" title="{{ song.title }}">{{ song.title }}</span>
                 <span class="album cursor-pointer" title="{{ song.album }}" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span>
                 <span class="artist cursor-pointer" title="{{ song.artist }}" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span>
+                <span class="user" title="{{ song.packet.user }}">Added by: {{ song.packet.user }}</span>
                 <span class="vote cursor-pointer" ng-click="voteSong(song)" data-image-icon="{{ getSongIcon(song) }}"></span>
               </li>
           </ul>

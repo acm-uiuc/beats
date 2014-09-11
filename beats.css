@@ -242,12 +242,12 @@ table.playlist {
     height: 50px; }
     .queue-area .song-queue li:first-child {
       background: rgba(0, 0, 0, 0.5); }
-  .queue-area .song-queue .title, .queue-area .song-queue .album, .queue-area .song-queue .artist {
+  .queue-area .song-queue .title, .queue-area .song-queue .album, .queue-area .song-queue .artist, .queue-area .song-queue .user {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     display: block; }
-  .queue-area .song-queue .album, .queue-area .song-queue .artist {
+  .queue-area .song-queue .album, .queue-area .song-queue .artist, .queue-area .song-queue .user {
     font-size: 10px;
     font-weight: 400; }
   .queue-area .song-queue .vote {

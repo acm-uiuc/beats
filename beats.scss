@@ -328,12 +328,12 @@ table.playlist {
             }
         }
 
-        .title, .album, .artist {
+        .title, .album, .artist, .user {
             @include ellipsis-overflow();
             display: block;
         }
 
-        .album, .artist {
+        .album, .artist, .user {
             font-size: 10px;
             font-weight: 400;
         }
