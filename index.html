@@ -99,9 +99,7 @@
         </ul>
         <div class="queue-area" drop-song="voteSong(song)">
           <div class="album-art">
-              <li ng-if="queue.length != 0">
-                  <img ng-src="{{ [queue[0].art_uri, 'http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg'][(queue[0].art.uri == null) ? 0 : 1]}}" />
-              </li>
+              <img ng-src="{{[queue[0].art_uri, 'http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg'][(queue[0].art_uri == null) ? 1 : 0]}}" />
           </div>
           <ul class="song-queue">
               <li ng-repeat="song in queue" drag-song="song" draggable="true">
