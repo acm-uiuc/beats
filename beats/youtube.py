@@ -1,5 +1,6 @@
 import pafy
 import isodate
+from urlparse import parse_qs, urlparse
 
 def get_youtube_video_details(url):
     try:
@@ -8,11 +9,6 @@ def get_youtube_video_details(url):
         raise Exception('Bad video url')
 
     return {'title': video.title, 'length': video.length}
-
-def get_art_uri(url):
-    videoid = url.split('?v=')[1]
-    uri = "http://img.youtube.com/vi/" + videoid + "/0.jpg"
-    return uri
 
 
 class YouTubeVideo(object):
@@ -30,4 +26,4 @@ class YouTubeVideo(object):
                 'title': self.title,
                 'artist': 'YouTube video',
                 'length': self.length,
-                'art_uri': get_art_uri(self.url)}
+                'art_uri': 'http://img.youtube.com/vi/' + parse_qs(urlparse(self.url).query)['v'][0] + '/0.jpg'}
