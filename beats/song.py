@@ -102,8 +102,7 @@ def add_songs_in_dir(path, store_checksum=False):
                 song_obj = {'title': title,
                     'artist': artist,
                     'length': song.info.length,
-                    'path': filepath,
-                    'art_uri': 'http://en.marceloalvarez.com/wp-content/uploads/2013/03/no_album_art.jpg'}
+                    'path': filepath}
 
                 # Calculate and store file checksum
                 if store_checksum:
