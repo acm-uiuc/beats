@@ -1,7 +1,12 @@
+import threading
 import vlc
+
+# Initial player volume
+INITIAL_VOLUME = 50
 
 instance = vlc.Instance('--no-video')
 player = instance.media_player_new()
+has_initialized = False
 now_playing = None
 volume = 100
 
@@ -17,6 +22,15 @@ def play_media(media):
     play(media.mrl())
     global now_playing
     now_playing = media
+
+    # Initialize the player volume to a non-max value on first play to protect
+    # eardrums. The player does not respond to volume changes right after the
+    # media loads, so the timer interval below was determined empirically.
+    global has_initialized
+    if not has_initialized:
+        threading.Timer(1, set_volume, (INITIAL_VOLUME,)).start()
+        has_initialized = True
+
     return get_status()
 
 
