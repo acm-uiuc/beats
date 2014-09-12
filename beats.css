@@ -226,7 +226,7 @@ table.playlist {
   .queue-area .album-art {
     pointer-events: none;
     width: 100%;
-    margin-bottom: -54px; }
+    margin-bottom: -70px; }
     .queue-area .album-art img {
       height: 100%;
       width: 100%; }
@@ -239,7 +239,7 @@ table.playlist {
     list-style-image: none;
     padding-left: 32px;
     position: relative;
-    height: 50px; }
+    height: 65px; }
     .queue-area .song-queue li:first-child {
       background: rgba(0, 0, 0, 0.5); }
   .queue-area .song-queue .title, .queue-area .song-queue .album, .queue-area .song-queue .artist, .queue-area .song-queue .user {
@@ -253,7 +253,7 @@ table.playlist {
   .queue-area .song-queue .vote {
     left: 8px;
     position: absolute;
-    top: 18px;
+    top: 23px;
     cursor: pointer; }
 
 .bottom-area {

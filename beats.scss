@@ -303,7 +303,7 @@ table.playlist {
     .album-art {
         pointer-events: none;
         width: 100%;
-        margin-bottom: -54px;
+        margin-bottom: -70px;
 
         img {
             height: 100%;
@@ -321,7 +321,7 @@ table.playlist {
             list-style-image: none;
             padding-left: 32px;
             position: relative;
-            height: 50px;
+            height: 65px;
 
             &:first-child {
                 background: rgba(0, 0, 0, 0.5)
@@ -341,7 +341,7 @@ table.playlist {
         .vote {
             left: 8px;
             position: absolute;
-            top: 18px;
+            top: 23px;
             cursor: pointer;
         }
     }
