@@ -229,7 +229,7 @@ function($scope, $http, $interval, $cookies)
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
     $scope.isPlaying = false;
-    $scope.layout = 'list';
+    $scope.layout = 'songlist';
 
     $scope.sections =
     [
