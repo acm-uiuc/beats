@@ -352,6 +352,11 @@ function($scope, $http, $interval, $cookies)
         $scope.errorMessage = 'An error has occurred.';
     };
 
+    $scope.showConnectionErrorMessage = function()
+    {
+        $scope.errorMessage = 'Connection error. Make sure you\'re on IllinoisNet or VPN.';
+    };
+
     $scope.addToPlayList = function(playlist, song)
     {
         // Add the song to the given playlist
@@ -382,7 +387,7 @@ function($scope, $http, $interval, $cookies)
         })
         .error(function(data, status)
         {
-            if (status == 401) {
+            if (status === 401) {
                 // Session expired
                 $scope.showSessionExpireMessage();
                 delete $cookies['crowd.token_key'];
@@ -440,10 +445,12 @@ function($scope, $http, $interval, $cookies)
         })
         .error(function(data, status)
         {
-            // Session expired
-            $scope.showSessionExpireMessage();
-            delete $cookies['crowd.token_key'];
-            $scope.loggedIn = null;
+            if (status === 400) {
+                // Session expired
+                $scope.showSessionExpireMessage();
+                delete $cookies['crowd.token_key'];
+                $scope.loggedIn = null;
+            }
         });
     };
 
@@ -607,4 +614,12 @@ function($scope, $http, $interval, $cookies)
 
     $scope.requestUser();
     $scope.randomSongs();
+
+    // Test connection to backend
+    $http.get(backendBase + '/v1/now_playing')
+    .error(function(data, status) {
+        if (status === 404) {
+            $scope.showConnectionErrorMessage();
+        }
+    });
 }]);
