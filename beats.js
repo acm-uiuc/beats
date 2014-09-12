@@ -347,6 +347,11 @@ function($scope, $http, $interval, $cookies)
         $scope.errorMessage = 'Your session has expired. Please login again.';
     };
 
+    $scope.showErrorMessage = function()
+    {
+        $scope.errorMessage = 'An error has occurred.';
+    };
+
     $scope.addToPlayList = function(playlist, song)
     {
         // Add the song to the given playlist
@@ -377,10 +382,14 @@ function($scope, $http, $interval, $cookies)
         })
         .error(function(data, status)
         {
-            // Session expired
-            $scope.showSessionExpireMessage();
-            delete $cookies['crowd.token_key'];
-            $scope.loggedIn = null;
+            if (status == 401) {
+                // Session expired
+                $scope.showSessionExpireMessage();
+                delete $cookies['crowd.token_key'];
+                $scope.loggedIn = null;
+            } else {
+                $scope.showErrorMessage();
+            }
         });
 
         return true;
