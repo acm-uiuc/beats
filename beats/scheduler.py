@@ -48,7 +48,7 @@ class Scheduler(object):
             if user == packet.user:
                 session.rollback()
                 raise Exception('User %s has already voted for this song' %
-                        user)
+                                user)
             try:
                 packet.additional_votes.append(Vote(user=user))
                 session.commit()
