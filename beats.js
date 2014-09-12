@@ -559,13 +559,7 @@ function($scope, $http, $interval, $cookies)
         $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
         $scope.userRequest('/v1/player/volume', 'volume=' + $scope.volume);
     };
-
-    //
-    // Intervals
-    //
-
-    // Frequency, check the the status of the player and queue
-    $interval(function()
+    $scope.refreshPlayer = function()
     {
         $http.get(backendBase + '/v1/now_playing')
         .success(function(data)
@@ -600,7 +594,14 @@ function($scope, $http, $interval, $cookies)
         {
             $scope.queue = data['queue'].slice(data['position']);
         });
-    }, 1000);
+    };
+
+    //
+    // Intervals
+    //
+
+    // Frequency, check the the status of the player and queue
+    $interval($scope.refreshPlayer, 1000);
 
     // Every minute, check that the session has not expired
     $interval(function()
@@ -614,6 +615,7 @@ function($scope, $http, $interval, $cookies)
 
     $scope.requestUser();
     $scope.randomSongs();
+    $scope.refreshPlayer();
 
     // Test connection to backend
     $http.get(backendBase + '/v1/now_playing')
