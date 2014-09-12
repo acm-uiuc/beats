@@ -9,10 +9,13 @@ from mutagen.mp4 import MP4
 from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import or_, func
 
+
 def remove_songs_in_dir(path):
     session = Session()
-    session.query(Song).filter(Song.path.like(path + '%')).delete(synchronize_session='fetch')
+    session.query(Song).filter(Song.path.like(path + '%')).delete(
+        synchronize_session='fetch')
     session.commit()
+
 
 def md5_for_file(f, block_size=2**20):
     """Returns MD5 checksum for file.
@@ -27,6 +30,7 @@ def md5_for_file(f, block_size=2**20):
             break
         md5.update(data)
     return md5.hexdigest()
+
 
 def _prune_dir(path, prune_modified=False):
     """Prunes songs in directory and returns set of remaining songs."""
@@ -53,6 +57,7 @@ def _prune_dir(path, prune_modified=False):
 
     session.commit()
     return remaining_paths
+
 
 def add_songs_in_dir(path, store_checksum=False):
     """Update database to reflect the contents of the given directory.
@@ -99,17 +104,19 @@ def add_songs_in_dir(path, store_checksum=False):
                     print 'Missing tags: ' + filepath
                     continue
 
-                song_obj = {'title': title,
+                song_obj = {
+                    'title': title,
                     'artist': artist,
                     'length': song.info.length,
-                    'path': filepath}
+                    'path': filepath,
+                }
 
                 # Calculate and store file checksum
                 if store_checksum:
-                    with open(filepath, 'rb') as f:
-                        song_obj['checksum'] = md5_for_file(f)
+                    with open(filepath, 'rb') as song_file:
+                        song_obj['checksum'] = md5_for_file(song_file)
 
-                try: # Album optional for singles
+                try:  # Album optional for singles
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['album'] = song.tags['\xa9alb'][0]
                     else:
@@ -121,7 +128,8 @@ def add_songs_in_dir(path, store_checksum=False):
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['tracknumber'] = song.tags['trkn'][0][0]
                     else:
-                        song_obj['tracknumber'] = int(song.tags['tracknumber'][0])
+                        song_obj['tracknumber'] = (
+                            int(song.tags['tracknumber'][0]))
                 except Exception:
                     song_obj['tracknumber'] = None
 
@@ -132,6 +140,7 @@ def add_songs_in_dir(path, store_checksum=False):
     conn.close()
     return num_songs
 
+
 def search_songs(query, limit=20):
     songs = []
     if query:
@@ -139,11 +148,12 @@ def search_songs(query, limit=20):
         res = session.query(Song).filter(or_(
             Song.title.like('%' + query + '%'),
             Song.artist.like('%' + query + '%'),
-            Song.album.like('%' + query + '%'))) \
-                    .limit(limit).all()
+            Song.album.like('%' + query + '%')
+        )).limit(limit).all()
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': query, 'limit': limit, 'results': songs}
+
 
 def random_songs(limit=20):
     session = Session()
@@ -152,32 +162,38 @@ def random_songs(limit=20):
     songs = [song.dictify() for song in res]
     return {'query': '', 'limit': limit, 'results': songs}
 
+
 def get_albums_for_artist(artist):
     songs = Song.__table__
     albums = []
     if artist:
         conn = engine.connect()
-        s = select([songs.c.album, func.count(songs.c.album).label('num_songs')]) \
-                .where(songs.c.artist == artist) \
-                .group_by(songs.c.album) \
-                .order_by(songs.c.album)
+        cols = [songs.c.album, func.count(songs.c.album).label('num_songs')]
+        s = (select(cols)
+             .where(songs.c.artist == artist)
+             .group_by(songs.c.album)
+             .order_by(songs.c.album))
         res = conn.execute(s)
         albums = [{'name': row[0], 'num_songs': row[1]} for row in res]
         conn.close()
     return {'query': artist, 'results': albums}
 
+
 def get_album(album):
     songs = []
     if album:
         session = Session()
-        res = session.query(Song).filter_by(album=album).order_by(Song.tracknumber, Song.path).all()
+        res = (session.query(Song).filter_by(album=album)
+               .order_by(Song.tracknumber, Song.path).all())
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': album, 'results': songs}
 
+
 def get_history(limit=20):
     session = Session()
-    history_items = session.query(PlayHistory).order_by(PlayHistory.id.desc()).limit(limit).all()
+    history_items = (session.query(PlayHistory).order_by(PlayHistory.id.desc())
+                     .limit(limit).all())
     session.commit()
     songs = []
     for item in history_items:
@@ -186,15 +202,17 @@ def get_history(limit=20):
         songs.append(song_obj)
     return {'limit': limit, 'results': songs}
 
+
 def top_songs(limit=20):
     songs = Song.__table__
     play_history = PlayHistory.__table__
     conn = engine.connect()
-    s = select([songs.c.id, func.count(play_history.c.id).label('play_count')]) \
-            .select_from(songs.join(play_history)) \
-            .group_by(songs.c.id) \
-            .order_by('play_count DESC') \
-            .limit(limit)
+    cols = [songs.c.id, func.count(play_history.c.id).label('play_count')]
+    s = (select(cols)
+         .select_from(songs.join(play_history))
+         .group_by(songs.c.id)
+         .order_by('play_count DESC')
+         .limit(limit))
     res = conn.execute(s)
     conn.close()
     session = Session()
@@ -202,15 +220,17 @@ def top_songs(limit=20):
     session.commit()
     return {'limit': limit, 'results': songs}
 
+
 def top_artists(limit=20):
     songs = Song.__table__
     play_history = PlayHistory.__table__
     conn = engine.connect()
-    s = select([songs.c.artist, func.count(play_history.c.id).label('play_count')]) \
-            .select_from(songs.join(play_history)) \
-            .group_by(songs.c.artist) \
-            .order_by('play_count DESC') \
-            .limit(limit)
+    cols = [songs.c.artist, func.count(play_history.c.id).label('play_count')]
+    s = (select(cols)
+         .select_from(songs.join(play_history))
+         .group_by(songs.c.artist)
+         .order_by('play_count DESC')
+         .limit(limit))
     res = [{'artist': row[0], 'play_count': row[1]} for row in conn.execute(s)]
     conn.close()
     return {'limit': limit, 'results': res}

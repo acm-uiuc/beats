@@ -18,6 +18,7 @@ app = Flask(__name__)
 scheduler = Scheduler()
 scheduler.start()
 
+
 def login_required(f):
     if not AUTHENTICATION_ENABLED:
         return f
@@ -33,13 +34,16 @@ def login_required(f):
 
     return decorated_function
 
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'message': str(error)}), 404
 
+
 @app.errorhandler(500)
 def not_found(error):
     return jsonify({'message': str(error)}), 500
+
 
 @app.route('/v1/player/play_next', methods=['POST'])
 @login_required
@@ -47,11 +51,13 @@ def not_found(error):
 def play_next():
     return jsonify(scheduler.play_next(skip=True) or {})
 
+
 @app.route('/v1/player/pause', methods=['POST'])
 @login_required
 @crossdomain(origin='*')
 def pause():
     return jsonify(player.pause())
+
 
 @app.route('/v1/player/volume', methods=['POST'])
 @login_required
@@ -62,16 +68,20 @@ def player_set_volume():
         if 0 <= vol <= 100:
             return jsonify(player.set_volume(vol))
         else:
-            return jsonify({'message': 'Volume must be between 0 and 100'}), 400
+            return jsonify({
+                'message': 'Volume must be between 0 and 100',
+            }), 400
     return jsonify({'message': 'No volume parameter'}), 400
+
 
 @app.route('/v1/songs/<song_id>', methods=['GET'])
 @crossdomain(origin='*')
 def show_song(song_id):
     try:
-        return jsonify(Song(song_id).dictify())
+        return jsonify(song.Song(song_id).dictify())
     except Exception, e:
         return jsonify({'message': str(e)}), 404
+
 
 @app.route('/v1/songs/search', methods=['GET'])
 @crossdomain(origin='*')
@@ -99,6 +109,7 @@ def search():
             return jsonify(song.search_songs(query, int(limit)))
         return jsonify(song.search_songs(query))
 
+
 @app.route('/v1/songs/random', methods=['GET'])
 @crossdomain(origin='*')
 def random_songs():
@@ -106,6 +117,7 @@ def random_songs():
     if limit and int(limit) != 0:
         return jsonify(song.random_songs(int(limit)))
     return jsonify(song.random_songs())
+
 
 @app.route('/v1/songs/history', methods=['GET'])
 @crossdomain(origin='*')
@@ -115,6 +127,7 @@ def get_history():
         return jsonify(song.get_history(int(limit)))
     return jsonify(song.get_history())
 
+
 @app.route('/v1/songs/top_songs', methods=['GET'])
 @crossdomain(origin='*')
 def top_songs():
@@ -122,6 +135,7 @@ def top_songs():
     if limit and int(limit) != 0:
         return jsonify(song.top_songs(int(limit)))
     return jsonify(song.top_songs())
+
 
 @app.route('/v1/songs/top_artists', methods=['GET'])
 @crossdomain(origin='*')
@@ -131,13 +145,15 @@ def top_artists():
         return jsonify(song.top_artists(int(limit)))
     return jsonify(song.top_artists())
 
+
 @app.route('/v1/queue', methods=['GET'])
 @crossdomain(origin='*')
 def show_queue():
-    user = request.args.get('user')
-    if user:
+    queue_user = request.args.get('user')
+    if queue_user:
         return jsonify(scheduler.get_queue(user))
     return jsonify(scheduler.get_queue())
+
 
 @app.route('/v1/queue/<int:song_id>', methods=['DELETE'])
 @login_required
@@ -145,11 +161,13 @@ def show_queue():
 def queue_remove(song_id):
     return jsonify(scheduler.remove_song(song_id))
 
+
 @app.route('/v1/queue', methods=['DELETE'])
 @login_required
 @crossdomain(origin='*')
 def queue_clear():
     return jsonify(scheduler.clear())
+
 
 @app.route('/v1/queue/add', methods=['POST'])
 @login_required
@@ -175,19 +193,26 @@ def queue_add():
             return jsonify({'message': str(e)}), 400
     return jsonify({'message': 'No id or url parameter'}), 400
 
+
 @app.route('/v1/now_playing', methods=['GET'])
 @crossdomain(origin='*')
 def now_playing():
     return jsonify(player.get_now_playing() or {})
 
+
 @app.route('/v1/session', methods=['POST'])
 @crossdomain(origin='*')
 def create_session():
-    """For Crowd SSO support, save the token in a cookie with name 'crowd.token_key'."""
+    """Login.
+
+    For Crowd SSO support, save the token in a cookie with name
+    'crowd.token_key'.
+    """
     username = request.form.get('username')
     password = request.form.get('password')
     r = user.create_session(username, password)
     return jsonify(r.json()), r.status_code
+
 
 @app.route('/v1/session/<token>', methods=['GET'])
 @crossdomain(origin='*')
@@ -195,11 +220,13 @@ def get_session(token):
     r = user.get_session(token)
     return jsonify(r.json()), r.status_code
 
+
 @app.route('/v1/session/<token>', methods=['DELETE'])
 @crossdomain(origin='*')
 def delete_session(token):
     r = user.delete_session(token)
     return Response(status=r.status_code)
+
 
 if __name__ == '__main__':
     print 'Beats by ACM'

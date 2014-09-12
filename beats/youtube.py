@@ -1,6 +1,6 @@
 import pafy
-import isodate
 from urlparse import parse_qs, urlparse
+
 
 def get_youtube_video_details(url):
     try:
@@ -22,9 +22,12 @@ class YouTubeVideo(object):
         return video.audiostreams[0].url
 
     def dictify(self):
-        youtube_id = parse_qs(urlparse(self.url).query)['v'][0] 
-        return {'url': self.url,
-                'title': self.title,
-                'artist': 'YouTube video',
-                'length': self.length,
-                'art_uri': 'http://img.youtube.com/vi/' + youtube_id + '/hqdefault.jpg'}
+        youtube_id = parse_qs(urlparse(self.url).query)['v'][0]
+        art_uri = 'http://img.youtube.com/vi/' + youtube_id + '/hqdefault.jpg'
+        return {
+            'url': self.url,
+            'title': self.title,
+            'artist': 'YouTube video',
+            'length': self.length,
+            'art_uri': art_uri,
+        }
