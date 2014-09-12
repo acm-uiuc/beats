@@ -39,3 +39,4 @@ venv
 beats.cfg
 *.db
 *.swp
+.idea
