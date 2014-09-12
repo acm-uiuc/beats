@@ -47,14 +47,14 @@ class Scheduler(object):
         if packet:  # Song is already queued; add a vote
             if user == packet.user:
                 session.rollback()
-                raise Exception('User %s has already voted for this song',
-                                user)
+                raise Exception('User %s has already voted for this song' %
+                        user)
             try:
                 packet.additional_votes.append(Vote(user=user))
                 session.commit()
             except FlushError:
                 session.rollback()
-                raise Exception('User %s has already voted for this song',
+                raise Exception('User %s has already voted for this song' %
                                 user)
             self._update_finish_times(packet.user)
         else:  # Song is not queued; queue it
@@ -84,7 +84,7 @@ class Scheduler(object):
                     session.commit()
                 except IntegrityError:
                     session.rollback()
-                    raise Exception('Song with id %d does not exist', song_id)
+                    raise Exception('Song with id %d does not exist' % song_id)
             self._update_finish_times(user)
             self._update_active_sessions()
         return self.get_queue()
