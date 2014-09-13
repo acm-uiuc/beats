@@ -231,6 +231,11 @@ def delete_session(token):
     return Response(status=r.status_code)
 
 
+@app.route('/', methods=['GET'])
+def index():
+    return app.send_static_file('index.html')
+
+
 if __name__ == '__main__':
     print 'Beats by ACM'
     print 'VLC version: ' + player.get_vlc_version()
