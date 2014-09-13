@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Beats by ACM</title>
+    <meta name="viewport" content="width=device-width">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="beats.css">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+  </head>
+  <body ng-app="BeatsApp" ng-controller="BeatsController">
+    <div class="dialog-container" ng-show="isShowingDialog()">
+      <div class="dialog-area top" ng-show="showLoginDialog">
+        <form ng-submit="login(formUsername, formPassword)">
+          <input name="username" placeholder="Username" ng-model="formUsername" take-focus="usernameFocus" required />
+          <input type="password" name="password" placeholder="Password" ng-model="formPassword" required />
+          <button type="button" class="cancel" title="Cancel" ng-click="hideLoginDialog()">
+            <span data-icon="&#xf00d;"></span>Cancel
+          </button>
+          <button type="submit" class="confirm" title="Login">
+            <span data-icon="&#xf090;"></span>Login
+          </button>
+        </form>
+      </div>
+      <div class="dialog-area top" ng-show="errorMessage">
+        {{ errorMessage }}
+        <button type="button" class="cancel" title="Close" ng-click="errorMessage = ''">
+          <span data-icon="&#xf00d;"></span>Close
+        </button>
+      </div>
+      <div class="dialog-area center" ng-show="showYouTubeDialog">
+        <form ng-submit="playYouTube(formYouTubeURL)">
+          <input placeholder="YouTube Video URL" ng-model="formYouTubeURL" take-focus="youTubeFocus" required />
+          <button type="button" class="cancel" title="Cancel" ng-click="hideYouTubeDialog()">
+            <span data-icon="&#xf00d;"></span>Cancel
+          </button>
+          <button type="submit" class="confirm" title="Play">
+            <span data-icon="&#xf16a;"></span>Play
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="main-container">
+      <div class="top-area">
+        <div class="control label large" title="Search" data-image-icon="&#xf002;"></div>
+        <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText" /></form>
+        <button class="control rect-button youtube" title="YouTube" ng-click="startYouTubeDialog()">
+          <span data-icon="&#xf167;"></span>Play YouTube
+        </button>
+        <button class="control rect-button" title="Logout" ng-click="logout()" ng-show="loggedIn"><span data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
+        <button class="control rect-button" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">
+          <span data-icon="&#xf090;"></span>Login
+        </button>
+        <img src="icon.png">
+      </div>
+      <div class="middle-area">
+        <div class="side-area">
+          <div class="playlists">
+            <ul>
+                <li ng-repeat="section in sections" ng-click="searchSongs(section.query)"><span data-icon="{{ section.icon }}"></span>{{ section.title }}</li>
+            </ul>
+            <hr />
+            <ul class="playlists">
+              <li ng-repeat="playlist in playlists" drop-song="addToPlayList(playlist, song)"><span data-icon="&#xf001;"></span>{{ playlist.title }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="playlist-area" ng-show="layout == 'songlist'">
+          <table class="playlist">
+            <colgroup>
+              <col span="1" style="width: 5%;">
+              <col span="1" style="width: 5%;">
+              <col span="1" style="width: 33%;">
+              <col span="1" style="width: 20%;">
+              <col span="1" style="width: 30%;">
+              <col span="1" style="width: 7%;">
+            </colgroup>
+            <thead>
+              <tr><th>Vote</th><th>Track</th><th>Title</th><th>Artist</th><th>Album</th><th>Length</th></tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="song in playlist track by $index" draggable="true" drag-song="song">
+                <td style="text-align: center" ng-click="voteSong(song)"><span class="cursor-pointer" data-image-icon="{{ getSongIcon(song) }}"></span></td>
+                <td>{{ song.tracknumber }}</td>
+                <td title="{{ song.title }}">{{ song.title }}</td>
+                <td title="{{ song.artist }}"><span class="cursor-pointer" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span></td>
+                <td title="{{ song.album }}"><span class="cursor-pointer" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span></td>
+                <td>{{ song.length|momentFormat }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="albumgrid-area" ng-show="layout == 'albumgrid'">
+          <li ng-repeat="album in albumlist track by $index" ng-click="searchAlbum(album.name)">
+            <img class="art" ng-src="{{['http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg', album.albumart][(album.albumart == undefined) ? 0 : 1]}}"/>
+            <p class="album-name" title="{{ [album.name,'No Album'][(album.name == null) ? 1 : 0] }}">{{[album.name,"No Album"][(album.name == null) ? 1 : 0] }}</p>
+          </li>
+        </ul>
+        <div class="queue-area" drop-song="voteSong(song)">
+          <div class="album-art">
+            <img ng-src="{{queue[0].art_uri || 'http://4.bp.blogspot.com/-3n7yrHpYsfw/TZtqsQMtHwI/AAAAAAAAG6o/RY4-sDUGFuA/s1600/album-light-up-night.jpg'}}" />
+          </div>
+          <ul class="song-queue">
+              <li ng-repeat="song in queue" drag-song="song" draggable="true">
+                <span class="title" title="{{ song.title }}">{{ song.title }}</span>
+                <span class="album cursor-pointer" title="{{ song.album }}" ng-click="searchSongs('album:' + song.album)">{{ song.album }}</span>
+                <span class="artist cursor-pointer" title="{{ song.artist }}" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span>
+                <span class="user" title="{{ song.packet.user }}">DJ {{ song.packet.user }}</span>
+                <span class="vote cursor-pointer" ng-click="voteSong(song)" data-image-icon="{{ getSongIcon(song) }}"></span>
+              </li>
+          </ul>
+        </div>
+      </div>
+      <div class="bottom-area">
+        <div class="control button"
+             title="Pause"
+             ng-click="pauseSong()"
+             data-image-icon="{{ ['\uf04b', '\uf04c'][isPlaying ? 1 : 0] }}">
+        </div>
+        <div class="control button"
+             title="Skip"
+             data-image-icon="&#xf051;"
+             ng-click="skipSong()"
+             style="margin-right: 20px">
+         </div>
+        <div class="control label"
+             title="Volume"
+             data-image-icon="&#xf028;"
+             style="margin-right: 14px">
+        </div>
+        <div class="control bar volume"
+             title="Volume"
+             bar-control="volume"
+             bar-set="setVolume(volume)"
+             bar-dragging="holdVolumeUpdate"
+             bar-min="0"
+             bar-max="100">
+          <div class="cover"
+               style="width: {{ volume }}%">
+          </div>
+          <div class="handle"
+               style="left: {{ volume }}%">
+          </div>
+        </div>
+        <div class="control label current-time-label" title="Track">{{ playbackTime|momentFormat }}</div>
+        <div class="control bar track" title="Track">
+          <div class="cover" style="width: {{ playbackTime / playbackDuration * 100 }}%"></div>
+        </div>
+        <div class="control label duration-label" title="Track">{{ playbackDuration|momentFormat }}</div>
+      </div>
+    </div>
+    <script src="angular.min.js"></script>
+    <script src="angular-cookies.min.js"></script>
+    <script src="beats.js"></script>
+  </body>
+</html>

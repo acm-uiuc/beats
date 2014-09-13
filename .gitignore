@@ -40,3 +40,4 @@ beats.cfg
 *.db
 *.swp
 .idea
+.sass-cache
