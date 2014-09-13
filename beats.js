@@ -255,12 +255,15 @@ function($scope, $http, $interval, $cookies)
 
     $scope.isSongVotable = function(song)
     {
-        // Songs in the queue can not be voted for if the user voted for them
         for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
         {
-            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
-            {
-                return false;
+            if ((!song.url && $scope.queue[queueIndex]['id'] == song.id) ||
+                (!song.id && $scope.queue[queueIndex]['url'] == song.url)) {
+                // Songs in the queue can not be voted for if the user has
+                // already voted for them
+                if ($scope.queue[queueIndex]['packet']['has_voted']) {
+                    return false;
+                }
             }
         }
         return true;
@@ -526,10 +529,17 @@ function($scope, $http, $interval, $cookies)
             return;
         }
 
-        if ($scope.userRequest('/v1/queue/add', 'id=' + song.id))
-        {
-            // Show the UI that the song was voted for
-            song.vote = true;
+        if (song.url) {
+            var url = encodeURIComponent(song.url);
+            if ($scope.userRequest('/v1/queue/add', 'url=' + url)) {
+                // Show the UI that the song was voted for
+                song.vote = true;
+            }
+        } else {
+            if ($scope.userRequest('/v1/queue/add', 'id=' + song.id)) {
+                // Show the UI that the song was voted for
+                song.vote = true;
+            }
         }
     };
 
