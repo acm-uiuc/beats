@@ -230,6 +230,7 @@ function($scope, $http, $interval, $cookies)
     $scope.playbackDuration = 0;
     $scope.isPlaying = false;
     $scope.layout = 'songlist';
+    $scope.defaultAlbumArt = 'static/default-album-art.jpg';
 
     $scope.sections =
     [
