@@ -151,7 +151,7 @@ def top_artists():
 def show_queue():
     queue_user = request.args.get('user')
     if queue_user:
-        return jsonify(scheduler.get_queue(user))
+        return jsonify(scheduler.get_queue(queue_user))
     return jsonify(scheduler.get_queue())
 
 

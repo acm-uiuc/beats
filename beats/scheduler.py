@@ -118,7 +118,7 @@ class Scheduler(object):
                 video_obj['packet'] = {
                     'num_votes': packet.num_votes(),
                     'user': packet.user,
-                    'has_voted': packet.has_voted(user) if user else False,
+                    'has_voted': packet.has_voted(user),
                 }
                 queue.append(video_obj)
             else:
@@ -127,7 +127,7 @@ class Scheduler(object):
                 song_obj['packet'] = {
                     'num_votes': packet.num_votes(),
                     'user': packet.user,
-                    'has_voted': packet.has_voted(user) if user else False,
+                    'has_voted': packet.has_voted(user),
                 }
                 queue.append(song_obj)
 
