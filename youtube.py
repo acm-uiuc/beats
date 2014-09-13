@@ -23,7 +23,7 @@ class YouTubeVideo(object):
 
     def dictify(self):
         youtube_id = parse_qs(urlparse(self.url).query)['v'][0]
-        art_uri = 'http://img.youtube.com/vi/' + youtube_id + '/hqdefault.jpg'
+        art_uri = 'https://img.youtube.com/vi/' + youtube_id + '/hqdefault.jpg'
         return {
             'url': self.url,
             'title': self.title,
