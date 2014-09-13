@@ -211,7 +211,7 @@ function($scope, $http, $interval, $cookies)
     // Data
     //
 
-    var backendBase = 'http://127.0.0.1:5000'
+    var backendBase = '/beats/1104'
     var authentication = true;
 
     $scope.showLoginDialog = false;

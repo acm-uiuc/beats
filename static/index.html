@@ -5,8 +5,8 @@
     <title>Beats by ACM</title>
     <meta name="viewport" content="width=device-width">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="beats.css">
-    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/beats.css">
+    <link href="static/font-awesome/css/font-awesome.css" rel="stylesheet">
   </head>
   <body ng-app="BeatsApp" ng-controller="BeatsController">
     <div class="dialog-container" ng-show="isShowingDialog()">
@@ -51,7 +51,7 @@
         <button class="control rect-button" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">
           <span data-icon="&#xf090;"></span>Login
         </button>
-        <img src="icon.png">
+        <img src="static/icon.png">
       </div>
       <div class="middle-area">
         <div class="side-area">
@@ -150,8 +150,8 @@
         <div class="control label duration-label" title="Track">{{ playbackDuration|momentFormat }}</div>
       </div>
     </div>
-    <script src="angular.min.js"></script>
-    <script src="angular-cookies.min.js"></script>
-    <script src="beats.js"></script>
+    <script src="static/angular.min.js"></script>
+    <script src="static/angular-cookies.min.js"></script>
+    <script src="static/beats.js"></script>
   </body>
 </html>
