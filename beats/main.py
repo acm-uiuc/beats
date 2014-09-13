@@ -180,7 +180,10 @@ def queue_add():
         session = user.get_session(token)
         username = session.json()['user']['name']
     if request.form.get('id'):
-        song_id = request.form.get('id')
+        try:
+            song_id = int(request.form.get('id'))
+        except ValueError:
+            return jsonify({'message': 'Invalid id'}), 400
         try:
             return jsonify(scheduler.vote_song(username, song_id=song_id))
         except Exception, e:
