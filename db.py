@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Unicode, Float, DateTime
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.pool import NullPool
 from config import config
@@ -17,11 +18,11 @@ class Song(Base):
     __tablename__ = 'songs'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(100))
-    artist = Column(String(100))
-    album = Column(String(100))
+    title = Column(Unicode(100))
+    artist = Column(Unicode(100))
+    album = Column(Unicode(100))
     length = Column(Float)
-    path = Column(String(500))
+    path = Column(Unicode(500))
     tracknumber = Column(Integer)
 
     # MD5 checksum to verify file integrity
@@ -77,7 +78,7 @@ class Packet(Base):
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
                      unique=True)
     video_url = Column(String(100), unique=True)
-    video_title = Column(String(100))
+    video_title = Column(Unicode(100))
     video_length = Column(Float)
     user = Column(String(8))
     arrival_time = Column(Float)
