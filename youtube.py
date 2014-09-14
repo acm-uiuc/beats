@@ -8,6 +8,11 @@ def get_youtube_video_details(url):
     except IOError:
         raise Exception('Bad video url')
 
+    try:
+        video.audiostreams[0].url
+    except IndexError:
+        raise Exception('Invalid video, potentially live stream')
+
     return {'title': video.title, 'length': video.length}
 
 
