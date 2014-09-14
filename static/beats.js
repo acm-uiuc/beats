@@ -623,3 +623,8 @@ function($scope, $http, $interval, $cookies)
     $scope.randomSongs();
     $scope.refreshPlayer();
 }]);
+
+// Print banner
+if (window.console) {
+    console.log(document.childNodes[1].nodeValue);
+}
