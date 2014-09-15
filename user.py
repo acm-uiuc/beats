@@ -1,6 +1,7 @@
 from config import config
 import requests
 import json
+import threading
 
 CROWD_SERVER = config.get('Crowd', 'server')
 CROWD_APPLICATION_NAME = config.get('Crowd', 'application_name')
@@ -36,6 +37,18 @@ def get_session(token):
     r = requests.get(
         'http://%s/crowd/rest/usermanagement/1/session/%s' % (
             CROWD_SERVER, token),
+        headers=CROWD_HEADERS,
+        auth=(CROWD_APPLICATION_NAME, CROWD_PASSWORD))
+    if r.status_code == requests.codes.ok:
+        threading.Thread(target=validate_session, args=(token,)).start()
+    return r
+
+
+def validate_session(token):
+    r = requests.post(
+        'http://%s/crowd/rest/usermanagement/1/session/%s' % (
+            CROWD_SERVER, token),
+        data=json.dumps({}),
         headers=CROWD_HEADERS,
         auth=(CROWD_APPLICATION_NAME, CROWD_PASSWORD))
     return r
