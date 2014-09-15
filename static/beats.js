@@ -278,8 +278,8 @@ function($scope, $http, $interval, $cookies)
         var waitingIcon = '\uf110';
 
         if ($scope.queue.length >= 1 &&
-            (!song.url && song.id == $scope.queue[0]['id'] ||
-             (!song.id && song.url == $scope.queue[0]['url'])))
+            (song.id && song.id == $scope.queue[0]['id'] ||
+             song.url && song.url == $scope.queue[0]['url']))
         {
             return playingIcon;
         }
