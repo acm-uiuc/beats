@@ -258,8 +258,8 @@ function($scope, $http, $interval, $cookies)
     {
         for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
         {
-            if ((!song.url && $scope.queue[queueIndex]['id'] == song.id) ||
-                (!song.id && $scope.queue[queueIndex]['url'] == song.url)) {
+            if ((song.id && $scope.queue[queueIndex]['id'] == song.id) ||
+                (song.url && $scope.queue[queueIndex]['url'] == song.url)) {
                 // Songs in the queue can not be voted for if the user has
                 // already voted for them
                 if ($scope.queue[queueIndex]['packet']['has_voted']) {
@@ -277,14 +277,24 @@ function($scope, $http, $interval, $cookies)
         var voteIcon    = '\uf067';
         var waitingIcon = '\uf110';
 
-        if ($scope.queue.length >= 1 && song['id'] == $scope.queue[0]['id'])
+        if ($scope.queue.length >= 1 &&
+            (!song.url && song.id == $scope.queue[0]['id'] ||
+             (!song.id && song.url == $scope.queue[0]['url'])))
         {
             return playingIcon;
         }
 
         for (var queueIndex = 0; queueIndex < $scope.queue.length; queueIndex++)
         {
-            if ($scope.queue[queueIndex]['id'] == song.id && $scope.queue[queueIndex]['packet']['has_voted'])
+            if (song.id && $scope.queue[queueIndex]['id'] == song.id &&
+                $scope.queue[queueIndex]['packet']['has_voted'])
+            {
+                delete song.vote;
+                return votedIcon;
+            }
+
+            if (song.url && $scope.queue[queueIndex]['url'] == song.url &&
+                $scope.queue[queueIndex]['packet']['has_voted'])
             {
                 delete song.vote;
                 return votedIcon;
