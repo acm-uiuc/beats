@@ -94,19 +94,19 @@ def search():
     elif query.startswith('play-history'):
         try:
             limit = int(query[13:])
-            return jsonify(song.get_history(limit))
+            return jsonify(song.get_history(limit=limit))
         except ValueError:
             return jsonify(song.get_history())
     elif query.startswith('top-songs'):
         try:
             limit = int(query[10:])
-            return jsonify(song.top_songs(limit))
+            return jsonify(song.top_songs(limit=limit))
         except ValueError:
             return jsonify(song.top_songs())
     else:
         limit = request.args.get('limit')
         if limit and int(limit) != 0:
-            return jsonify(song.search_songs(query, int(limit)))
+            return jsonify(song.search_songs(query, limit=int(limit)))
         return jsonify(song.search_songs(query))
 
 
@@ -115,7 +115,7 @@ def search():
 def random_songs():
     limit = request.args.get('limit')
     if limit and int(limit) != 0:
-        return jsonify(song.random_songs(int(limit)))
+        return jsonify(song.random_songs(limit=int(limit)))
     return jsonify(song.random_songs())
 
 
@@ -124,7 +124,7 @@ def random_songs():
 def get_history():
     limit = request.args.get('limit')
     if limit and int(limit) != 0:
-        return jsonify(song.get_history(int(limit)))
+        return jsonify(song.get_history(limit=int(limit)))
     return jsonify(song.get_history())
 
 
@@ -133,7 +133,7 @@ def get_history():
 def top_songs():
     limit = request.args.get('limit')
     if limit and int(limit) != 0:
-        return jsonify(song.top_songs(int(limit)))
+        return jsonify(song.top_songs(limit=int(limit)))
     return jsonify(song.top_songs())
 
 
@@ -142,7 +142,7 @@ def top_songs():
 def top_artists():
     limit = request.args.get('limit')
     if limit and int(limit) != 0:
-        return jsonify(song.top_artists(int(limit)))
+        return jsonify(song.top_artists(limit=int(limit)))
     return jsonify(song.top_artists())
 
 
@@ -151,7 +151,7 @@ def top_artists():
 def show_queue():
     queue_user = request.args.get('user')
     if queue_user:
-        return jsonify(scheduler.get_queue(queue_user))
+        return jsonify(scheduler.get_queue(user=queue_user))
     return jsonify(scheduler.get_queue())
 
 

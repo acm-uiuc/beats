@@ -9,7 +9,7 @@ http://dx.doi.org/10.1109/90.234856
 """
 
 from db import Session, Song, PlayHistory, Packet, Vote
-from song import random_songs
+import song
 from youtube import get_youtube_video_details, YouTubeVideo
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
@@ -184,7 +184,7 @@ class Scheduler(object):
 
     def play_next(self, skip=False):
         if self.empty():
-            random_song = random_songs(1)['results']
+            random_song = song.random_songs(limit=1)['results']
             if len(random_song) == 1:
                 self.vote_song('RANDOM', random_song[0]['id'])
 
