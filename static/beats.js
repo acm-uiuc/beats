@@ -260,6 +260,11 @@ function($scope, $http, $interval, $cookies)
         {
             if ((song.id && $scope.queue[queueIndex]['id'] == song.id) ||
                 (song.url && $scope.queue[queueIndex]['url'] == song.url)) {
+                // Song is already playing
+                if (queueIndex === 0) {
+                    return false;
+                }
+
                 // Songs in the queue can not be voted for if the user has
                 // already voted for them
                 if ($scope.queue[queueIndex]['packet']['has_voted']) {
