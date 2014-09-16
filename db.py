@@ -16,6 +16,7 @@ Base = declarative_base()
 
 class Song(Base):
     __tablename__ = 'songs'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, primary_key=True)
     title = Column(Unicode(100))
@@ -64,6 +65,7 @@ class Song(Base):
 
 class PlayHistory(Base):
     __tablename__ = 'play_history'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'))
@@ -73,6 +75,7 @@ class PlayHistory(Base):
 
 class Packet(Base):
     __tablename__ = 'packets'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
@@ -100,6 +103,7 @@ class Packet(Base):
 
 class Vote(Base):
     __tablename__ = 'votes'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     packet_id = Column(Integer, ForeignKey('packets.id', ondelete='CASCADE'),
                        primary_key=True)
