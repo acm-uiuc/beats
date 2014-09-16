@@ -88,6 +88,7 @@ class Packet(Base):
     finish_time = Column(Float)
     additional_votes = relationship('Vote', cascade='all,delete-orphan',
                                     passive_deletes=True, backref='packets')
+    player_name = Column(String(16))
 
     def num_votes(self):
         return 1 + len(self.additional_votes)
