@@ -1,4 +1,4 @@
-"""Add player_name column to packets table
+"""Add player_name column to packets and play_history tables
 
 Revision ID: 44eb15e16422
 Revises: None
@@ -16,7 +16,9 @@ import sqlalchemy as sa
 
 def upgrade():
     op.add_column('packets', sa.Column('player_name', sa.String(length=16)))
+    op.add_column('play_history', sa.Column('player_name', sa.String(length=16)))
 
 
 def downgrade():
     op.drop_column('packets', 'player_name')
+    op.drop_column('play_history', 'player_name')

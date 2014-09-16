@@ -1,15 +1,24 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import create_engine
 from logging.config import fileConfig
+
+# Add the parent directory to path
+# because it won't let me do relative imports
+import sys
+import os
+parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parentdir)
+from config import config as beats_config
+beats_url = beats_config.get('Database', 'url')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-config = context.config
+alembic_config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+fileConfig(alembic_config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -19,7 +28,7 @@ target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
+# my_important_option = alembic_config.get_main_option("my_important_option")
 # ... etc.
 
 
@@ -35,8 +44,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=target_metadata)
+    context.configure(url=beats_url, target_metadata=target_metadata)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -49,10 +57,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    engine = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix='sqlalchemy.',
-        poolclass=pool.NullPool)
+    engine = create_engine(beats_url)
 
     connection = engine.connect()
     context.configure(
