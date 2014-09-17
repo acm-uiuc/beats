@@ -426,9 +426,14 @@ function($scope, $http, $interval, $cookies)
             $cookies['crowd.token_key'] = data['token'];
             $scope.requestUser();
         })
-        .error(function(data)
+        .error(function(data, status)
         {
-            $scope.errorMessage = 'Your login failed. Please try again.';
+            if (status === 403) {
+                $scope.errorMessage = 'Access denied: you are not an ACM member.';
+            }
+            else {
+                $scope.errorMessage = 'Your login failed. Please try again.';
+            }
         });
     };
 
