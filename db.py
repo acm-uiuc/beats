@@ -71,6 +71,7 @@ class PlayHistory(Base):
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'))
     user = Column(String(8))
     played_at = Column(DateTime, default=datetime.datetime.utcnow)
+    player_name = Column(String(16))
 
 
 class Packet(Base):
@@ -88,6 +89,7 @@ class Packet(Base):
     finish_time = Column(Float)
     additional_votes = relationship('Vote', cascade='all,delete-orphan',
                                     passive_deletes=True, backref='packets')
+    player_name = Column(String(16))
 
     def num_votes(self):
         return 1 + len(self.additional_votes)
