@@ -37,6 +37,9 @@ nosetests.xml
 
 venv
 beats.cfg
+*.log
+*.pid
+
 *.db
 *.swp
 .idea
