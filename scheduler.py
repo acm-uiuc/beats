@@ -218,7 +218,8 @@ class Scheduler(object):
                     next_song = session.query(Song).get(next_packet.song_id)
                     player.play_media(next_song)
                     next_song.history.append(
-                        PlayHistory(user=next_packet.user))
+                        PlayHistory(user=next_packet.user,
+                                    player_name=PLAYER_NAME))
                     session.commit()
                     return next_song.dictify()
 

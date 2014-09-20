@@ -1,3 +1,4 @@
+from config import config
 from db import Song, PlayHistory, Session, engine
 from os import walk
 import hashlib
@@ -8,6 +9,8 @@ from mutagen.oggvorbis import OggVorbis
 from mutagen.mp4 import MP4
 from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import or_, func
+
+PLAYER_NAME = config.get('Player', 'player_name')
 
 
 def remove_songs_in_dir(path):
@@ -192,8 +195,9 @@ def get_album(album):
 
 def get_history(limit=20):
     session = Session()
-    history_items = (session.query(PlayHistory).order_by(PlayHistory.id.desc())
-                     .limit(limit).all())
+    history_items = (session.query(PlayHistory)
+                     .filter_by(player_name=PLAYER_NAME)
+                     .order_by(PlayHistory.id.desc()).limit(limit).all())
     session.commit()
     songs = []
     for item in history_items:
