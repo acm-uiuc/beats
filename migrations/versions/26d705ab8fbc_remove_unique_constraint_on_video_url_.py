@@ -20,5 +20,5 @@ def upgrade():
 
 
 def downgrade():
-    op.create_unique_constraint('video_url', 'packets', ['video_url']);
+    op.create_unique_constraint('video_url', 'packets', ['video_url'])
     pass
