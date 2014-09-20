@@ -8,6 +8,7 @@ IEEE/ACM Trans. Netw. 1, 3 (June 1993), 344-357. DOI=10.1109/90.234856
 http://dx.doi.org/10.1109/90.234856
 """
 
+from config import config
 from db import Session, Song, PlayHistory, Packet, Vote
 import song
 from youtube import get_youtube_video_details, YouTubeVideo
@@ -16,6 +17,8 @@ from sqlalchemy.orm.exc import FlushError
 import threading
 import time
 import player
+
+PLAYER_NAME = config.get('Player', 'player_name')
 
 SCHEDULER_INTERVAL_SEC = 0.25
 """Interval at which to run the scheduler loop"""
@@ -37,10 +40,11 @@ class Scheduler(object):
         session = Session()
 
         if video_url:
-            query = session.query(Packet).filter_by(video_url=video_url)
-            packet = query.first()
+            packet = session.query(Packet).filter_by(
+                video_url=video_url, player_name=PLAYER_NAME).first()
         elif song_id is not None:
-            packet = session.query(Packet).filter_by(song_id=song_id).first()
+            packet = session.query(Packet).filter_by(
+                song_id=song_id, player_name=PLAYER_NAME).first()
         else:
             raise Exception('Must specify either song_id or video_url')
 
@@ -66,7 +70,8 @@ class Scheduler(object):
                                         video_title=video_details['title'],
                                         video_length=video_details['length'],
                                         user=user,
-                                        arrival_time=self.virtual_time)
+                                        arrival_time=self.virtual_time,
+                                        player_name=PLAYER_NAME)
                         session.add(packet)
                         session.commit()
                     except Exception, e:
@@ -79,7 +84,8 @@ class Scheduler(object):
                 try:
                     packet = Packet(song_id=song_id,
                                     user=user,
-                                    arrival_time=self.virtual_time)
+                                    arrival_time=self.virtual_time,
+                                    player_name=PLAYER_NAME)
                     session.add(packet)
                     session.commit()
                 except IntegrityError:
@@ -93,7 +99,8 @@ class Scheduler(object):
     def num_songs_queued():
         """Returns the number of songs that are queued"""
         session = Session()
-        num_songs = session.query(Packet).count()
+        num_songs = session.query(Packet).filter_by(
+            player_name=PLAYER_NAME).count()
         session.commit()
         return num_songs
 
@@ -107,7 +114,8 @@ class Scheduler(object):
         each song.
         """
         session = Session()
-        packets = session.query(Packet).order_by(Packet.finish_time).all()
+        packets = (session.query(Packet).filter_by(player_name=PLAYER_NAME)
+                   .order_by(Packet.finish_time).all())
         session.commit()
 
         queue = []
@@ -149,7 +157,7 @@ class Scheduler(object):
 
     def clear(self):
         session = Session()
-        session.query(Packet).delete()
+        session.query(Packet).filter_by(player_name=PLAYER_NAME).delete()
         session.commit()
         player.stop()
         return self.get_queue()
@@ -157,7 +165,8 @@ class Scheduler(object):
     def remove_song(self, song_id, skip=False):
         """Removes the packet with the given id"""
         session = Session()
-        packet = session.query(Packet).filter_by(song_id=song_id).first()
+        packet = session.query(Packet).filter_by(
+            song_id=song_id, player_name=PLAYER_NAME).first()
         if (isinstance(player.now_playing, Song) and
                 player.now_playing.id == song_id):
             player.stop()
@@ -171,7 +180,8 @@ class Scheduler(object):
     def remove_video(self, url, skip=False):
         """Removes the packet with the given video_url"""
         session = Session()
-        packet = session.query(Packet).filter_by(video_url=url).first()
+        packet = session.query(Packet).filter_by(
+            video_url=url, player_name=PLAYER_NAME).first()
         if (isinstance(player.now_playing, YouTubeVideo) and
                 player.now_playing.url == url):
             player.stop()
@@ -195,8 +205,9 @@ class Scheduler(object):
                 else:
                     self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
-            next_packet = (session.query(Packet).order_by(Packet.finish_time)
-                           .first())
+            next_packet = (session.query(Packet)
+                           .filter_by(player_name=PLAYER_NAME)
+                           .order_by(Packet.finish_time).first())
             if next_packet:
                 if next_packet.video_url:
                     video = YouTubeVideo(next_packet)
@@ -226,10 +237,12 @@ class Scheduler(object):
         session = Session()
 
         if user:
-            packets = (session.query(Packet).filter_by(user=user)
+            packets = (session.query(Packet)
+                       .filter_by(user=user, player_name=PLAYER_NAME)
                        .order_by(Packet.arrival_time).all())
         else:
-            packets = session.query(Packet).order_by(Packet.arrival_time).all()
+            packets = (session.query(Packet).filter_by(player_name=PLAYER_NAME)
+                       .order_by(Packet.arrival_time).all())
 
         last_finish_time = {}
         for packet in packets:
@@ -251,13 +264,15 @@ class Scheduler(object):
     def _update_active_sessions(self):
         """Updates the active_sessions member variable"""
         session = Session()
-        self.active_sessions = session.query(Packet.user).distinct().count()
+        self.active_sessions = session.query(Packet.user).filter_by(
+            player_name=PLAYER_NAME).distinct().count()
         session.commit()
 
     def _initialize_virtual_time(self):
         """Initializes virtual time to the latest packet arrival time"""
         session = Session()
         last_arrived_packet = (session.query(Packet)
+                               .filter_by(player_name=PLAYER_NAME)
                                .order_by(Packet.arrival_time.desc()).first())
         if last_arrived_packet:
             self.virtual_time = last_arrived_packet.arrival_time

@@ -81,7 +81,7 @@ class Packet(Base):
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
                      unique=True)
-    video_url = Column(String(100), unique=True)
+    video_url = Column(String(100))
     video_title = Column(Unicode(100))
     video_length = Column(Float)
     user = Column(String(8))

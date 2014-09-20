@@ -1,3 +1,6 @@
+[Player]
+player_name = 1104
+
 [Authentication]
 enabled = true
 test_username = testuser
