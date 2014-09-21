@@ -43,3 +43,11 @@ gunicorn -c gunicorn_config.py main:app
 ```
 
 The server will start at [http://localhost:5000/](http://localhost:5000/).
+
+Adding songs on prod
+--------------------
+```bash
+cd /var/www/beats
+source venv/bin/activate
+./scan_netid.py netid1 [netid2 netid3 ...]
+```
