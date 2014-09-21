@@ -76,7 +76,7 @@ def add_songs_in_dir(path, store_checksum=False):
     for root, _, files in walk(path):
         for f in files:
             ext = splitext(f)[1]
-            filepath = join(root, f)
+            filepath = join(root, f).decode('utf-8')
             if ext in {'.mp3', '.flac', '.ogg', '.m4a', '.mp4'}:
                 if filepath in already_added:
                     print 'Already added: ' + filepath
