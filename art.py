@@ -1,11 +1,14 @@
-from os import splitext, isfile
-import mutagen
+from os.path import splitext, isfile
+import traceback
+from mutagen.mp3 import MP3
+from mutagen.flac import FLAC
 import hashlib
+from config import config
 
-art_path = "/home/prin/Music/theArt/"
+art_path = config.get('Artwork', 'art_path')
 
 def index_art(path):
-    ext = splitext(path)
+    ext = splitext(path)[1]
 
     art_uri = ""
     if ext == ".mp3":
@@ -17,10 +20,11 @@ def index_art(path):
 
 def index_mp3_art(song):
     try:
-        tags = mutagen.mp3.Open(song)
+        tags = MP3(song)
     except:
+        print traceback.format_exc()
         return False
-    art = ""
+    data = ""
     for tag in tags:
         if tag.startswith("APIC"):
             data = tags[tag].data
@@ -32,9 +36,11 @@ def index_mp3_art(song):
 
 def index_flac_art(song):
     try:
-        tags = mutagen.flac.Open(song)
+        tags = FLAC(song)
+        print traceback.format_exc()
     except:
         return False
+    data = ""
     if tags.pictures[0].data:
         data = tags.pictures[0].data
 
@@ -46,21 +52,15 @@ def write_art(data):
     if not data:
         return None
 
-    filename = song.md5_for_file(data) + ".jpg"
+    m = hashlib.md5()
+    m.update(data)
 
-    if not isfile(art_path + filename):
-        out = open(art_path + filename, "w")
+    filename = m.hexdigest() + ".jpg"
+
+    if not isfile("." + art_path + filename):
+        out = open("." + art_path + filename, "w")
         out.write(data)
         out.close()
         print "indexed " + filename
 
     return art_path + filename
-
-def md5_for_file(f, block_size=2**20):
-    md5 = hashlib.md5()
-    while True:
-        data = f.read(block_size)
-        if not data:
-            break
-        md5.update(data)
-    return md5.hexdigest()
