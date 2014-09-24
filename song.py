@@ -69,7 +69,7 @@ def add_songs_in_dir(path, store_checksum=False):
     update the song metadata in the database if the file is modified. Disabled
     by default because it makes scanning a lot slower.
     """
-    already_added = _prune_dir(path, prune_modified=store_checksum)
+    already_added = _prune_dir(unicode(path), prune_modified=store_checksum)
     table = Song.__table__
     conn = engine.connect()
     num_songs = 0
