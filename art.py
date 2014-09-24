@@ -1,5 +1,4 @@
 from os.path import splitext, isfile
-import traceback
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 import hashlib
@@ -22,7 +21,6 @@ def index_mp3_art(song):
     try:
         tags = MP3(song)
     except:
-        print traceback.format_exc()
         return False
     data = ""
     for tag in tags:
@@ -37,7 +35,6 @@ def index_mp3_art(song):
 def index_flac_art(song):
     try:
         tags = FLAC(song)
-        print traceback.format_exc()
     except:
         return False
     data = ""
@@ -61,6 +58,5 @@ def write_art(data):
         out = open("." + art_path + filename, "w")
         out.write(data)
         out.close()
-        print "indexed " + filename
 
     return art_path + filename
