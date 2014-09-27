@@ -139,9 +139,6 @@ def add_songs_in_dir(path, store_checksum=False):
                 # Album art added on indexing
                 if not isfile(art.get_art(filepath)):
                     art.index_art(filepath)
-                    print "indexed art"
-                else:
-                    print "already indexed"
 
                 print 'Added: ' + filepath
                 conn.execute(table.insert().values(song_obj))
