@@ -1,8 +1,9 @@
 from config import config
 from db import Song, PlayHistory, Session, engine
+import art
 from os import walk
 import hashlib
-from os.path import splitext, join, isfile
+from os.path import split, splitext, join, isfile
 from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
@@ -11,7 +12,7 @@ from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import or_, func
 
 PLAYER_NAME = config.get('Player', 'player_name')
-
+ART_DIR = config.get('Artwork', 'art_path')
 
 def remove_songs_in_dir(path):
     session = Session()
@@ -60,7 +61,6 @@ def _prune_dir(path, prune_modified=False):
 
     session.commit()
     return remaining_paths
-
 
 def add_songs_in_dir(path, store_checksum=False):
     """Update database to reflect the contents of the given directory.
@@ -135,7 +135,14 @@ def add_songs_in_dir(path, store_checksum=False):
                             int(song.tags['tracknumber'][0]))
                 except Exception:
                     song_obj['tracknumber'] = None
-                
+
+                # Album art added on indexing
+                if not isfile(art.get_art(filepath)):
+                    art.index_art(filepath)
+                    print "indexed art"
+                else:
+                    print "already indexed"
+
                 print 'Added: ' + filepath
                 conn.execute(table.insert().values(song_obj))
                 num_songs += 1
