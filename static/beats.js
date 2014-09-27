@@ -417,6 +417,7 @@ function($scope, $http, $interval, $cookies)
     $scope.login = function(username, password)
     {
         $scope.hideLoginDialog();
+        password = encodeURIComponent(password);
         $http.post(backendBase + '/v1/session', 'username=' + username + '&password=' + password,
         {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
