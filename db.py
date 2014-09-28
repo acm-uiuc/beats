@@ -3,13 +3,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Unicode, Float, DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import QueuePool
 from config import config
 import datetime
 
 DATABASE_URL = config.get('Database', 'url')
 
-engine = create_engine(DATABASE_URL, poolclass=NullPool)
+engine = create_engine(DATABASE_URL, max_overflow=-1)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
