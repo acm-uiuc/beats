@@ -46,6 +46,7 @@ class Song(Base):
             'length': self.length,
             'path': self.path,
             'tracknumber': self.tracknumber,
+            'play_count': self.play_count(),
         }
 
     def play_count(self):
