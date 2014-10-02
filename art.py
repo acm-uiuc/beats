@@ -1,25 +1,26 @@
-from os.path import join, split, splitext
+from os.path import join, splitext
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
-import hashlib
 from config import config
 
 ART_DIR = config.get('Artwork', 'art_path')
 
-def index_art(path):
-    ext = splitext(path)[1]
+
+def index_art(song):
+    ext = splitext(song['path'])[1]
 
     art_uri = ''
     if ext == '.mp3':
-        art_uri = index_mp3_art(path)
+        art_uri = index_mp3_art(song)
     elif ext == '.flac':
-        art_uri = index_flac_art(path)
+        art_uri = index_flac_art(song)
 
     return art_uri
 
+
 def index_mp3_art(song):
     try:
-        tags = MP3(song)
+        tags = MP3(song['path'])
     except:
         return False
     data = ''
@@ -32,9 +33,10 @@ def index_mp3_art(song):
 
     return path
 
+
 def index_flac_art(song):
     try:
-        tags = FLAC(song)
+        tags = FLAC(song['path'])
     except:
         return False
     data = ''
@@ -45,22 +47,21 @@ def index_flac_art(song):
 
     return path
 
-def write_art(path, data):
+
+def write_art(song, data):
     if not data:
         return None
 
-    filepath = get_art(path)
+    filepath = get_art(song['checksum'])
 
     out = open(filepath, 'w')
     out.write(data)
     out.close()
 
-def get_art(path):
-    m = hashlib.md5()
-    m.update(split(path)[0].encode('utf-8'))
-    filename = m.hexdigest() + '.jpg'
 
-    filepath = join('.' + ART_DIR + filename)
-    print filepath
+def get_art(checksum):
+    if not checksum:
+        return None
+    filepath = join('.' + ART_DIR + checksum + ".jpg")
 
     return filepath

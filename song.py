@@ -14,6 +14,7 @@ from sqlalchemy.sql.expression import or_, func
 PLAYER_NAME = config.get('Player', 'player_name')
 ART_DIR = config.get('Artwork', 'art_path')
 
+
 def remove_songs_in_dir(path):
     session = Session()
     session.query(Song).filter(Song.path.like(path + '%')).delete(
@@ -62,7 +63,8 @@ def _prune_dir(path, prune_modified=False):
     session.commit()
     return remaining_paths
 
-def add_songs_in_dir(path, store_checksum=False):
+
+def add_songs_in_dir(path, store_checksum=True):
     """Update database to reflect the contents of the given directory.
 
     store_checksum: Whether or not to store an MD5 file checksum in order to
@@ -118,6 +120,8 @@ def add_songs_in_dir(path, store_checksum=False):
                 if store_checksum:
                     with open(filepath, 'rb') as song_file:
                         song_obj['checksum'] = md5_for_file(song_file)
+                else:
+                    song_obj['checksum'] = None
 
                 try:  # Album optional for singles
                     if ext in {'.m4a', '.mp4'}:
@@ -127,7 +131,7 @@ def add_songs_in_dir(path, store_checksum=False):
                 except Exception:
                     song_obj['album'] = None
 
-                try: # Track number optional
+                try:  # Track number optional
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['tracknumber'] = song.tags['trkn'][0][0]
                     else:
@@ -137,8 +141,8 @@ def add_songs_in_dir(path, store_checksum=False):
                     song_obj['tracknumber'] = None
 
                 # Album art added on indexing
-                if not isfile(art.get_art(filepath)):
-                    art.index_art(filepath)
+                if not isfile(art.get_art(song_obj['checksum'])):
+                    art.index_art(song_obj)
 
                 print 'Added: ' + filepath
                 conn.execute(table.insert().values(song_obj))
