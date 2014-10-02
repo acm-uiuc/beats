@@ -46,7 +46,7 @@ class Song(Base):
             'length': self.length,
             'path': self.path,
             'tracknumber': self.tracknumber,
-            'art_uri': art.get_art(self.checksum),
+            'art_uri': art.find_art(self.checksum),
         }
 
     def play_count(self):

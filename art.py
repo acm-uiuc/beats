@@ -1,4 +1,4 @@
-from os.path import join, splitext
+from os.path import join, splitext, isfile
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 from config import config
@@ -65,3 +65,11 @@ def get_art(checksum):
     filepath = join('.' + ART_DIR + checksum + ".jpg")
 
     return filepath
+
+
+def find_art(checksum):
+    path = get_art(checksum)
+
+    if isfile(path):
+        return path
+    return None
