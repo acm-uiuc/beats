@@ -1,0 +1,27 @@
+apt-get install python-pip
+apt-get install git
+
+# Set up backend and frontend
+apt-get install vlc python-dev libmysqlclient-dev
+apt-get install alsa-utils
+git clone https://github.com/acm-uiuc/beats.git /var/www/beats
+cd /var/www/beats
+pip install virtualenv
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp beats.cfg.sample beats.cfg
+# Set up beats.cfg
+
+# Set up apache
+apt-get install apache2
+rm /etc/apache2/sites-enabled/000-default
+ln -sf ../mods-available/proxy.conf /etc/apache2/mods-enabled
+ln -sf ../mods-available/proxy.load /etc/apache2/mods-enabled
+ln -sf ../mods-available/proxy_http.load /etc/apache2/mods-enabled
+# create /etc/apache2/sites-available/beats as follows:
+# <VirtualHost *:80>
+#     ProxyPass / http://localhost:5000/ retry=0
+# </VirtualHost>
+ln -sf ../sites-available/beats /etc/apache2/sites-enabled
+service apache2 restart
