@@ -2,7 +2,7 @@ apt-get install python-pip
 apt-get install git
 
 # Set up backend and frontend
-apt-get install vlc python-dev libmysqlclient-dev
+apt-get install vlc python-dev mysql-client libmysqlclient-dev
 apt-get install alsa-utils
 git clone https://github.com/acm-uiuc/beats.git /var/www/beats
 cd /var/www/beats
