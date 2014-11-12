@@ -238,7 +238,7 @@ function($scope, $http, $interval, $cookies)
         { title: 'Recently Added', icon: '\uf017', query: '' },
         { title: 'Recently Played', icon: '\uf04b', query: 'play-history' },
         { title: 'Random', icon: '\uf074', query: '' },
-        { title: 'Top 100', icon: '\uf01b', query: 'top-songs:100' },
+        { title: 'Top 50', icon: '\uf01b', query: 'top-songs:50' },
     ];
 
     $scope.playlists =
