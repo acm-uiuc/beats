@@ -22,7 +22,7 @@ class Song(Base):
     artist = Column(Unicode(100))
     album = Column(Unicode(100))
     length = Column(Float)
-    path = Column(Unicode(500))
+    path = Column(Unicode(1000))
     tracknumber = Column(Integer)
 
     # MD5 checksum to verify file integrity
