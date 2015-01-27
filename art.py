@@ -97,7 +97,11 @@ def write_art(song, data, mime):
 def get_art(checksum):
     if not checksum:
         return None
+    ext = ['.jpg', '.png']
+
     filepath = join(checksum)
-    for f in listdir('.' + ART_DIR):
-        if f.startswith(filepath):
-            return '.' + ART_DIR + f;
+    for e in ext:
+        if isfile('.' + ART_DIR + checksum + e):
+            return '.' + ART_DIR + checksum + e;
+
+    return ""
