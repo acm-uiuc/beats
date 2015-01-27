@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Unicode, Float, DateTime
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from config import config
 import art
@@ -46,7 +46,8 @@ class Song(Base):
             'length': self.length,
             'path': self.path,
             'tracknumber': self.tracknumber,
-            'art_uri': art.find_art(self.checksum),
+            'play_count': self.play_count(),
+            'art_uri': art.get_art(self.artist, self.album),
         }
 
     def play_count(self):
@@ -111,27 +112,6 @@ class Vote(Base):
     packet_id = Column(Integer, ForeignKey('packets.id', ondelete='CASCADE'),
                        primary_key=True)
     user = Column(String(8), primary_key=True)
-
-
-class Playlist(Base):
-    __tablename__ = 'playlists'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100))
-    user = Column(String(8))
-
-
-class PlaylistItem(Base):
-    __tablename__ = 'playlist_items'
-
-    playlist_id = Column(
-        Integer, ForeignKey('playlists.id', ondelete='CASCADE'),
-        primary_key=True)
-    index = Column(Integer, primary_key=True, autoincrement=False)
-    song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'))
-
-    __table_args__ = (UniqueConstraint('playlist_id', 'song_id'),)
-
 
 def init_db():
     Base.metadata.create_all(engine)

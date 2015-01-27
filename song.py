@@ -64,14 +64,14 @@ def _prune_dir(path, prune_modified=False):
     return remaining_paths
 
 
-def add_songs_in_dir(path, store_checksum=True):
+def add_songs_in_dir(path, store_checksum=False):
     """Update database to reflect the contents of the given directory.
 
     store_checksum: Whether or not to store an MD5 file checksum in order to
     update the song metadata in the database if the file is modified. Disabled
     by default because it makes scanning a lot slower.
     """
-    already_added = _prune_dir(unicode(path), prune_modified=store_checksum)
+    already_added = _prune_dir(path, prune_modified=store_checksum)
     table = Song.__table__
     conn = engine.connect()
     num_songs = 0
@@ -120,10 +120,8 @@ def add_songs_in_dir(path, store_checksum=True):
                 if store_checksum:
                     with open(filepath, 'rb') as song_file:
                         song_obj['checksum'] = md5_for_file(song_file)
-                else:
-                    song_obj['checksum'] = None
 
-                try:  # Album optional for singles
+                try: # Album optional for singles
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['album'] = song.tags['\xa9alb'][0]
                     else:
@@ -131,7 +129,7 @@ def add_songs_in_dir(path, store_checksum=True):
                 except Exception:
                     song_obj['album'] = None
 
-                try:  # Track number optional
+                try: # Track number optional
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['tracknumber'] = song.tags['trkn'][0][0]
                     else:
@@ -141,7 +139,7 @@ def add_songs_in_dir(path, store_checksum=True):
                     song_obj['tracknumber'] = None
 
                 # Album art added on indexing
-                if art.get_art(song_obj['checksum']) == "":
+                if not art.get_art(song_obj['artist'], song_obj['album']):
                     art.index_art(song_obj)
 
                 print 'Added: ' + filepath
@@ -179,13 +177,13 @@ def get_albums_for_artist(artist):
     albums = []
     if artist:
         conn = engine.connect()
-        cols = [songs.c.album, func.count(songs.c.album).label('num_songs'), songs.c.checksum]
+        cols = [songs.c.album, func.count(songs.c.album).label('num_songs'), songs.c.artist]
         s = (select(cols)
              .where(songs.c.artist == artist)
              .group_by(songs.c.album)
              .order_by(songs.c.album))
         res = conn.execute(s)
-        albums = [{'name': row[0], 'num_songs': row[1], 'art_uri': art.get_art(row[2])} for row in res]
+        albums = [{'name': row[0], 'num_songs': row[1], 'art_uri': art.get_art(row[2], row[0])} for row in res]
         conn.close()
     return {'query': artist, 'results': albums}
 

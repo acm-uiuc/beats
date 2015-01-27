@@ -1,107 +1,90 @@
-from os import listdir
-from os.path import join, splitext, dirname, isfile
+from os import path, listdir
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 from config import config
+import imghdr
 
 ART_DIR = config.get('Artwork', 'art_path')
 
-
 def index_art(song):
-    ext = splitext(song['path'])[1]
+    ext = path.splitext(song['path'])[1]
 
-    art_uri = ''
-    if ext == '.mp3':
-        art_uri = index_mp3_art(song)
-    elif ext == '.flac':
-        art_uri = index_flac_art(song)
-
-
-def index_mp3_art(song):
     try:
-        tags = MP3(song['path'])
+        if ext == '.mp3':
+            tags = MP3(song['path'])
+        elif ext == '.flac':
+            tags = FLAC(song['path'])
+        else:
+            return None
     except:
-        return False
+        return None
+
     data = ''
-    mime = ''
-    for tag in tags:
-        if tag.startswith('APIC'):
-            data = tags[tag].data
-            mime = tags[tag].mime
-            break
-    if not data:
-        path = find_art(song)
-        if path:
-            afile = open(path, 'r')
-            data = afile.read()
-            mime = guess_type(path)
 
-    path = write_art(song, data)
-
-    return path
-
-
-def index_flac_art(song):
-    try:
-        tags = FLAC(song['path'])
-    except:
-        return False
-    data = ''
-    mime = ''
-    if tags.pictures:
+    if isinstance(tags, FLAC) and tags.pictures:
         data = tags.pictures[0].data
-        mime = tags.pictures[0].mime
-    else:
-        path = find_art(song)
-        if path:
-            afile = open(path, 'r')
-            data = afile.read()
-            mime = guess_type(path)
+    elif isinstance(tags, MP3):
+        for tag in tags:
+            if tag.startswith('APIC'):
+                data = tags[tag].data
+                break
 
-    path = write_art(song, data, mime)
+    if not data:
+        directory = find_art(song)
+        if directory:
+            try:
+                afile = open(directory, 'r')
+                data = afile.read()
+                afile.close()
+            except IOError:
+                return None
+        else:
+            return None
 
-    return path
+    directory = write_art(song, data)
 
 def find_art(song):
     art_strings = ['cover.jpg', 'cover.png', 'folder.jpg', 'folder.png']
-    path = dirname(song['path'])
+    directory = path.dirname(song['path'])
     for s in art_strings:
-        if isfile(join(path, s)):
-            return join(path, s)
+        if path.isfile(path.join(directory, s)):
+            return path.join(directory, s)
 
-    for f in listdir(path):
-        if f.endswith(".jpg") or f.endswith(".png"):
-            return join(path, f)
+    for f in listdir(directory):
+        ext = path.splitext(f)[1]
+        if ext == 'jpg' or ext == 'png':
+            return path.join(directory, f)
 
-    return ""
+    return None
 
 
-def write_art(song, data, mime):
-    if not data:
+def write_art(song, data):
+    if not data or not song['artist'] or not song['album']:
         return None
+
+    image_type = imghdr.what(None, data)
     ext = ''
-    if mime == 'image/png':
-        ext = 'png'
-    elif mime == 'image/jpeg':
-        ext = 'jpg'
-    else:
-        ext = 'jpg'
 
-    filepath = join('.' + ART_DIR + song['checksum'] + "." + ext)
+    if image_type == 'jpeg':
+        ext = '.jpg'
+    elif image_type == 'png':
+        ext = '.png'
 
+    filepath = u"{0}{1} - {2}{3}".format('.' + ART_DIR, song['artist'], song['album'], ext)
+    
     out = open(filepath, 'w')
     out.write(data)
     out.close()
 
 
-def get_art(checksum):
-    if not checksum:
+def get_art(artist, album):
+    if not album or not artist:
         return None
     ext = ['.jpg', '.png']
+    name = artist + " - " + album
 
-    filepath = join(checksum)
     for e in ext:
-        if isfile('.' + ART_DIR + checksum + e):
-            return '.' + ART_DIR + checksum + e;
+        if path.isfile('.' + ART_DIR + name + e):
+            return '.' + ART_DIR + name + e
 
-    return ""
+    return None
