@@ -70,7 +70,9 @@ def write_art(song, data):
     elif image_type == 'png':
         ext = '.png'
 
-    filepath = u"{0}{1} - {2}{3}".format('.' + ART_DIR, song['artist'], song['album'], ext)
+    title = u"{0} - {1}".format(song['artist'], song['album'])
+    folder = sanitize_folder_name(title)
+    filepath = u"{0}{1}{2}".format('.' + ART_DIR, folder, ext)
     
     out = open(filepath, 'w')
     out.write(data)
@@ -81,10 +83,16 @@ def get_art(artist, album):
     if not album or not artist:
         return None
     ext = ['.jpg', '.png']
-    name = artist + " - " + album
+
+    name = u"{0} - {1}".format(artist, album)
 
     for e in ext:
         if path.isfile('.' + ART_DIR + name + e):
             return '.' + ART_DIR + name + e
 
     return None
+
+def sanitize_folder_name(name):
+    keepcharacters = (' ','.','_','-')
+    folder = "".join(c for c in name if c.isalnum() or c in keepcharacters).rstrip()
+    return folder
