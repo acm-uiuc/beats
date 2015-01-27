@@ -16,8 +16,6 @@ def index_art(song):
     elif ext == '.flac':
         art_uri = index_flac_art(song)
 
-    return art_uri
-
 
 def index_mp3_art(song):
     try:
@@ -34,7 +32,6 @@ def index_mp3_art(song):
     if not data:
         path = find_art(song)
         if path:
-            print 'ext. art at ' + path
             afile = open(path, 'r')
             data = afile.read()
             mime = guess_type(path)

@@ -105,7 +105,7 @@ Source: https://github.com/acm-uiuc/beats
         </div>
         <ul class="albumgrid-area" ng-show="layout == 'albumgrid'">
           <li ng-repeat="album in albumlist track by $index" ng-click="searchAlbum(album.name)">
-            <img class="art" ng-src="{{[defaultAlbumArt, album.albumart][(album.albumart == undefined) ? 0 : 1]}}"/>
+              <img class="art" ng-src="{{album.art_uri || defaultAlbumArt}}"/>
             <p class="album-name" title="{{ [album.name,'No Album'][(album.name == null) ? 1 : 0] }}">{{[album.name,"No Album"][(album.name == null) ? 1 : 0] }}</p>
           </li>
         </ul>

@@ -142,7 +142,6 @@ def add_songs_in_dir(path, store_checksum=True):
 
                 # Album art added on indexing
                 if art.get_art(song_obj['checksum']) == "":
-                    print 'art for ' + filepath
                     art.index_art(song_obj)
 
                 print 'Added: ' + filepath
@@ -180,13 +179,13 @@ def get_albums_for_artist(artist):
     albums = []
     if artist:
         conn = engine.connect()
-        cols = [songs.c.album, func.count(songs.c.album).label('num_songs')]
+        cols = [songs.c.album, func.count(songs.c.album).label('num_songs'), songs.c.checksum]
         s = (select(cols)
              .where(songs.c.artist == artist)
              .group_by(songs.c.album)
              .order_by(songs.c.album))
         res = conn.execute(s)
-        albums = [{'name': row[0], 'num_songs': row[1]} for row in res]
+        albums = [{'name': row[0], 'num_songs': row[1], 'art_uri': art.get_art(row[2])} for row in res]
         conn.close()
     return {'query': artist, 'results': albums}
 
@@ -200,7 +199,6 @@ def get_album(album):
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': album, 'results': songs}
-
 
 def get_history(limit=20):
     session = Session()
