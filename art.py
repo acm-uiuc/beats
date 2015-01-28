@@ -85,10 +85,11 @@ def get_art(artist, album):
     ext = ['.jpg', '.png']
 
     name = u"{0} - {1}".format(artist, album)
+    folder = sanitize_folder_name(name)
 
     for e in ext:
-        if path.isfile('.' + ART_DIR + name + e):
-            return '.' + ART_DIR + name + e
+        if path.isfile('.' + ART_DIR + folder + e):
+            return '.' + ART_DIR + folder + e
 
     return None
 
