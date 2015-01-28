@@ -52,7 +52,7 @@ def find_art(song):
 
     for f in listdir(directory):
         ext = path.splitext(f)[1]
-        if ext == 'jpg' or ext == 'png':
+        if ext == '.jpg' or ext == '.png':
             return path.join(directory, f)
 
     return None
@@ -73,7 +73,6 @@ def write_art(song, data):
     title = u"{0} - {1}".format(song['artist'], song['album'])
     folder = sanitize_folder_name(title)
     filepath = u"{0}{1}{2}".format('.' + ART_DIR, folder, ext)
-    
     out = open(filepath, 'w')
     out.write(data)
     out.close()
