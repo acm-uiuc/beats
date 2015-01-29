@@ -1,6 +1,7 @@
 from os import path, listdir
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
+from mutagen.mp4 import MP4, MP4Tags, MP4Cover
 from config import config
 import imghdr
 
@@ -14,6 +15,8 @@ def index_art(song):
             tags = MP3(song['path'])
         elif ext == '.flac':
             tags = FLAC(song['path'])
+        elif ext == '.m4a':
+            tags = MP4(song['path']).tags
         else:
             return None
     except:
@@ -28,6 +31,8 @@ def index_art(song):
             if tag.startswith('APIC'):
                 data = tags[tag].data
                 break
+    elif isinstance(tags, MP4Tags) and tags['covr']:
+        data = tags['covr'][0]
 
     if not data:
         directory = find_art(song)
