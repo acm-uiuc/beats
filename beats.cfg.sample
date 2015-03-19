@@ -12,3 +12,6 @@ password = replace_me
 
 [Database]
 url = mysql://root@localhost/acoustics2
+
+[Artwork]
+art_path = replace_me
