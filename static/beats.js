@@ -896,37 +896,41 @@ function($scope, $http, $interval, $cookies)
             {
                 $scope.volume = data['player_status']['volume'];
             }
-            // Prevent enabling/disabling the equalizer while the user is changing it
-            if (!$scope.holdEqEnabledUpdate)
+            // Check for equalizer support
+            if (data['player_status']['equalizer_enabled'] !== undefined)
             {
-                $scope.eqEnabled = data['player_status']['equalizer_enabled'];
-            }
-            // Prevent changing the equalizer preset while the user is changing it
-            if (!$scope.holdEqPresetUpdate)
-            {
-                $scope.eqPresetIndex = data['player_status']['equalizer_preset'];
-            }
-            // Prevent changing the preamp while the user is changing it
-            if (!$scope.holdEqPreampUpdate)
-            {
-                $scope.eqPreampLevel = data['player_status']['equalizer_preamp_level'];
-            }
-            levels = data['player_status']['equalizer_band_levels'];
-            for (var bandIdx = 0; bandIdx < levels.length; bandIdx++)
-            {
-                var holdName = 'holdEqBand' + bandIdx + 'Update';
-                var hold = $scope[holdName];
-                if ($scope[holdName] === undefined)
+                // Prevent enabling/disabling the equalizer while the user is changing it
+                if (!$scope.holdEqEnabledUpdate)
                 {
-                    $scope[holdName] = false;
+                    $scope.eqEnabled = data['player_status']['equalizer_enabled'];
                 }
-                // Prevent changing the band while the user is changing it
-                if (!$scope[holdName])
+                // Prevent changing the equalizer preset while the user is changing it
+                if (!$scope.holdEqPresetUpdate)
                 {
-                    $scope['bandLevel' + bandIdx] = levels[bandIdx];
+                    $scope.eqPresetIndex = data['player_status']['equalizer_preset'];
                 }
+                // Prevent changing the preamp while the user is changing it
+                if (!$scope.holdEqPreampUpdate)
+                {
+                    $scope.eqPreampLevel = data['player_status']['equalizer_preamp_level'];
+                }
+                levels = data['player_status']['equalizer_band_levels'];
+                for (var bandIdx = 0; bandIdx < levels.length; bandIdx++)
+                {
+                    var holdName = 'holdEqBand' + bandIdx + 'Update';
+                    var hold = $scope[holdName];
+                    if ($scope[holdName] === undefined)
+                    {
+                        $scope[holdName] = false;
+                    }
+                    // Prevent changing the band while the user is changing it
+                    if (!$scope[holdName])
+                    {
+                        $scope['bandLevel' + bandIdx] = levels[bandIdx];
+                    }
+                }
+                $scope.updateEqLabels(-2);
             }
-            $scope.updateEqLabels(-2);
             $scope.isPlaying = data['player_status']['state'] == 'State.Playing';
         });
 
