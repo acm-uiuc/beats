@@ -150,7 +150,7 @@ def set_equalizer_preset(idx):
 
 def set_equalizer_preamp(lev):
     global equalizer_preamp_level
-    equalizer_preamp_level = float(lev)
+    equalizer_preamp_level = lev
     vlc.libvlc_audio_equalizer_set_preamp(equalizer, lev)
     if equalizer_enabled:
         player.set_equalizer(equalizer)
@@ -159,7 +159,7 @@ def set_equalizer_preamp(lev):
 
 def set_equalizer_band(idx, lev):
     global equalizer_band_levels
-    equalizer_band_levels[idx] = float(lev)
+    equalizer_band_levels[idx] = lev
     vlc.libvlc_audio_equalizer_set_amp_at_index(equalizer, lev, idx)
     if equalizer_enabled:
         player.set_equalizer(equalizer)
