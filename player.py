@@ -140,12 +140,11 @@ def set_equalizer_enabled(enabled):
 
 def set_equalizer_preset(idx):
     global equalizer
-    if idx in xrange(num_equalizer_presets):
-        vlc.libvlc_audio_equalizer_release(equalizer)
-        equalizer = vlc.libvlc_audio_equalizer_new_from_preset(idx)
-        populate_equalizer_globals(equalizer, preset_idx=idx)
-        if equalizer_enabled:
-            player.set_equalizer(equalizer)
+    vlc.libvlc_audio_equalizer_release(equalizer)
+    equalizer = vlc.libvlc_audio_equalizer_new_from_preset(idx)
+    populate_equalizer_globals(equalizer, preset_idx=idx)
+    if equalizer_enabled:
+        player.set_equalizer(equalizer)
     return get_status()
 
 
@@ -160,11 +159,10 @@ def set_equalizer_preamp(lev):
 
 def set_equalizer_band(idx, lev):
     global equalizer_band_levels
-    if idx in xrange(num_equalizer_bands):
-        equalizer_band_levels[idx] = float(lev)
-        vlc.libvlc_audio_equalizer_set_amp_at_index(equalizer, lev, idx)
-        if equalizer_enabled:
-            player.set_equalizer(equalizer)
+    equalizer_band_levels[idx] = float(lev)
+    vlc.libvlc_audio_equalizer_set_amp_at_index(equalizer, lev, idx)
+    if equalizer_enabled:
+        player.set_equalizer(equalizer)
     return get_status()
 
 
