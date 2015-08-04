@@ -31,7 +31,7 @@ def index_art(song):
             if tag.startswith('APIC'):
                 data = tags[tag].data
                 break
-    elif isinstance(tags, MP4Tags) and tags['covr']:
+    elif isinstance(tags, MP4Tags) and 'covr' in tags and tags['covr']:
         data = tags['covr'][0]
 
     if not data:
