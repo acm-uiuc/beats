@@ -35,6 +35,16 @@ def login_required(f):
     return decorated_function
 
 
+def check_eq_support(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not player.equalizer_supported:
+            return jsonify({'message': 'Equalizer not supported'}), 400
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'message': str(error)}), 404
@@ -81,6 +91,7 @@ def player_get_equalizer_info():
 
 
 @app.route('/v1/player/enable_eq', methods=['POST'])
+@check_eq_support
 @login_required
 @crossdomain(origin='*')
 def player_enable_eq():
@@ -91,6 +102,7 @@ def player_enable_eq():
 
 
 @app.route('/v1/player/adjust_eq_preset', methods=['POST'])
+@check_eq_support
 @login_required
 @crossdomain(origin='*')
 def player_adjust_eq_preset():
@@ -107,6 +119,7 @@ def player_adjust_eq_preset():
 
 
 @app.route('/v1/player/adjust_eq_preamp', methods=['POST'])
+@check_eq_support
 @login_required
 @crossdomain(origin='*')
 def player_adjust_eq_preamp():
@@ -122,6 +135,7 @@ def player_adjust_eq_preamp():
 
 
 @app.route('/v1/player/adjust_eq_band', methods=['POST'])
+@check_eq_support
 @login_required
 @crossdomain(origin='*')
 def player_adjust_eq_band():

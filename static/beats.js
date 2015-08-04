@@ -421,6 +421,7 @@ function($scope, $http, $interval, $cookies)
     $scope.albumlist = [];
     $scope.queue = [];
     $scope.volume = 0;
+    $scope.eqSupported = false;
     $scope.eqEnabled = false;
     $scope.eqPresets = [];
     $scope.eqPresetIndex = 0;
@@ -783,31 +784,36 @@ function($scope, $http, $interval, $cookies)
         $http.get(backendBase + '/v1/equalizer_info')
         .success(function(data)
         {
-            // Populate preset choices in preset menu
-            var presNames = data['equalizer_preset_names'];
-            for (var presIndex = 0; presIndex < presNames.length; presIndex++)
+            // Check for equalizer support
+            $scope.eqSupported = data['equalizer_supported'];
+            if ($scope.eqSupported)
             {
-                $scope.eqPresets.push({
-                    value: presIndex,
-                    displayName: presNames[presIndex]
-                });
-            }
-            // Add equalizer band controls
-            var freqs = data['equalizer_band_freqs'];
-            for (var bandIndex = 0; bandIndex < freqs.length; bandIndex++)
-            {
-                // Dynamically initialize scope variables for the band control
-                var holdName = 'holdEqBand' + bandIndex + 'Update';
-                if ($scope[holdName] === undefined)
+                // Populate preset choices in preset menu
+                var presNames = data['equalizer_preset_names'];
+                for (var presIndex = 0; presIndex < presNames.length; presIndex++)
                 {
-                    $scope[holdName] = false;
-                    $scope['bandLevel' + bandIndex] = 0.0;
+                    $scope.eqPresets.push({
+                        value: presIndex,
+                        displayName: presNames[presIndex]
+                    });
                 }
-                // Add the frequency along with its corresponding band index
-                $scope.eqBandFrequencies.push({
-                    freq: freqs[bandIndex],
-                    index: bandIndex
-                });
+                // Add equalizer band controls
+                var freqs = data['equalizer_band_freqs'];
+                for (var bandIndex = 0; bandIndex < freqs.length; bandIndex++)
+                {
+                    // Dynamically initialize scope variables for the band control
+                    var holdName = 'holdEqBand' + bandIndex + 'Update';
+                    if ($scope[holdName] === undefined)
+                    {
+                        $scope[holdName] = false;
+                        $scope['bandLevel' + bandIndex] = 0.0;
+                    }
+                    // Add the frequency along with its corresponding band index
+                    $scope.eqBandFrequencies.push({
+                        freq: freqs[bandIndex],
+                        index: bandIndex
+                    });
+                }
             }
         });
     };
