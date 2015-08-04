@@ -60,7 +60,7 @@ html, body {
     padding: 8px;
     text-shadow: 1px 1px 1px black; }
   .dialog-area .confirm {
-    background-color: #448aa6; }
+    background-color: #448AA6; }
   .dialog-area .cancel {
     background-color: #d44637; }
 
@@ -75,7 +75,7 @@ html, body {
 
 .top-area {
   align-items: center;
-  background: linear-gradient(to bottom, #383838 0%, #222222 100%);
+  background: linear-gradient(to bottom, #383838 0%, #222 100%);
   border-bottom: 1px solid #333;
   display: flex;
   flex: 1;
@@ -98,7 +98,7 @@ html, body {
   width: 100%; }
 
 .side-area {
-  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444 0%, #333 100%);
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -130,9 +130,9 @@ html, body {
     padding-top: 4px;
     position: relative; }
     .playlists li:hover {
-      background: #448aa6; }
+      background: #448AA6; }
     .playlists li.dragover {
-      background: #448aa6; }
+      background: #448AA6; }
 
 .playlist-area {
   background-color: #444;
@@ -172,7 +172,7 @@ html, body {
       width: 150px;
       text-shadow: 1px 1px 1px black; }
     .albumgrid-area li:hover {
-      background: #448aa6;
+      background: #448AA6;
       box-shadow: 0 0 10px 0 black; }
 
 table.playlist {
@@ -184,7 +184,7 @@ table.playlist {
   table-layout: fixed;
   width: 100%; }
   table.playlist thead {
-    background: linear-gradient(to bottom, #448aa6 0%, #356b8c 100%); }
+    background: linear-gradient(to bottom, #448AA6 0%, #356B8C 100%); }
   table.playlist th {
     padding: 4px;
     border-right: 1px solid black; }
@@ -258,7 +258,7 @@ table.playlist {
 
 .bottom-area {
   align-items: center;
-  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444 0%, #333 100%);
   border-top: 1px solid #333;
   box-shadow: 0 0 17px 3px black;
   display: flex;
@@ -270,6 +270,32 @@ table.playlist {
   vertical-align: middle;
   width: 100%;
   z-index: 5; }
+
+.equalizer.row-container {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  vertical-align: middle;
+  margin: 20px; }
+  .equalizer.row-container.right-aligned {
+    align-items: flex-end; }
+.equalizer.row-filler {
+  width: 100%; }
+.equalizer.preset.label {
+  margin-left: 20px;
+  margin-right: 10px; }
+.equalizer.preset.selector {
+  width: 100px; }
+.equalizer.preamp.label {
+  width: 120px; }
+  .equalizer.preamp.label.db {
+    text-align: right; }
+.equalizer.band.ctrl-area {
+  text-align: center;
+  width: 65px; }
+.equalizer.band.label {
+  margin-top: 15px; }
 
 .control {
   color: #D0D9E5;
@@ -284,7 +310,7 @@ table.playlist {
     text-shadow: 1px 1px 1px black;
     transition: text-shadow 0.2s, box-shadow 0.2s; }
     .control.button:hover {
-      text-shadow: 0 0 4px #d0d9e5; }
+      text-shadow: 0 0 4px #D0D9E5; }
   .control.rect-button {
     background: #555;
     border-radius: 4px;
@@ -314,20 +340,40 @@ table.playlist {
     .control input:focus {
       outline: none; }
     .control input:hover {
-      box-shadow: 0 0 4px #d0d9e5; }
+      box-shadow: 0 0 4px #D0D9E5; }
   .control.bar {
-    background: linear-gradient(to bottom, #aaaaaa 0%, white 100%);
+    background: linear-gradient(to bottom, #AAA 0%, #FFF 100%);
     border-radius: 5px;
     border: 1px solid #444;
     height: 10px;
     position: relative; }
+    .control.bar.as-vertical {
+      height: none;
+      width: 10px; }
+    .control.bar.as-toggle {
+      height: 18px; }
+      .control.bar.as-toggle.as-vertical {
+        height: none;
+        width: 18px; }
     .control.bar:hover {
       box-shadow: 0 0 4px #D0D9E5; }
     .control.bar .cover {
-      background-color: #448aa6;
+      background-color: #448AA6;
       border-radius: 4px;
       height: 10px;
       position: absolute; }
+      .control.bar .cover.as-vertical {
+        height: none;
+        width: 10px; }
+      .control.bar .cover.as-toggle {
+        height: 18px; }
+        .control.bar .cover.as-toggle.as-off {
+          background-color: #900; }
+        .control.bar .cover.as-toggle.as-on {
+          background-color: #360; }
+        .control.bar .cover.as-toggle.as-vertical {
+          height: none;
+          width: 18px; }
     .control.bar .handle {
       background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
       border-radius: 8px;
@@ -339,12 +385,31 @@ table.playlist {
       position: relative;
       transition: box-shadow 0.1s;
       width: 16px; }
+      .control.bar .handle.as-toggle {
+        background: linear-gradient(to bottom, #AAA 0%, #FFF 100%);
+        border-radius: 2px;
+        margin-top: 0px; }
+      .control.bar .handle.as-vertical {
+        margin-left: -4px;
+        margin-right: -8px; }
       .control.bar .handle:hover {
-        box-shadow: 0 0 4px #d0d9e5; }
+        box-shadow: 0 0 4px #D0D9E5; }
   .control.volume {
     width: 150px; }
+  .control.equalizer-bars {
+    padding-left: 0px;
+    padding-right: 0px;
+    margin: 0 auto; }
+    .control.equalizer-bars.on-off {
+      width: 50px; }
+    .control.equalizer-bars.preamp {
+      width: 100%; }
+    .control.equalizer-bars.band {
+      height: 250px; }
   .control.track {
     width: 100%; }
   .control.current-time-label {
     margin-left: 16px;
     margin-right: 16px; }
+
+/*# sourceMappingURL=beats.css.map */

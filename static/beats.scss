@@ -3,6 +3,8 @@ $item-shadow: 0 0 10px 0 black;
 $text-highlight-shadow: 1px 1px 1px black;
 $hover-blur: 0 0 4px #D0D9E5;
 $blue: #448AA6;
+$red: #900;
+$green: #360;
 
 @mixin ellipsis-overflow() {
     overflow-x: hidden;
@@ -363,6 +365,49 @@ table.playlist {
     z-index: 5;
 }
 
+.equalizer {
+    &.row-container {
+        align-items: center;
+        display: flex;
+        flex: 1;
+        justify-content: space-between;
+        vertical-align: middle;
+        margin: 20px;
+        &.right-aligned {
+            align-items: flex-end;
+        }
+    }
+    &.row-filler {
+        width: 100%;
+    }
+    &.preset {
+        &.label {
+            margin-left: 20px;
+            margin-right: 10px;
+        }
+        &.selector {
+            width: 100px;
+        }
+    }
+    &.preamp {
+        &.label {
+            width: 120px;
+            &.db {
+                text-align: right;
+            }
+        }
+    }
+    &.band {
+        &.ctrl-area {
+            text-align: center;
+            width: 65px;
+        }
+        &.label {
+            margin-top: 15px;
+        }
+    }
+}
+
 .control {
     color: #D0D9E5;
     cursor: default;
@@ -439,6 +484,17 @@ table.playlist {
         border-radius: 5px;
         border: 1px solid #444;
         height: 10px;
+        &.as-vertical {
+            height: none;
+            width: 10px;
+        }
+        &.as-toggle {
+            height: 18px;
+            &.as-vertical {
+                height: none;
+                width: 18px;
+            }
+        }
         position: relative;
 
         &:hover {
@@ -449,17 +505,43 @@ table.playlist {
             background-color: $blue;
             border-radius: 4px;
             height: 10px;
+            &.as-vertical {
+                height: none;
+                width: 10px;
+            }
+            &.as-toggle {
+                height: 18px;
+                &.as-off {
+                    background-color: $red;
+                }
+                &.as-on {
+                    background-color: $green;
+                }
+                &.as-vertical {
+                    height: none;
+                    width: 18px;
+                }
+            }
             position: absolute;
         }
 
         .handle {
             background: linear-gradient(to bottom, #7e868c 0%, #374044 100%);
             border-radius: 8px;
+            &.as-toggle {
+                background: linear-gradient(to bottom, #AAA 0%, #FFF 100%);
+                border-radius: 2px;
+                margin-top: 0px;
+            }
             border: 1px solid #444;
             box-shadow: 0 0 2px black;
             height: 16px;
             margin-left: -8px;
             margin-top: -4px;
+            &.as-vertical {
+                margin-left: -4px;
+                margin-right: -8px;
+            }
             position: relative;
             transition:  box-shadow 0.1s;
             width: 16px;
@@ -472,6 +554,24 @@ table.playlist {
 
     &.volume {
         width: 150px;
+    }
+
+    &.equalizer-bars {
+        padding-left: 0px;
+        padding-right: 0px;
+        margin: 0 auto;
+
+        &.on-off {
+            width: 50px;
+        }
+
+        &.preamp {
+            width: 100%;
+        }
+
+        &.band {
+            height: 250px;
+        }
     }
 
     &.track {

@@ -10,6 +10,42 @@ has_initialized = False
 now_playing = None
 volume = 100
 
+# Equalizer functionality (requires libvlc 2.2.0 or newer)
+
+def populate_equalizer_globals(equalizer, preset_idx=0):
+    # We intend to change the global variables specified below
+    global equalizer_preamp_level
+    global equalizer_preset
+    global equalizer_band_levels
+
+    # Get preamp level/preset (preamp level value in dB)
+    equalizer_preamp_level = vlc.libvlc_audio_equalizer_get_preamp(equalizer)
+    equalizer_preset = preset_idx
+
+    # Get band levels (values in dB)
+    # Note that num_equalizer_bands must be set at this point
+    equalizer_band_levels = [
+        vlc.libvlc_audio_equalizer_get_amp_at_index(equalizer, idx)
+        for idx in xrange(num_equalizer_bands)]
+
+# Initialize equalizer
+equalizer = vlc.libvlc_audio_equalizer_new()
+equalizer_enabled = False
+
+# Populate equalizer band frequencies (values in Hz)
+num_equalizer_bands = vlc.libvlc_audio_equalizer_get_band_count()
+equalizer_band_freqs = tuple(
+    vlc.libvlc_audio_equalizer_get_band_frequency(idx)
+    for idx in xrange(num_equalizer_bands))
+
+# Populate equalizer preset names
+num_equalizer_presets = vlc.libvlc_audio_equalizer_get_preset_count()
+equalizer_preset_names = tuple(
+    vlc.libvlc_audio_equalizer_get_preset_name(idx)
+    for idx in xrange(num_equalizer_presets))
+
+# Initialize equalizer globals
+populate_equalizer_globals(equalizer)
 
 def play(mrl):
     m = instance.media_new(mrl)
@@ -48,7 +84,11 @@ def stop():
 
 def get_status():
     media = player.get_media()
-    status = {'state': str(player.get_state()), 'volume': volume}
+    status = {'state': str(player.get_state()), 'volume': volume,
+              'equalizer_enabled': equalizer_enabled,
+              'equalizer_preset': equalizer_preset,
+              'equalizer_preamp_level': equalizer_preamp_level,
+              'equalizer_band_levels': equalizer_band_levels}
     if media:
         status['media'] = vlc.bytes_to_str(media.get_mrl())
         status['current_time'] = player.get_time()
@@ -67,6 +107,51 @@ def set_volume(vol):
     global volume
     volume = vol
     player.audio_set_volume(vol)
+    return get_status()
+
+
+def get_static_equalizer_info():
+    # This routine is useful in that we know right away the number of presets
+    # and the number of bands
+    return {'equalizer_preset_names': equalizer_preset_names,
+            'equalizer_band_freqs': equalizer_band_freqs}
+
+
+def set_equalizer_enabled(enabled):
+    global equalizer_enabled
+    if equalizer_enabled != enabled:
+        equalizer_enabled = enabled
+        player.set_equalizer(equalizer if enabled else None)
+    return get_status()
+
+
+def set_equalizer_preset(idx):
+    global equalizer
+    if idx in xrange(num_equalizer_presets):
+        vlc.libvlc_audio_equalizer_release(equalizer)
+        equalizer = vlc.libvlc_audio_equalizer_new_from_preset(idx)
+        populate_equalizer_globals(equalizer, preset_idx=idx)
+        if equalizer_enabled:
+            player.set_equalizer(equalizer)
+    return get_status()
+
+
+def set_equalizer_preamp(lev):
+    global equalizer_preamp_level
+    equalizer_preamp_level = float(lev)
+    vlc.libvlc_audio_equalizer_set_preamp(equalizer, lev)
+    if equalizer_enabled:
+        player.set_equalizer(equalizer)
+    return get_status()
+
+
+def set_equalizer_band(idx, lev):
+    global equalizer_band_levels
+    if idx in xrange(num_equalizer_bands):
+        equalizer_band_levels[idx] = float(lev)
+        vlc.libvlc_audio_equalizer_set_amp_at_index(equalizer, lev, idx)
+        if equalizer_enabled:
+            player.set_equalizer(equalizer)
     return get_status()
 
 

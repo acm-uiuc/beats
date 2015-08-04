@@ -74,6 +74,75 @@ def player_set_volume():
     return jsonify({'message': 'No volume parameter'}), 400
 
 
+@app.route('/v1/equalizer_info', methods=['GET'])
+@crossdomain(origin='*')
+def player_get_equalizer_info():
+    return jsonify(player.get_static_equalizer_info())
+
+
+@app.route('/v1/player/enable_eq', methods=['POST'])
+@login_required
+@crossdomain(origin='*')
+def player_enable_eq():
+    if request.form.get('enabled'):
+        enabled = request.form.get('enabled') in ('True', 'true')
+        return jsonify(player.set_equalizer_enabled(enabled))
+    return jsonify({'message': 'No equalizer enablement parameter'}), 400
+
+
+@app.route('/v1/player/adjust_eq_preset', methods=['POST'])
+@login_required
+@crossdomain(origin='*')
+def player_adjust_eq_preset():
+    if request.form.get('index'):
+        idx = int(request.form.get('index'))
+        if 0 <= idx < player.num_equalizer_presets:
+            return jsonify(player.set_equalizer_preset(idx))
+        else:
+            return jsonify({
+                'message': 'Equalizer preset index must be between 0 and %d'%(
+                    player.num_equalizer_presets - 1)
+            }), 400
+    return jsonify({'message': 'No equalizer preset index parameter'}), 400
+
+
+@app.route('/v1/player/adjust_eq_preamp', methods=['POST'])
+@login_required
+@crossdomain(origin='*')
+def player_adjust_eq_preamp():
+    if request.form.get('level'):
+        lvl = float(request.form.get('level'))
+        if -20.0 <= lvl <= 20.0:
+            return jsonify(player.set_equalizer_preamp(lvl))
+        else:
+            return jsonify({'message':
+                'Equalizer preamp level must be between -20 dB and +20 dB'
+            }), 400
+    return jsonify({'message': 'No equalizer preamp level parameter'}), 400
+
+
+@app.route('/v1/player/adjust_eq_band', methods=['POST'])
+@login_required
+@crossdomain(origin='*')
+def player_adjust_eq_band():
+    if not request.form.get('band'):
+        return jsonify({'message': 'No band index parameter'}), 400
+    if not request.form.get('level'):
+        return jsonify({'message': 'No band level parameter'}), 400
+    idx = int(request.form.get('band'))
+    lvl = float(request.form.get('level'))
+    if idx < 0 or idx >= player.num_equalizer_bands:
+        return jsonify({
+            'message': 'Equalizer band index must be between 0 and %d'%(
+                player.num_equalizer_bands - 1)
+        }), 400
+    if lvl < -20.0 or lvl > 20.0:
+        return jsonify({
+            'message': 'Equalizer band level must be between -20 dB and +20 dB'
+        }), 400
+    return jsonify(player.set_equalizer_band(idx, lvl))
+
+
 @app.route('/v1/songs/<song_id>', methods=['GET'])
 @crossdomain(origin='*')
 def show_song(song_id):
