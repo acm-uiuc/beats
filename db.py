@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 from config import config
 import art
 import datetime
+import urllib
 
 DATABASE_URL = config.get('Database', 'url')
 
@@ -35,7 +36,7 @@ class Song(Base):
                            passive_deletes=True, backref='songs')
 
     def mrl(self):
-        return 'file://' + self.path
+        return 'file://' + urllib.quote(self.path)
 
     def dictify(self):
         return {
