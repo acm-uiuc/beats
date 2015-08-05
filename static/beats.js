@@ -781,7 +781,7 @@ function($scope, $http, $interval, $cookies)
 
     $scope.getEqualizerInfo = function()
     {
-        $http.get(backendBase + '/v1/equalizer_info')
+        $http.get(backendBase + '/v1/player/equalizer')
         .success(function(data)
         {
             // Check for equalizer support
@@ -821,7 +821,7 @@ function($scope, $http, $interval, $cookies)
     $scope.enableEqualizer = function(enable)
     {
         $scope.eqEnabled = enable;
-        $scope.userRequest('/v1/player/enable_eq', 'enabled=' + enable);
+        $scope.userRequest('/v1/player/equalizer/enable', 'enabled=' + enable);
     }
 
     $scope.adjustEqualizerPreset = function(index)
@@ -829,20 +829,20 @@ function($scope, $http, $interval, $cookies)
         if ($scope.eqPresets.length > Math.floor(index))
         {
             $scope.eqPresetIndex = Math.floor(index);
-            $scope.userRequest('/v1/player/adjust_eq_preset', 'index=' + $scope.eqPresetIndex);
+            $scope.userRequest('/v1/player/equalizer/adjust_preset', 'index=' + $scope.eqPresetIndex);
         }
     };
 
     $scope.adjustEqualizerPreamp = function(level)
     {
         $scope.eqPreampLevel = roundDbValue(level); // Because of the bar control, this may have non-zero digits after the tenth
-        $scope.userRequest('/v1/player/adjust_eq_preamp', 'level=' + $scope.eqPreampLevel);
+        $scope.userRequest('/v1/player/equalizer/adjust_preamp', 'level=' + $scope.eqPreampLevel);
     };
 
     $scope.adjustEqualizerBand = function(level, band)
     {
         $scope['bandLevel' + band] = roundDbValue(level); // Because of the bar control, this may have non-zero digits after the tenth
-        $scope.userRequest('/v1/player/adjust_eq_band', 'band=' + band + '&level=' + $scope['bandLevel' + band]);
+        $scope.userRequest('/v1/player/equalizer/adjust_band', 'band=' + band + '&level=' + $scope['bandLevel' + band]);
     };
 
     $scope.playYouTube = function(url)

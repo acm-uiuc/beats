@@ -84,13 +84,13 @@ def player_set_volume():
     return jsonify({'message': 'No volume parameter'}), 400
 
 
-@app.route('/v1/equalizer_info', methods=['GET'])
+@app.route('/v1/player/equalizer', methods=['GET'])
 @crossdomain(origin='*')
 def player_get_equalizer_info():
     return jsonify(player.get_static_equalizer_info())
 
 
-@app.route('/v1/player/enable_eq', methods=['POST'])
+@app.route('/v1/player/equalizer/enable', methods=['POST'])
 @check_eq_support
 @login_required
 @crossdomain(origin='*')
@@ -101,7 +101,7 @@ def player_enable_eq():
     return jsonify({'message': 'No equalizer enablement parameter'}), 400
 
 
-@app.route('/v1/player/adjust_eq_preset', methods=['POST'])
+@app.route('/v1/player/equalizer/adjust_preset', methods=['POST'])
 @check_eq_support
 @login_required
 @crossdomain(origin='*')
@@ -118,7 +118,7 @@ def player_adjust_eq_preset():
     return jsonify({'message': 'No equalizer preset index parameter'}), 400
 
 
-@app.route('/v1/player/adjust_eq_preamp', methods=['POST'])
+@app.route('/v1/player/equalizer/adjust_preamp', methods=['POST'])
 @check_eq_support
 @login_required
 @crossdomain(origin='*')
@@ -134,7 +134,7 @@ def player_adjust_eq_preamp():
     return jsonify({'message': 'No equalizer preamp level parameter'}), 400
 
 
-@app.route('/v1/player/adjust_eq_band', methods=['POST'])
+@app.route('/v1/player/equalizer/adjust_band', methods=['POST'])
 @check_eq_support
 @login_required
 @crossdomain(origin='*')
