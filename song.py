@@ -12,7 +12,6 @@ from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import or_, func
 
 PLAYER_NAME = config.get('Player', 'player_name')
-ART_DIR = config.get('Artwork', 'art_path')
 
 
 def remove_songs_in_dir(path):
