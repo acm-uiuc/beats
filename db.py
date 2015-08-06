@@ -36,7 +36,7 @@ class Song(Base):
                            passive_deletes=True, backref='songs')
 
     def mrl(self):
-        return 'file://' + urllib.quote(self.path)
+        return 'file://' + urllib.quote(self.path.encode('utf-8'))
 
     def dictify(self):
         return {
