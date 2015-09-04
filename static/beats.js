@@ -219,6 +219,8 @@ function($scope, $http, $interval, $cookies)
     $scope.formPassword = '';
     $scope.showYouTubeDialog = false;
     $scope.formYouTubeURL = '';
+    $scope.showSoundCloudDialog = false;
+    $scope.formSoundCloudURL = '';
 
     $scope.loggedIn = null;
     $scope.playlist = [];
@@ -320,7 +322,7 @@ function($scope, $http, $interval, $cookies)
 
     $scope.isShowingDialog = function()
     {
-        return $scope.showLoginDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
+        return $scope.showLoginDialog || $scope.showYouTubeDialog || $scope.showSoundCloudDialog || !!$scope.errorMessage;
     };
 
     $scope.startYouTubeDialog = function()
@@ -337,6 +339,17 @@ function($scope, $http, $interval, $cookies)
     $scope.hideYouTubeDialog = function()
     {
         $scope.showYouTubeDialog = false;
+    };
+
+    $scope.startSoundCloudDialog = function () {
+        if (!$scope.ensureLogin()) return;
+        $scope.formSoundCloudURL = '';
+        $scope.showSoundCloudDialog = true;
+        $scope.soundCloudFocus = true;
+    };
+
+    $scope.hideSoundCloudDialog = function () {
+        $scope.showSoundCloudDialog = false;
     };
 
     $scope.hideLoginDialog = function()
@@ -569,6 +582,12 @@ function($scope, $http, $interval, $cookies)
 
         $scope.userRequest('/v1/queue/add', 'url=' + encodeURIComponent(url));
 
+    };
+
+    $scope.playSoundCloud = function (url) {
+        $scope.hideSoundCloudDialog();
+        if (!$scope.ensureLogin()) return;
+        $scope.userRequest('/v1/queue/add', 'url=' + encodeURIComponent(url));
     };
 
     $scope.pauseSong = function()

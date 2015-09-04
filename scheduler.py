@@ -77,6 +77,9 @@ class Scheduler(object):
                     except Exception, e:
                         session.rollback()
                         raise e
+                elif 'soundcloud.com' in video_url:
+                    session.rollback()
+                    raise Exception('Soundcloud support pending')
                 else:
                     session.rollback()
                     raise Exception('Unsupported website')

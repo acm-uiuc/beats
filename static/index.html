@@ -49,6 +49,17 @@ Source: https://github.com/acm-uiuc/beats
           </button>
         </form>
       </div>
+      <div class="dialog-area center" ng-show="showSoundCloudDialog">
+        <form ng-submit="playSoundCloud(formSoundCloudURL)">
+          <input placeholder="SoundCloud Music URL" ng-model="formSoundCloudURL" take-focus="soundCloudFocus" required />
+          <button type="button" class="cancel" title="Cancel" ng-click="hideSoundCloudDialog()">
+            <span data-icon="&#xf00d;"></span>Cancel
+          </button>
+          <button type="submit" class="confirm" title="Play">
+            <span data-icon="&#xf16a;"></span>Play
+          </button>
+        </form>
+      </div>
     </div>
     <div class="main-container">
       <div class="top-area">
@@ -56,6 +67,9 @@ Source: https://github.com/acm-uiuc/beats
         <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText" /></form>
         <button class="control rect-button youtube" title="YouTube" ng-click="startYouTubeDialog()">
           <span data-icon="&#xf167;"></span>Play YouTube
+        </button>
+        <button class="control rect-button soundcloud" title="SoundCloud" ng-click="startSoundCloudDialog()">
+          <span data-icon="&#xf1be;"></span>Play SoundCloud
         </button>
         <button class="control rect-button" title="Logout" ng-click="logout()" ng-show="loggedIn"><span data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
         <button class="control rect-button" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">
