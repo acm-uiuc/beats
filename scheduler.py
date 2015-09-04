@@ -12,6 +12,7 @@ from config import config
 from db import Session, Song, PlayHistory, Packet, Vote
 import song
 from youtube import get_youtube_video_details, YouTubeVideo
+from soundcloudlib import get_soundcloud_music_details, SoundCloudMusic
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 import threading
@@ -78,8 +79,22 @@ class Scheduler(object):
                         session.rollback()
                         raise e
                 elif 'soundcloud.com' in video_url:
-                    session.rollback()
-                    raise Exception('Soundcloud support pending')
+                    try:
+                        track_obj = get_soundcloud_music_details(video_url)
+                        packet = Packet(soundcloud_url=video_url,
+                                        video_title=video_details['title'],
+                                        video_length=video_details['length'],
+                                        video_id=video_details['id'],
+                                        art_uri=video_details['art_uri'],
+                                        artist=video_details['artist'],
+                                        user=user,
+                                        arrival_time=self.virtual_time,
+                                        player_name=PLAYER_NAME)
+                        session.add(packet)
+                        session.commit()
+                    except Exception, e:
+                        session.rollback()
+                        raise e
                 else:
                     session.rollback()
                     raise Exception('Unsupported website')
@@ -132,6 +147,15 @@ class Scheduler(object):
                     'has_voted': packet.has_voted(user),
                 }
                 queue.append(video_obj)
+            elif packet.soundcloud_url:
+                sc = SoundCloudMusic(packet)
+                sc_obj = sc.dictify()
+                sc_obj['packet'] = {
+                    'num_votes': packet.num_votes(),
+                    'user': packet.user,
+                    'has_voted': packet.has_voted(user)
+                }
+                queue.append(sc_obj)
             else:
                 song = session.query(Song).get(packet.song_id)
                 song_obj = song.dictify()

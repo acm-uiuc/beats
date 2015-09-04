@@ -85,8 +85,12 @@ class Packet(Base):
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
                      unique=True)
     video_url = Column(String(100))
+    soundcloud_url = Column(String(100))  # compatibility with soundcloud
     video_title = Column(Unicode(100))
     video_length = Column(Float)
+    video_id = Column(String(32))  # compatibility with soundcloud
+    art_uri = Column(String(100))  # compatibility with soundcloud
+    artist = Column(Unicode(100))  # compatibility with soundcloud
     user = Column(String(8))
     arrival_time = Column(Float)
     finish_time = Column(Float)
