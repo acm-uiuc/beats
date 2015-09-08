@@ -44,3 +44,4 @@ beats.cfg
 *.swp
 .idea
 .sass-cache
+static/art
