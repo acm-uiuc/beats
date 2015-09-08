@@ -20,9 +20,9 @@ class Song(Base):
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, primary_key=True)
-    title = Column(Unicode(100))
-    artist = Column(Unicode(100))
-    album = Column(Unicode(100))
+    title = Column(Unicode(200))
+    artist = Column(Unicode(200))
+    album = Column(Unicode(200))
     length = Column(Float)
     path = Column(Unicode(1000))
     tracknumber = Column(Integer)
