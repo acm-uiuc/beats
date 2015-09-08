@@ -188,16 +188,10 @@ def queue_add():
             return jsonify(scheduler.vote_song(username, song_id=song_id))
         except Exception, e:
             return jsonify({'message': str(e)}), 400
-    elif request.form.get('url'):
+    elif request.form.get('url'):  # youtube and soundcloud
         url = request.form.get('url')
         try:
-            return jsonify(scheduler.vote_song(username, video_url=url))
-        except Exception, e:
-            return jsonify({'message': str(e)}), 400
-    elif request.form.get('scurl'):  # soundcloud url
-        scurl = request.form.get('scurl')
-        try:
-            return jsonify(scheduler.vote_song(username, soundcloud_url=scurl))
+            return jsonify(scheduler.vote_song(username, stream_url=url))
         except Exception, e:
             return jsonify({'message': str(e)}), 400
     return jsonify({'message': 'No id or url parameter'}), 400

@@ -9,17 +9,17 @@ def get_soundcloud_music_details(url):
     track_data = json.loads(track_obj.raw_data)
     return {'title': track_data['title'],
             'length': track_data['duration'] / 1000.,  # reported in milliseconds
-            'id': track_data['id'],
+            'stream_id': track_data['id'],
             'art_uri': track_data['artwork_url'],
             'artist': track_data['user']['username']}
 
 
 class SoundCloudMusic(object):
     def __init__(self, packet):
-        self.url = packet.video_url
-        self.title = packet.video_title
-        self.length = packet.video_length
-        self.id = packet.soundcloud_id
+        self.url = packet.stream_url
+        self.title = packet.stream_title
+        self.length = packet.stream_length
+        self.id = packet.stream_id
         self.art_uri = packet.art_uri
         self.uploader = packet.artist
 
@@ -37,4 +37,5 @@ class SoundCloudMusic(object):
             'artist': self.uploader,
             'length': self.length,
             'art_uri': self.art_uri,
+            'id': self.id
         }

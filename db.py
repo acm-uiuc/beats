@@ -84,12 +84,11 @@ class Packet(Base):
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
                      unique=True)
-    video_url = Column(String(100))
-    soundcloud_url = Column(String(100))  # compatibility with soundcloud
-    video_title = Column(Unicode(100))
-    video_length = Column(Float)
-    soundcloud_id = Column(String(32))  # compatibility with soundcloud
-    art_uri = Column(String(100))  # compatibility with soundcloud
+    stream_url = Column(String(100))  # renamed from video_url
+    stream_title = Column(Unicode(100))  # renamed from video_title
+    stream_length = Column(Float)  # renamed from video_length
+    stream_id = Column(String(32))  # compatibility with soundcloud & youtube
+    art_uri = Column(String(100))  # compatibility with soundcloud & youtube
     artist = Column(Unicode(100))  # compatibility with soundcloud
     user = Column(String(8))
     arrival_time = Column(Float)

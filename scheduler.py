@@ -36,21 +36,18 @@ class Scheduler(object):
         self._update_active_sessions()
         self._update_finish_times()
 
-    def vote_song(self, user, song_id=None, video_url=None, soundcloud_url=None):
+    def vote_song(self, user, song_id=None, stream_url=None):
         """Vote for a song"""
         session = Session()
 
-        if video_url:
+        if stream_url:
             packet = session.query(Packet).filter_by(
-                video_url=video_url, player_name=PLAYER_NAME).first()
-        elif soundcloud_url:
-            packet = session.query(Packet).filter_by(
-                soundcloud_url=soundcloud_url, player_name=PLAYER_NAME).first()
+                stream_url=stream_url, player_name=PLAYER_NAME).first()
         elif song_id is not None:
             packet = session.query(Packet).filter_by(
                 song_id=song_id, player_name=PLAYER_NAME).first()
         else:
-            raise Exception('Must specify either song_id or video_url')
+            raise Exception('Must specify either song_id or stream_url')
 
         if packet:  # Song is already queued; add a vote
             if user == packet.user:
@@ -66,13 +63,15 @@ class Scheduler(object):
                                 user)
             self._update_finish_times(packet.user)
         else:  # Song is not queued; queue it
-            if video_url:
-                if 'www.youtube.com' in video_url:
+            if stream_url:
+                if 'www.youtube.com' in stream_url:
                     try:
-                        video_details = get_youtube_video_details(video_url)
-                        packet = Packet(video_url=video_url,
-                                        video_title=video_details['title'],
-                                        video_length=video_details['length'],
+                        video_details = get_youtube_video_details(stream_url)
+                        packet = Packet(stream_url=stream_url,
+                                        stream_title=video_details['title'],
+                                        stream_length=video_details['length'],
+                                        stream_id=video_details['stream_id'],
+                                        art_uri=video_details['art_uri'],
                                         user=user,
                                         arrival_time=self.virtual_time,
                                         player_name=PLAYER_NAME)
@@ -81,17 +80,13 @@ class Scheduler(object):
                     except Exception, e:
                         session.rollback()
                         raise e
-                else:
-                    session.rollback()
-                    raise Exception('Unsupported website')  # Youtube URL must be from Youtube
-            elif soundcloud_url:
-                if 'soundcloud.com' in soundcloud_url:
+                elif 'soundcloud.com' in stream_url:
                     try:
-                        track_obj = get_soundcloud_music_details(soundcloud_url)
-                        packet = Packet(soundcloud_url=soundcloud_url,
-                                        video_title=track_obj['title'],
-                                        video_length=track_obj['length'],
-                                        soundcloud_id=track_obj['id'],
+                        track_obj = get_soundcloud_music_details(stream_url)
+                        packet = Packet(stream_url=stream_url,
+                                        stream_title=track_obj['title'],
+                                        stream_length=track_obj['length'],
+                                        stream_id=track_obj['stream_id'],
                                         art_uri=track_obj['art_uri'],
                                         artist=track_obj['artist'],
                                         user=user,
@@ -104,7 +99,7 @@ class Scheduler(object):
                         raise e
                 else:
                     session.rollback()
-                    raise Exception('Soundcloud URL must be from soundcloud.com')
+                    raise Exception('Unsupported website')  # Youtube URL must be from Youtube
             else:
                 try:
                     packet = Packet(song_id=song_id,
@@ -145,7 +140,7 @@ class Scheduler(object):
 
         queue = []
         for packet in packets:
-            if packet.video_url:
+            if packet.stream_url and 'www.youtube.com' in packet.stream_url:
                 video = YouTubeVideo(packet)
                 video_obj = video.dictify()
                 video_obj['packet'] = {
@@ -154,7 +149,7 @@ class Scheduler(object):
                     'has_voted': packet.has_voted(user),
                 }
                 queue.append(video_obj)
-            elif packet.soundcloud_url:
+            elif packet.stream_url and 'soundcloud.com' in packet.stream_url:
                 sc = SoundCloudMusic(packet)
                 sc_obj = sc.dictify()
                 sc_obj['packet'] = {
@@ -212,10 +207,10 @@ class Scheduler(object):
         return self.get_queue()
 
     def remove_video(self, url, skip=False):
-        """Removes the packet with the given video_url"""
+        """Removes the packet with the given stream_url"""
         session = Session()
         packet = session.query(Packet).filter_by(
-            video_url=url, player_name=PLAYER_NAME).first()
+            stream_url=url, player_name=PLAYER_NAME).first()
         if (isinstance(player.now_playing, YouTubeVideo) and
                 player.now_playing.url == url):
             player.stop()
@@ -250,12 +245,12 @@ class Scheduler(object):
                            .filter_by(player_name=PLAYER_NAME)
                            .order_by(Packet.finish_time).first())
             if next_packet:
-                if next_packet.video_url:
+                if next_packet.stream_url and 'www.youtube.com' in next_packet.stream_url:
                     video = YouTubeVideo(next_packet)
                     player.play_media(video)
                     session.commit()
                     return video.dictify()
-                elif next_packet.soundcloud_url:
+                elif next_packet.stream_url and 'soundcloud.com' in next_packet.stream_url:
                     video = SoundCloudMusic(next_packet)
                     player.play_media(video)
                     session.commit()
@@ -292,7 +287,7 @@ class Scheduler(object):
 
         last_finish_time = {}
         for packet in packets:
-            length = (packet.video_length or
+            length = (packet.stream_length or
                       session.query(Song).get(packet.song_id).length)
             user = packet.user
 

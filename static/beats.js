@@ -217,10 +217,8 @@ function($scope, $http, $interval, $cookies)
     $scope.showLoginDialog = false;
     $scope.formUsername = '';
     $scope.formPassword = '';
-    $scope.showYouTubeDialog = false;
-    $scope.formYouTubeURL = '';
-    $scope.showSoundCloudDialog = false;
-    $scope.formSoundCloudURL = '';
+    $scope.showStreamDialog = false;
+    $scope.formStreamURL = '';
 
     $scope.loggedIn = null;
     $scope.playlist = [];
@@ -322,34 +320,23 @@ function($scope, $http, $interval, $cookies)
 
     $scope.isShowingDialog = function()
     {
-        return $scope.showLoginDialog || $scope.showYouTubeDialog || $scope.showSoundCloudDialog || !!$scope.errorMessage;
+        return $scope.showLoginDialog || $scope.showStreamDialog || !!$scope.errorMessage;
     };
 
-    $scope.startYouTubeDialog = function()
+    $scope.startStreamDialog = function()
     {
         if (!$scope.ensureLogin())
         {
             return;
         }
-        $scope.formYouTubeURL = '';
-        $scope.showYouTubeDialog = true;
-        $scope.youTubeFocus = true;
+        $scope.formStreamURL = '';
+        $scope.showStreamDialog = true;
+        $scope.streamFocus = true;
     };
 
-    $scope.hideYouTubeDialog = function()
+    $scope.hideStreamDialog = function()
     {
-        $scope.showYouTubeDialog = false;
-    };
-
-    $scope.startSoundCloudDialog = function () {
-        if (!$scope.ensureLogin()) return;
-        $scope.formSoundCloudURL = '';
-        $scope.showSoundCloudDialog = true;
-        $scope.soundCloudFocus = true;
-    };
-
-    $scope.hideSoundCloudDialog = function () {
-        $scope.showSoundCloudDialog = false;
+        $scope.showStreamDialog = false;
     };
 
     $scope.hideLoginDialog = function()
@@ -573,21 +560,15 @@ function($scope, $http, $interval, $cookies)
         }
     };
 
-    $scope.playYouTube = function(url)
+    $scope.playStream = function(url)
     {
-        $scope.hideYouTubeDialog();
+        $scope.hideStreamDialog();
         if (!$scope.ensureLogin()) {
             return;
         }
 
         $scope.userRequest('/v1/queue/add', 'url=' + encodeURIComponent(url));
 
-    };
-
-    $scope.playSoundCloud = function (url) {
-        $scope.hideSoundCloudDialog();
-        if (!$scope.ensureLogin()) return;
-        $scope.userRequest('/v1/queue/add', 'scurl=' + encodeURIComponent(url));
     };
 
     $scope.pauseSong = function()
