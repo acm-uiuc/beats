@@ -14,4 +14,4 @@ password = replace_me
 url = mysql://root@localhost/acoustics2
 
 [Artwork]
-art_path = replace_me
+art_path = /static/art/
