@@ -7,7 +7,7 @@ def get_soundcloud_music_details(url):
     track_obj = sc_client.get('/resolve', url=url)
     track_data = json.loads(track_obj.raw_data)
     return {'title': track_data['title'],
-            'length': track_data['duration'],
+            'length': track_data['duration'] / 1000.,  # reported in milliseconds
             'id': track_data['id'],
             'art_uri': track_data['artwork_url'],
             'artist': track_data['user']['username']}

@@ -587,7 +587,7 @@ function($scope, $http, $interval, $cookies)
     $scope.playSoundCloud = function (url) {
         $scope.hideSoundCloudDialog();
         if (!$scope.ensureLogin()) return;
-        $scope.userRequest('/v1/queue/add', 'url=' + encodeURIComponent(url));
+        $scope.userRequest('/v1/queue/add', 'scurl=' + encodeURIComponent(url));
     };
 
     $scope.pauseSong = function()

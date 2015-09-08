@@ -36,13 +36,16 @@ class Scheduler(object):
         self._update_active_sessions()
         self._update_finish_times()
 
-    def vote_song(self, user, song_id=None, video_url=None):
+    def vote_song(self, user, song_id=None, video_url=None, soundcloud_url=None):
         """Vote for a song"""
         session = Session()
 
         if video_url:
             packet = session.query(Packet).filter_by(
                 video_url=video_url, player_name=PLAYER_NAME).first()
+        elif soundcloud_url:
+            packet = session.query(Packet).filter_by(
+                soundcloud_url=soundcloud_url, player_name=PLAYER_NAME).first()
         elif song_id is not None:
             packet = session.query(Packet).filter_by(
                 song_id=song_id, player_name=PLAYER_NAME).first()
@@ -78,15 +81,19 @@ class Scheduler(object):
                     except Exception, e:
                         session.rollback()
                         raise e
-                elif 'soundcloud.com' in video_url:
+                else:
+                    session.rollback()
+                    raise Exception('Unsupported website')  # Youtube URL must be from Youtube
+            elif soundcloud_url:
+                if 'soundcloud.com' in soundcloud_url:
                     try:
-                        track_obj = get_soundcloud_music_details(video_url)
-                        packet = Packet(soundcloud_url=video_url,
-                                        video_title=video_details['title'],
-                                        video_length=video_details['length'],
-                                        video_id=video_details['id'],
-                                        art_uri=video_details['art_uri'],
-                                        artist=video_details['artist'],
+                        track_obj = get_soundcloud_music_details(soundcloud_url)
+                        packet = Packet(soundcloud_url=soundcloud_url,
+                                        video_title=track_obj['title'],
+                                        video_length=track_obj['length'],
+                                        video_id=track_obj['id'],
+                                        art_uri=track_obj['art_uri'],
+                                        artist=track_obj['artist'],
                                         user=user,
                                         arrival_time=self.virtual_time,
                                         player_name=PLAYER_NAME)
@@ -97,7 +104,7 @@ class Scheduler(object):
                         raise e
                 else:
                     session.rollback()
-                    raise Exception('Unsupported website')
+                    raise Exception('Soundcloud URL must be from soundcloud.com')
             else:
                 try:
                     packet = Packet(song_id=song_id,
@@ -214,6 +221,11 @@ class Scheduler(object):
             player.stop()
             if skip:
                 self.virtual_time = packet.finish_time
+        elif (isinstance(player.now_playing, SoundCloudMusic) and
+                player.now_playing.url == url):
+            player.stop()
+            if skip:
+                self.virtual_time = packet.finish_time
         session.delete(packet)
         session.commit()
         self._update_active_sessions()
@@ -229,6 +241,8 @@ class Scheduler(object):
             if player.now_playing:
                 if isinstance(player.now_playing, YouTubeVideo):
                     self.remove_video(player.now_playing.url, skip=skip)
+                elif isinstance(player.now_playing, SoundCloudMusic):
+                    self.remove_video(player.now_playing.url, skip=skip)
                 else:
                     self.remove_song(player.now_playing.id, skip=skip)
             session = Session()
@@ -241,6 +255,10 @@ class Scheduler(object):
                     player.play_media(video)
                     session.commit()
                     return video.dictify()
+                elif next_packet.soundcloud_url:
+                    video = SoundCloudMusic(next_packet)
+                    player.play_media(video)
+                    session.commit()
                 else:
                     next_song = session.query(Song).get(next_packet.song_id)
                     player.play_media(next_song)
