@@ -10,6 +10,13 @@ function containsType(types, name)
     return false;
 }
 
+function roundDbValue(level)
+{
+    var negLevel = level < 0.0;
+    var absLevel = negLevel ? -level : level;
+    return (negLevel ? -0.1 : 0.1) * Math.floor(absLevel * 10.0 + 0.5);
+}
+
 angular.module('Beats.filters', [])
 
 // A filter that takes a number of seconds and converts it to MM:SS format
@@ -23,6 +30,40 @@ angular.module('Beats.filters', [])
             seconds = '0' + seconds;
         }
         return Math.floor(input / 60) + ':' + seconds;
+    };
+})
+
+// A filter that takes a given frequency and converts it into Hz or kHz with
+// the appropriate label
+.filter('freqFormat', function()
+{
+    return function(input)
+    {
+        var unit = 'Hz';
+        var value = input;
+        if (input > 999.5)
+        {
+            unit = 'kHz';
+            value /= 1000.0;
+        }
+        return Math.floor(value + 0.5) + ' ' + unit;
+    };
+})
+
+// A filter that rounds a dB level (the same way as how the rounding is done in
+// roundDbValue) and appends a 'dB' label
+.filter('dbFormat', function()
+{
+    return function(input)
+    {
+        var negInput = input < 0.0;
+        var absInput = negInput ? -input : input;
+
+        var multInput = Math.floor(absInput * 10.0 + 0.5);
+        var tenth = multInput % 10;
+        var whole = Math.floor(multInput / 10);
+
+        return (negInput ? '-' : '') + whole + '.' + tenth + ' dB';
     };
 });
 
@@ -61,6 +102,10 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
             // Get the parameters that determine how to set the value
             var barMin = attrs.barMin | 0;
             var barMax = attrs.barMax | 0;
+            var barOrientation = attrs.barOrientation;
+            var barUseParentScope = attrs.barUseParentScope;
+            var useParent = barUseParentScope == 'true';
+            var scopeToUse = useParent ? scope.$parent : scope;
 
             var dragging = false;
 
@@ -72,21 +117,37 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                     event.preventDefault();
 
                     // Determine ratio from 0 to 1 over the control
-                    var ratioX = (event.clientX - element[0].offsetLeft) / (element[0].offsetWidth);
+                    var ratio;
+                    if (barOrientation == 'vertical')
+                    {
+                        ratio = 1.0 - (event.clientY - element[0].offsetTop) / (element[0].offsetHeight);
+                    }
+                    else
+                    {
+                        ratio = (event.clientX - element[0].offsetLeft) / (element[0].offsetWidth);
+                    }
+                    console.log(ratio);
 
                     // Linearly map that ratio to between barMax and barMin
-                    scope[attrs.barControl] = ratioX * (barMax - barMin) + barMin;
-                    if (scope[attrs.barControl] < barMin)
+                    scopeToUse[attrs.barControl] = ratio * (barMax - barMin) + barMin;
+                    if (scopeToUse[attrs.barControl] < barMin)
                     {
-                        scope[attrs.barControl] = barMin;
+                        scopeToUse[attrs.barControl] = barMin;
                     }
-                    if (scope[attrs.barControl] > barMax)
+                    if (scopeToUse[attrs.barControl] > barMax)
                     {
-                        scope[attrs.barControl] = barMax;
+                        scopeToUse[attrs.barControl] = barMax;
+                    }
+
+                    // Mouse move event hooks are optional (WARNING: The
+                    // evaluated expression runs in this scope, never the
+                    // parent!!!)
+                    if (attrs.barOnMouseMove !== undefined) {
+                        scope.$eval(attrs.barOnMouseMove);
                     }
 
                     // Update the view
-                    scope.$digest();
+                    scopeToUse.$digest();
                 }
             };
 
@@ -95,20 +156,20 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
                 if (dragging)
                 {
                     // Call the callback for whenever the bar is set
-                    scope.$eval(attrs.barSet);
+                    scopeToUse.$eval(attrs.barSet);
                     dragging = false;
 
                     // Indicate that dragging has stopped
-                    scope[attrs.barDragging] = false;
+                    scopeToUse[attrs.barDragging] = false;
                 }
-            }
+            };
 
             element[0].addEventListener('mousedown', function(event)
             {
                 dragging = true;
 
                 // Indicate that dragging has started
-                scope[attrs.barDragging] = true;
+                scopeToUse[attrs.barDragging] = true;
 
                 handleDragging(event);
             });
@@ -119,6 +180,140 @@ angular.module('BeatsApp', ['Beats.filters', 'ngCookies'])
         }
     };
 })
+.directive('toggleSwitch', function()
+{
+    // Directive for having toggle slider based input switches
+    return {
+        link: function(scope, element, attrs)
+        {
+            // Get the parameters that determine how to set the value
+            var toggleOrientation = attrs.toggleOrientation;
+
+            var dragging = false;
+            var mouseMoved = false;
+
+            var handleDragging = function(event)
+            {
+                if (event === null)
+                {
+                    // Simply change the value of the toggle switch
+                    scope[attrs.toggleSwitch] = !scope[attrs.toggleSwitch];
+                }
+                else if (dragging)
+                {
+                    // The mouse moved
+                    mouseMoved = true;
+
+                    // Prevent browser's default dragging behaviour
+                    event.preventDefault();
+
+                    // Determine ratio from 0 to 1 over the control
+                    var ratio;
+                    if (toggleOrientation == 'vertical')
+                    {
+                        ratio = 1.0 - (event.clientY - element[0].offsetTop) / (element[0].offsetHeight);
+                    }
+                    else
+                    {
+                        ratio = (event.clientX - element[0].offsetLeft) / (element[0].offsetWidth);
+                    }
+
+                    // Linearly map that ratio to between barMax and barMin
+                    scope[attrs.toggleSwitch] = ratio >= 0.5;
+                }
+
+                // Update the view
+                scope.$digest();
+            };
+
+            var finishDragging = function()
+            {
+                if (dragging)
+                {
+                    // Update toggle if we didn't move the mouse
+                    if (!mouseMoved)
+                    {
+                        handleDragging(null);
+                    }
+                    mouseMoved = false;
+
+                    // Call the callback for whenever the bar is set
+                    scope.$eval(attrs.toggleSet);
+                    dragging = false;
+
+                    // Indicate that dragging has stopped
+                    scope[attrs.toggleDragging] = false;
+                }
+            };
+
+            element[0].addEventListener('mousedown', function(event)
+            {
+                dragging = true;
+
+                // Indicate that dragging has started
+                scope[attrs.toggleDragging] = true;
+            });
+
+            element[0].addEventListener('mouseup', finishDragging);
+            element[0].addEventListener('mouseleave', finishDragging);
+            element[0].addEventListener('mousemove', handleDragging);
+        }
+    };
+})
+.directive('dbTextDisplay', ['dbFormatFilter', function(dbFormatFilter)
+{
+    // Directive for having decibel label displays
+    return {
+        link: function(scope, element, attrs)
+        {
+            var dbTextIndex = attrs.dbTextIndex | 0;
+            var dbTextUseParentScope = attrs.dbTextUseParentScope;
+            var useParent = dbTextUseParentScope == 'true';
+            var scopeToUse = useParent ? scope.$parent : scope;
+
+            var updatePreampText = function()
+            {
+                element.text(dbFormatFilter(scopeToUse.eqPreampLevel));
+            };
+
+            var updateBandText = function()
+            {
+                element.text(dbFormatFilter(scopeToUse['bandLevel' + dbTextIndex]));
+            };
+
+            var updateText = function()
+            {
+                if (dbTextIndex == -1)
+                {
+                    updatePreampText();
+                }
+                else
+                {
+                    updateBandText();
+                }
+            };
+
+            scopeToUse.$on('changeDbText', function(event, args)
+            {
+                // args.index has two special sentinel values:
+                // 1) -1 means to update the text corresponding to the preamp,
+                //    which means the label corresponding to the preamp setting
+                //    should have a db-text-index value of -1.
+                // 2) -2 means to update the text no matter what it is.  In the
+                //    case of updating every single control (e.g., during a
+                //    refresh operation), this sentinel value helps reduce the
+                //    broadcast complexity from O(N^2) to O(N), where N is the
+                //    number of bands.
+                if (args.index == -2 || args.index == dbTextIndex)
+                {
+                    updateText();
+                }
+            });
+
+            updateText();
+        }
+    };
+}])
 .directive('dragSong', function()
 {
     // Directive for having bar slider based input controls
@@ -217,6 +412,7 @@ function($scope, $http, $interval, $cookies)
     $scope.showLoginDialog = false;
     $scope.formUsername = '';
     $scope.formPassword = '';
+    $scope.showEqualizerDialog = false;
     $scope.showYouTubeDialog = false;
     $scope.formYouTubeURL = '';
 
@@ -225,7 +421,15 @@ function($scope, $http, $interval, $cookies)
     $scope.albumlist = [];
     $scope.queue = [];
     $scope.volume = 0;
+    $scope.eqSupported = false;
+    $scope.eqEnabled = false;
+    $scope.eqPresets = [];
+    $scope.eqPresetIndex = 0;
+    $scope.eqPreampLevel = 0.0;
+    $scope.eqBandFrequencies = [];
     $scope.holdVolumeUpdate = false;
+    $scope.holdEqEnabledUpdate = false;
+    $scope.holdEqPreampUpdate = false;
     $scope.playbackTime = 0;
     $scope.playbackDuration = 0;
     $scope.isPlaying = false;
@@ -320,7 +524,22 @@ function($scope, $http, $interval, $cookies)
 
     $scope.isShowingDialog = function()
     {
-        return $scope.showLoginDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
+        return $scope.showLoginDialog || $scope.showEqualizerDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
+    };
+
+    $scope.startEqualizerDialog = function()
+    {
+        if (!$scope.ensureLogin())
+        {
+            return;
+        }
+        $scope.showEqualizerDialog = true;
+        $scope.equalizerFocus = true;
+    };
+
+    $scope.hideEqualizerDialog = function()
+    {
+        $scope.showEqualizerDialog = false;
     };
 
     $scope.startYouTubeDialog = function()
@@ -560,6 +779,72 @@ function($scope, $http, $interval, $cookies)
         }
     };
 
+    $scope.getEqualizerInfo = function()
+    {
+        $http.get(backendBase + '/v1/player/equalizer')
+        .success(function(data)
+        {
+            // Check for equalizer support
+            $scope.eqSupported = data['equalizer_supported'];
+            if ($scope.eqSupported)
+            {
+                // Populate preset choices in preset menu
+                var presNames = data['equalizer_preset_names'];
+                for (var presIndex = 0; presIndex < presNames.length; presIndex++)
+                {
+                    $scope.eqPresets.push({
+                        value: presIndex,
+                        displayName: presNames[presIndex]
+                    });
+                }
+                // Add equalizer band controls
+                var freqs = data['equalizer_band_freqs'];
+                for (var bandIndex = 0; bandIndex < freqs.length; bandIndex++)
+                {
+                    // Dynamically initialize scope variables for the band control
+                    var holdName = 'holdEqBand' + bandIndex + 'Update';
+                    if ($scope[holdName] === undefined)
+                    {
+                        $scope[holdName] = false;
+                        $scope['bandLevel' + bandIndex] = 0.0;
+                    }
+                    // Add the frequency along with its corresponding band index
+                    $scope.eqBandFrequencies.push({
+                        freq: freqs[bandIndex],
+                        index: bandIndex
+                    });
+                }
+            }
+        });
+    };
+
+    $scope.enableEqualizer = function(enable)
+    {
+        $scope.eqEnabled = enable;
+        $scope.userRequest('/v1/player/equalizer/enable', 'enabled=' + enable);
+    }
+
+    $scope.adjustEqualizerPreset = function(index)
+    {
+        if ($scope.eqPresets.length > Math.floor(index))
+        {
+            $scope.eqPresetIndex = Math.floor(index);
+            $scope.userRequest('/v1/player/equalizer/adjust_preset', 'index=' + $scope.eqPresetIndex);
+        }
+    };
+
+    $scope.adjustEqualizerPreamp = function(level)
+    {
+        $scope.eqPreampLevel = roundDbValue(level); // Because of the bar control, this may have non-zero digits after the tenth
+        $scope.userRequest('/v1/player/equalizer/adjust_preamp', 'level=' + $scope.eqPreampLevel);
+    };
+
+    $scope.adjustEqualizerBand = function(level, band)
+    {
+        $scope['bandLevel' + band] = roundDbValue(level); // Because of the bar control, this may have non-zero digits after the tenth
+        $scope.userRequest('/v1/player/equalizer/adjust_band', 'band=' + band + '&level=' + $scope['bandLevel' + band]);
+    };
+
     $scope.playYouTube = function(url)
     {
         $scope.hideYouTubeDialog();
@@ -586,6 +871,12 @@ function($scope, $http, $interval, $cookies)
         $scope.volume = Math.round(volume); // Because of the bar control, this may be a fraction
         $scope.userRequest('/v1/player/volume', 'volume=' + $scope.volume);
     };
+    $scope.updateEqLabels = function(index)
+    {
+        $scope.$broadcast('changeDbText', {
+            index: index
+        });
+    };
     $scope.refreshPlayer = function()
     {
         $http.get(backendBase + '/v1/now_playing')
@@ -604,6 +895,41 @@ function($scope, $http, $interval, $cookies)
             if (!$scope.holdVolumeUpdate)
             {
                 $scope.volume = data['player_status']['volume'];
+            }
+            // Check for equalizer support
+            if (data['player_status']['equalizer_enabled'] !== undefined)
+            {
+                // Prevent enabling/disabling the equalizer while the user is changing it
+                if (!$scope.holdEqEnabledUpdate)
+                {
+                    $scope.eqEnabled = data['player_status']['equalizer_enabled'];
+                }
+                // Prevent changing the equalizer preset while the user is changing it
+                if (!$scope.holdEqPresetUpdate)
+                {
+                    $scope.eqPresetIndex = data['player_status']['equalizer_preset'];
+                }
+                // Prevent changing the preamp while the user is changing it
+                if (!$scope.holdEqPreampUpdate)
+                {
+                    $scope.eqPreampLevel = data['player_status']['equalizer_preamp_level'];
+                }
+                levels = data['player_status']['equalizer_band_levels'];
+                for (var bandIdx = 0; bandIdx < levels.length; bandIdx++)
+                {
+                    var holdName = 'holdEqBand' + bandIdx + 'Update';
+                    var hold = $scope[holdName];
+                    if ($scope[holdName] === undefined)
+                    {
+                        $scope[holdName] = false;
+                    }
+                    // Prevent changing the band while the user is changing it
+                    if (!$scope[holdName])
+                    {
+                        $scope['bandLevel' + bandIdx] = levels[bandIdx];
+                    }
+                }
+                $scope.updateEqLabels(-2);
             }
             $scope.isPlaying = data['player_status']['state'] == 'State.Playing';
         });
@@ -642,6 +968,7 @@ function($scope, $http, $interval, $cookies)
 
     $scope.requestUser();
     $scope.randomSongs();
+    $scope.getEqualizerInfo();
     $scope.refreshPlayer();
 }]);
 

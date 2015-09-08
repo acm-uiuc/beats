@@ -38,6 +38,87 @@ Source: https://github.com/acm-uiuc/beats
           <span data-icon="&#xf00d;"></span>Close
         </button>
       </div>
+      <div class="dialog-area center" ng-show="showEqualizerDialog">
+        <div class="equalizer row-container">
+          <div class="control bar as-toggle equalizer-bars on-off"
+               title="{{ eqEnabled ? 'Disable' : 'Enable' }} equalizer"
+               toggle-switch="eqEnabled"
+               toggle-set="enableEqualizer(eqEnabled)"
+               toggle-dragging="holdEqEnabledUpdate">
+            <div class="cover as-toggle as-off"
+                 style="left: {{ (eqEnabled ? 1.0 : 0.0) * 100 }}%; width: {{ (eqEnabled ? 0.0 : 1.0) * 100 }}%;">
+            </div>
+            <div class="cover as-toggle as-on"
+                 style="width: {{ (eqEnabled ? 1.0 : 0.0) * 100 }}%;">
+            </div>
+            <div class="handle as-toggle"
+                 style="left: {{ (eqEnabled ? 1.0 : 0.0) * 55 + 20 }}%;">
+            </div>
+          </div>
+          <div class="equalizer preset label">Preset:</div>
+          <select title="Preset" ng-model="eqPresetIndex"
+                                 ng-change="adjustEqualizerPreset(eqPresetIndex)"
+                                 style="width: 100%">
+            <option ng-selected="{{preset.value == eqPresetIndex}}"
+                    ng-repeat="preset in eqPresets"
+                    value="{{preset.value}}">
+              {{preset.displayName}}
+            </option>
+          </select>
+        </div>
+        <div class="equalizer row-container">
+          <div class="equalizer preamp label">Preamp:</div>
+          <div class="control bar equalizer-bars preamp"
+             title="Preamp"
+             bar-control="eqPreampLevel"
+             bar-set="adjustEqualizerPreamp(eqPreampLevel)"
+             bar-on-mouse-move="updateEqLabels(-1)"
+             bar-dragging="holdEqPreampUpdate"
+             bar-min="-20"
+             bar-max="20">
+            <div class="cover"
+                 style="width: {{ (eqPreampLevel + 20)/40 * 100 }}%">
+            </div>
+            <div class="handle"
+                 style="left: {{ (eqPreampLevel + 20)/40 * 100 }}%">
+            </div>
+          </div>
+          <div class="equalizer preamp label db"
+               db-text-display="eqPreampLevel"
+               db-text-index="-1"></div>
+        </div>
+        <div class="equalizer row-container">
+          <div class="equalizer band ctrl-area" ng-repeat="band in eqBandFrequencies">
+            <div class="control bar as-vertical equalizer-bars band"
+                 title="{{ band.freq|freqFormat }}"
+                 bar-use-parent-scope="true"
+                 bar-control="bandLevel{{ band.index }}"
+                 bar-set="adjustEqualizerBand(bandLevel{{ band.index }}, {{ band.index }})"
+                 bar-on-mouse-move="updateEqLabels(band.index)"
+                 bar-dragging="holdEqBand{{ band.index }}Update"
+                 bar-min="-20"
+                 bar-max="20"
+                 bar-orientation="vertical">
+              <div class="cover as-vertical"
+                   style="top: {{ ((20 - $parent['bandLevel' + band.index])/40.0 * 100) }}%; height: {{ (($parent['bandLevel' + band.index] + 20)/40.0 * 100) }}%">
+              </div>
+              <div class="handle as-vertical"
+                   style="top: {{ ((20 - $parent['bandLevel' + band.index])/40.0 * 100) }}%">
+              </div>
+            </div>
+            <div class="equalizer band label">{{ band.freq|freqFormat }}</div>
+            <div db-text-use-parent-scope="true"
+                 db-text-display="bandLevel{{ band.index }}"
+                 db-text-index="{{ band.index }}"></div>
+          </div>
+        </div>
+        <div class="equalizer row-container">
+          <div class="equalizer row-filler"></div>
+          <button type="button" class="cancel" title="Close" ng-click="hideEqualizerDialog()">
+            <span data-icon="&#xf00d;"></span>Close
+          </button>
+        </div>
+      </div>
       <div class="dialog-area center" ng-show="showYouTubeDialog">
         <form ng-submit="playYouTube(formYouTubeURL)">
           <input placeholder="YouTube Video URL" ng-model="formYouTubeURL" take-focus="youTubeFocus" required />
@@ -136,6 +217,13 @@ Source: https://github.com/acm-uiuc/beats
              ng-click="skipSong()"
              style="margin-right: 20px">
          </div>
+        <div class="control button equalizer"
+             title="Equalizer"
+             data-image-icon="&#xf085;"
+             ng-click="startEqualizerDialog()"
+             ng-show="eqSupported"
+             style="margin-right: 20px">
+        </div>
         <div class="control label"
              title="Volume"
              data-image-icon="&#xf028;"
