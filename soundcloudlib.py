@@ -18,7 +18,7 @@ class SoundCloudMusic(object):
         self.url = packet.video_url
         self.title = packet.video_title
         self.length = packet.video_length
-        self.id = packet.video_id
+        self.id = packet.soundcloud_id
         self.art_uri = packet.art_uri
         self.uploader = packet.artist
 

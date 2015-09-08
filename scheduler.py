@@ -91,7 +91,7 @@ class Scheduler(object):
                         packet = Packet(soundcloud_url=soundcloud_url,
                                         video_title=track_obj['title'],
                                         video_length=track_obj['length'],
-                                        video_id=track_obj['id'],
+                                        soundcloud_id=track_obj['id'],
                                         art_uri=track_obj['art_uri'],
                                         artist=track_obj['artist'],
                                         user=user,
