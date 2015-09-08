@@ -106,7 +106,7 @@ Source: https://github.com/acm-uiuc/beats
             </thead>
             <tbody>
               <tr ng-repeat="song in playlist track by $index" draggable="true" drag-song="song">
-                <td style="text-align: center" ng-click="voteSong(song)"><span class="cursor-pointer" data-image-icon="{{ getSongIcon(song) }}"></span></td>
+                <td style="text-align: center" ng-click="voteSong(song)"><span class="cursor-pointer fa-spin" data-image-icon="{{ getSongIcon(song) }}"></span></td>
                 <td>{{ song.tracknumber }}</td>
                 <td title="{{ song.title }}">{{ song.title }}</td>
                 <td title="{{ song.artist }}"><span class="cursor-pointer" ng-click="searchSongs('artist:' + song.artist)">{{ song.artist }}</span></td>
