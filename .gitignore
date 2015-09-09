@@ -45,5 +45,4 @@ static/art
 *.swp
 .idea
 .sass-cache
-static/art
 alembic/
