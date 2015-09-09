@@ -45,3 +45,4 @@ beats.cfg
 .idea
 .sass-cache
 static/art
+alembic/
