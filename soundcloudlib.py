@@ -2,7 +2,7 @@ import soundcloud
 import json
 from config import config
 
-sc_client = soundcloud.Client(client_id=config.get('Soundcloud', 'soundcloud_key'))
+sc_client = soundcloud.Client(client_id=config.get('SoundCloud', 'soundcloud_key'))
 
 def get_soundcloud_music_details(url):
     track_obj = sc_client.get('/resolve', url=url)

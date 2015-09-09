@@ -99,7 +99,7 @@ class Scheduler(object):
                         raise e
                 else:
                     session.rollback()
-                    raise Exception('Unsupported website')  # Youtube URL must be from Youtube
+                    raise Exception('Unsupported website')  # YouTube URL must be from YouTube
             else:
                 try:
                     packet = Packet(song_id=song_id,

@@ -1,7 +1,7 @@
 [Player]
 player_name = 1104
 
-[Soundcloud]
+[SoundCloud]
 soundcloud_key = replace_me
 
 [Authentication]

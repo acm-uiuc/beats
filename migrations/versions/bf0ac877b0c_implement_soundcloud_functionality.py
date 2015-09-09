@@ -1,4 +1,4 @@
-"""Implement Soundcloud functionality
+"""Implement SoundCloud functionality
 
 Revision ID: bf0ac877b0c
 Revises: 26d705ab8fbc
