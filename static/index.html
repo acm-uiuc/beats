@@ -119,10 +119,15 @@ Source: https://github.com/acm-uiuc/beats
           </button>
         </div>
       </div>
-      <div class="dialog-area center" ng-show="showYouTubeDialog">
-        <form ng-submit="playYouTube(formYouTubeURL)">
-          <input placeholder="YouTube Video URL" ng-model="formYouTubeURL" take-focus="youTubeFocus" required />
-          <button type="button" class="cancel" title="Cancel" ng-click="hideYouTubeDialog()">
+      <div class="dialog-area center" ng-show="showStreamDialog">
+        <form ng-submit="playStream(formStreamURL)">
+          <p>Supported Streams:</p>
+          <ul>
+            <li><span data-icon="&#xf167;"></span>YouTube</li>
+            <li><span data-icon="&#xf1be;"></span>SoundCloud</li>
+          </ul>
+          <input placeholder="Stream URL" ng-model="formStreamURL" take-focus="streamFocus" required />
+          <button type="button" class="cancel" title="Cancel" ng-click="hideStreamDialog()">
             <span data-icon="&#xf00d;"></span>Cancel
           </button>
           <button type="submit" class="confirm" title="Play">
@@ -135,8 +140,8 @@ Source: https://github.com/acm-uiuc/beats
       <div class="top-area">
         <div class="control label large" title="Search" data-image-icon="&#xf002;"></div>
         <form ng-submit="searchSongs(searchText)" class="control"><input type="search" placeholder="Search" ng-model="searchText" /></form>
-        <button class="control rect-button youtube" title="YouTube" ng-click="startYouTubeDialog()">
-          <span data-icon="&#xf167;"></span>Play YouTube
+        <button class="control rect-button stream" title="Stream" ng-click="startStreamDialog()">
+          <span data-icon="&#xf001;"></span>Play Stream
         </button>
         <button class="control rect-button" title="Logout" ng-click="logout()" ng-show="loggedIn"><span data-icon="&#xf08b;"></span>Logout: {{ loggedIn['first-name'] }}</button>
         <button class="control rect-button" title="Login" ng-click="ensureLogin()" ng-show="!loggedIn">

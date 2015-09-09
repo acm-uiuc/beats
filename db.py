@@ -20,9 +20,9 @@ class Song(Base):
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, primary_key=True)
-    title = Column(Unicode(100))
-    artist = Column(Unicode(100))
-    album = Column(Unicode(100))
+    title = Column(Unicode(200))
+    artist = Column(Unicode(200))
+    album = Column(Unicode(200))
     length = Column(Float)
     path = Column(Unicode(1000))
     tracknumber = Column(Integer)
@@ -84,9 +84,12 @@ class Packet(Base):
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
                      unique=True)
-    video_url = Column(String(100))
-    video_title = Column(Unicode(100))
-    video_length = Column(Float)
+    stream_url = Column(String(100))  # renamed from video_url
+    stream_title = Column(Unicode(100))  # renamed from video_title
+    stream_length = Column(Float)  # renamed from video_length
+    stream_id = Column(String(32))  # compatibility with soundcloud & youtube
+    art_uri = Column(String(100))  # compatibility with soundcloud & youtube
+    artist = Column(Unicode(100))  # compatibility with soundcloud
     user = Column(String(8))
     arrival_time = Column(Float)
     finish_time = Column(Float)
