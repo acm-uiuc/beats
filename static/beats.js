@@ -413,8 +413,8 @@ function($scope, $http, $interval, $cookies)
     $scope.formUsername = '';
     $scope.formPassword = '';
     $scope.showEqualizerDialog = false;
-    $scope.showYouTubeDialog = false;
-    $scope.formYouTubeURL = '';
+    $scope.showStreamDialog = false;
+    $scope.formStreamURL = '';
 
     $scope.loggedIn = null;
     $scope.playlist = [];
@@ -524,7 +524,7 @@ function($scope, $http, $interval, $cookies)
 
     $scope.isShowingDialog = function()
     {
-        return $scope.showLoginDialog || $scope.showEqualizerDialog || $scope.showYouTubeDialog || !!$scope.errorMessage;
+        return $scope.showLoginDialog || $scope.showEqualizerDialog || $scope.showStreamDialog || !!$scope.errorMessage;
     };
 
     $scope.startEqualizerDialog = function()
@@ -542,20 +542,20 @@ function($scope, $http, $interval, $cookies)
         $scope.showEqualizerDialog = false;
     };
 
-    $scope.startYouTubeDialog = function()
+    $scope.startStreamDialog = function()
     {
         if (!$scope.ensureLogin())
         {
             return;
         }
-        $scope.formYouTubeURL = '';
-        $scope.showYouTubeDialog = true;
-        $scope.youTubeFocus = true;
+        $scope.formStreamURL = '';
+        $scope.showStreamDialog = true;
+        $scope.streamFocus = true;
     };
 
-    $scope.hideYouTubeDialog = function()
+    $scope.hideStreamDialog = function()
     {
-        $scope.showYouTubeDialog = false;
+        $scope.showStreamDialog = false;
     };
 
     $scope.hideLoginDialog = function()
@@ -845,9 +845,9 @@ function($scope, $http, $interval, $cookies)
         $scope.userRequest('/v1/player/equalizer/adjust_band', 'band=' + band + '&level=' + $scope['bandLevel' + band]);
     };
 
-    $scope.playYouTube = function(url)
+    $scope.playStream = function(url)
     {
-        $scope.hideYouTubeDialog();
+        $scope.hideStreamDialog();
         if (!$scope.ensureLogin()) {
             return;
         }

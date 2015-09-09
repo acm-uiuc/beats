@@ -1,6 +1,9 @@
 [Player]
 player_name = 1104
 
+[Soundcloud]
+soundcloud_key = replace_me
+
 [Authentication]
 enabled = true
 test_username = testuser
