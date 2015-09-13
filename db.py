@@ -117,6 +117,17 @@ class Vote(Base):
                        primary_key=True)
     user = Column(String(8), primary_key=True)
 
+
+class AuditLogMessage(Base):
+    __tablename__ = 'audit_log'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    id = Column(Integer, primary_key=True)
+    user = Column(String(8))
+    message = Column(String(200))
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    player_name = Column(String(16))
+
 def init_db():
     Base.metadata.create_all(engine)
 
