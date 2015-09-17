@@ -649,7 +649,7 @@ function($scope, $http, $interval, $cookies)
         .error(function(data, status)
         {
             if (status === 403) {
-                $scope.errorMessage = 'Access denied: you are not an ACM member.';
+                $scope.errorMessage = data.message;
             }
             else {
                 $scope.errorMessage = 'Your login failed. Please try again.';

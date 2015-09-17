@@ -8,6 +8,7 @@ import song
 import player
 import user
 import audit_log
+from db import BannedUser
 
 AUTHENTICATION_ENABLED = config.getboolean('Authentication', 'enabled')
 if not AUTHENTICATION_ENABLED:
@@ -327,6 +328,16 @@ def create_session():
     username = request.form.get('username')
     password = request.form.get('password')
     r = user.create_session(username, password)
+    if isinstance(r, BannedUser):
+        reason = r.reason or 'Not specified'
+        message = (
+            'You are banned. Please contact a Beats admin to be unbanned. '
+            'Reason: ' + reason
+        )
+        return jsonify({'message': message}), 403
+    elif r.status_code == 403:
+        return jsonify(
+            {'message': 'You must be an ACM member to use Beats.'}), 403
     return jsonify(r.json()), r.status_code
 
 

@@ -128,6 +128,14 @@ class AuditLogMessage(Base):
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     player_name = Column(String(16))
 
+
+class BannedUser(Base):
+    __tablename__ = 'banned_users'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    username = Column(String(8), primary_key=True)
+    reason = Column(String(200))
+
 def init_db():
     Base.metadata.create_all(engine)
 
