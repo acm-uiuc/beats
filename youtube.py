@@ -29,7 +29,7 @@ class YouTubeVideo(object):
 
     def mrl(self):
         video = pafy.new(self.url)
-        return video.audiostreams[0].url
+        return video.getbestaudio().url
 
     def dictify(self):
         return {
