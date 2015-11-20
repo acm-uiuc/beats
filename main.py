@@ -7,6 +7,8 @@ from config import config
 import song
 import player
 import user
+import audit_log
+from db import BannedUser
 
 AUTHENTICATION_ENABLED = config.getboolean('Authentication', 'enabled')
 if not AUTHENTICATION_ENABLED:
@@ -35,6 +37,24 @@ def login_required(f):
     return decorated_function
 
 
+def get_username(token):
+    if not AUTHENTICATION_ENABLED:
+        return TEST_USERNAME
+    else:
+        session = user.get_session(token)
+        return session.json()['user']['name']
+
+
+def check_eq_support(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not player.equalizer_supported:
+            return jsonify({'message': 'Equalizer not supported'}), 400
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'message': str(error)}), 404
@@ -49,6 +69,10 @@ def not_found(error):
 @login_required
 @crossdomain(origin='*')
 def play_next():
+    audit_log.log(
+        get_username(request.form.get('token')),
+        'Skipped song'
+    )
     return jsonify(scheduler.play_next(skip=True) or {})
 
 
@@ -56,6 +80,10 @@ def play_next():
 @login_required
 @crossdomain(origin='*')
 def pause():
+    audit_log.log(
+        get_username(request.form.get('token')),
+        'Paused/resumed song'
+    )
     return jsonify(player.pause())
 
 
@@ -66,12 +94,93 @@ def player_set_volume():
     if request.form.get('volume'):
         vol = int(request.form.get('volume'))
         if 0 <= vol <= 100:
+            audit_log.log(
+                get_username(request.form.get('token')),
+                'Changed volume to %d' % vol
+            )
             return jsonify(player.set_volume(vol))
         else:
             return jsonify({
                 'message': 'Volume must be between 0 and 100',
             }), 400
     return jsonify({'message': 'No volume parameter'}), 400
+
+
+@app.route('/v1/player/equalizer', methods=['GET'])
+@crossdomain(origin='*')
+def player_get_equalizer_info():
+    return jsonify(player.get_static_equalizer_info())
+
+
+@app.route('/v1/player/equalizer/enable', methods=['POST'])
+@check_eq_support
+@login_required
+@crossdomain(origin='*')
+def player_enable_eq():
+    if request.form.get('enabled'):
+        enabled = request.form.get('enabled') in ('True', 'true')
+        audit_log.log(
+            get_username(request.form.get('token')),
+            '%s equalizer' % ('Enabled' if enabled else 'Disabled')
+        )
+        return jsonify(player.set_equalizer_enabled(enabled))
+    return jsonify({'message': 'No equalizer enablement parameter'}), 400
+
+
+@app.route('/v1/player/equalizer/adjust_preset', methods=['POST'])
+@check_eq_support
+@login_required
+@crossdomain(origin='*')
+def player_adjust_eq_preset():
+    if request.form.get('index'):
+        idx = int(request.form.get('index'))
+        if 0 <= idx < player.num_equalizer_presets:
+            return jsonify(player.set_equalizer_preset(idx))
+        else:
+            return jsonify({
+                'message': 'Equalizer preset index must be between 0 and %d'%(
+                    player.num_equalizer_presets - 1)
+            }), 400
+    return jsonify({'message': 'No equalizer preset index parameter'}), 400
+
+
+@app.route('/v1/player/equalizer/adjust_preamp', methods=['POST'])
+@check_eq_support
+@login_required
+@crossdomain(origin='*')
+def player_adjust_eq_preamp():
+    if request.form.get('level'):
+        lvl = float(request.form.get('level'))
+        if -20.0 <= lvl <= 20.0:
+            return jsonify(player.set_equalizer_preamp(lvl))
+        else:
+            return jsonify({'message':
+                'Equalizer preamp level must be between -20 dB and +20 dB'
+            }), 400
+    return jsonify({'message': 'No equalizer preamp level parameter'}), 400
+
+
+@app.route('/v1/player/equalizer/adjust_band', methods=['POST'])
+@check_eq_support
+@login_required
+@crossdomain(origin='*')
+def player_adjust_eq_band():
+    if not request.form.get('band'):
+        return jsonify({'message': 'No band index parameter'}), 400
+    if not request.form.get('level'):
+        return jsonify({'message': 'No band level parameter'}), 400
+    idx = int(request.form.get('band'))
+    lvl = float(request.form.get('level'))
+    if idx < 0 or idx >= player.num_equalizer_bands:
+        return jsonify({
+            'message': 'Equalizer band index must be between 0 and %d'%(
+                player.num_equalizer_bands - 1)
+        }), 400
+    if lvl < -20.0 or lvl > 20.0:
+        return jsonify({
+            'message': 'Equalizer band level must be between -20 dB and +20 dB'
+        }), 400
+    return jsonify(player.set_equalizer_band(idx, lvl))
 
 
 @app.route('/v1/songs/<song_id>', methods=['GET'])
@@ -159,6 +268,10 @@ def show_queue():
 @login_required
 @crossdomain(origin='*')
 def queue_remove(song_id):
+    audit_log.log(
+        get_username(request.form.get('token')),
+        'Removed song with id %d' % song_id
+    )
     return jsonify(scheduler.remove_song(song_id))
 
 
@@ -166,6 +279,10 @@ def queue_remove(song_id):
 @login_required
 @crossdomain(origin='*')
 def queue_clear():
+    audit_log.log(
+        get_username(request.form.get('token')),
+        'Cleared queue'
+    )
     return jsonify(scheduler.clear())
 
 
@@ -173,25 +290,22 @@ def queue_clear():
 @login_required
 @crossdomain(origin='*')
 def queue_add():
-    token = request.form.get('token')
-    if not AUTHENTICATION_ENABLED:
-        username = TEST_USERNAME
-    else:
-        session = user.get_session(token)
-        username = session.json()['user']['name']
+    username = get_username(request.form.get('token'))
     if request.form.get('id'):
         try:
             song_id = int(request.form.get('id'))
         except ValueError:
             return jsonify({'message': 'Invalid id'}), 400
+        audit_log.log(username, 'Added/voted for song with id %d' % song_id)
         try:
             return jsonify(scheduler.vote_song(username, song_id=song_id))
         except Exception, e:
             return jsonify({'message': str(e)}), 400
-    elif request.form.get('url'):
+    elif request.form.get('url'):  # youtube and soundcloud
         url = request.form.get('url')
+        audit_log.log(username, 'Added/voted for stream with url %s' % url)
         try:
-            return jsonify(scheduler.vote_song(username, video_url=url))
+            return jsonify(scheduler.vote_song(username, stream_url=url))
         except Exception, e:
             return jsonify({'message': str(e)}), 400
     return jsonify({'message': 'No id or url parameter'}), 400
@@ -214,6 +328,16 @@ def create_session():
     username = request.form.get('username')
     password = request.form.get('password')
     r = user.create_session(username, password)
+    if isinstance(r, BannedUser):
+        reason = r.reason or 'Not specified'
+        message = (
+            'You are banned. Please contact a Beats admin to be unbanned. '
+            'Reason: ' + reason
+        )
+        return jsonify({'message': message}), 403
+    elif r.status_code == 403:
+        return jsonify(
+            {'message': 'You must be an ACM member to use Beats.'}), 403
     return jsonify(r.json()), r.status_code
 
 

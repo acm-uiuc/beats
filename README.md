@@ -8,6 +8,10 @@ Setup
 
 First, install MySQL locally and start it. Create a database for Beats.
 
+```bash
+echo "CREATE DATABASE acoustics2;" | mysql
+```
+
 Set up a virtual Python environment for this project.
 
 ```bash

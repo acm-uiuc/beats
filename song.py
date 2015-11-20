@@ -1,8 +1,9 @@
 from config import config
 from db import Song, PlayHistory, Session, engine
+import art
 from os import walk
 import hashlib
-from os.path import splitext, join, isfile
+from os.path import split, splitext, join, isfile
 from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
 from mutagen.oggvorbis import OggVorbis
@@ -119,7 +120,7 @@ def add_songs_in_dir(path, store_checksum=False):
                     with open(filepath, 'rb') as song_file:
                         song_obj['checksum'] = md5_for_file(song_file)
 
-                try:  # Album optional for singles
+                try: # Album optional for singles
                     if ext in {'.m4a', '.mp4'}:
                         song_obj['album'] = song.tags['\xa9alb'][0]
                     else:
@@ -135,6 +136,10 @@ def add_songs_in_dir(path, store_checksum=False):
                             int(song.tags['tracknumber'][0]))
                 except Exception:
                     song_obj['tracknumber'] = None
+
+                # Album art added on indexing
+                if not art.get_art(song_obj['artist'], song_obj['album']):
+                    art.index_art(song_obj)
 
                 print 'Added: ' + filepath
                 conn.execute(table.insert().values(song_obj))
@@ -171,13 +176,13 @@ def get_albums_for_artist(artist):
     albums = []
     if artist:
         conn = engine.connect()
-        cols = [songs.c.album, func.count(songs.c.album).label('num_songs')]
+        cols = [songs.c.album, func.count(songs.c.album).label('num_songs'), songs.c.artist]
         s = (select(cols)
              .where(songs.c.artist == artist)
              .group_by(songs.c.album)
              .order_by(songs.c.album))
         res = conn.execute(s)
-        albums = [{'name': row[0], 'num_songs': row[1]} for row in res]
+        albums = [{'name': row[0], 'num_songs': row[1], 'art_uri': art.get_art(row[2], row[0])} for row in res]
         conn.close()
     return {'query': artist, 'results': albums}
 
@@ -191,7 +196,6 @@ def get_album(album):
         session.commit()
         songs = [song.dictify() for song in res]
     return {'query': album, 'results': songs}
-
 
 def get_history(limit=20):
     session = Session()

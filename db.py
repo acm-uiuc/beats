@@ -4,7 +4,9 @@ from sqlalchemy import Column, Integer, String, Unicode, Float, DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from config import config
+import art
 import datetime
+import urllib
 
 DATABASE_URL = config.get('Database', 'url')
 
@@ -18,9 +20,9 @@ class Song(Base):
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(Integer, primary_key=True)
-    title = Column(Unicode(100))
-    artist = Column(Unicode(100))
-    album = Column(Unicode(100))
+    title = Column(Unicode(200))
+    artist = Column(Unicode(200))
+    album = Column(Unicode(200))
     length = Column(Float)
     path = Column(Unicode(1000))
     tracknumber = Column(Integer)
@@ -34,7 +36,7 @@ class Song(Base):
                            passive_deletes=True, backref='songs')
 
     def mrl(self):
-        return 'file://' + self.path
+        return 'file://' + urllib.quote(self.path.encode('utf-8'))
 
     def dictify(self):
         return {
@@ -46,6 +48,7 @@ class Song(Base):
             'path': self.path,
             'tracknumber': self.tracknumber,
             'play_count': self.play_count(),
+            'art_uri': art.get_art(self.artist, self.album),
         }
 
     def play_count(self):
@@ -81,9 +84,12 @@ class Packet(Base):
     id = Column(Integer, primary_key=True)
     song_id = Column(Integer, ForeignKey('songs.id', ondelete='CASCADE'),
                      unique=True)
-    video_url = Column(String(100))
-    video_title = Column(Unicode(100))
-    video_length = Column(Float)
+    stream_url = Column(String(100))  # renamed from video_url
+    stream_title = Column(Unicode(100))  # renamed from video_title
+    stream_length = Column(Float)  # renamed from video_length
+    stream_id = Column(String(32))  # compatibility with soundcloud & youtube
+    art_uri = Column(String(100))  # compatibility with soundcloud & youtube
+    artist = Column(Unicode(100))  # compatibility with soundcloud
     user = Column(String(8))
     arrival_time = Column(Float)
     finish_time = Column(Float)
@@ -111,6 +117,24 @@ class Vote(Base):
                        primary_key=True)
     user = Column(String(8), primary_key=True)
 
+
+class AuditLogMessage(Base):
+    __tablename__ = 'audit_log'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    id = Column(Integer, primary_key=True)
+    user = Column(String(8))
+    message = Column(String(200))
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    player_name = Column(String(16))
+
+
+class BannedUser(Base):
+    __tablename__ = 'banned_users'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    username = Column(String(8), primary_key=True)
+    reason = Column(String(200))
 
 def init_db():
     Base.metadata.create_all(engine)

@@ -39,8 +39,10 @@ venv
 beats.cfg
 *.log
 *.pid
+static/art
 
 *.db
 *.swp
 .idea
 .sass-cache
+alembic/

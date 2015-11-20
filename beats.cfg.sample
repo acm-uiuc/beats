@@ -1,6 +1,9 @@
 [Player]
 player_name = 1104
 
+[SoundCloud]
+soundcloud_key = replace_me
+
 [Authentication]
 enabled = true
 test_username = testuser
@@ -12,3 +15,6 @@ password = replace_me
 
 [Database]
 url = mysql://root@localhost/acoustics2
+
+[Artwork]
+art_path = /static/art/
