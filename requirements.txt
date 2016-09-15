@@ -17,5 +17,4 @@ simplejson==3.8.1
 soundcloud==0.4.1
 SQLAlchemy==0.9.3
 Werkzeug==0.9.4
-wheel==0.24.0
-youtube-dl==2016.1.15
+youtube-dl==2016.9.15
